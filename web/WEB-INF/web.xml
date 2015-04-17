@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+		  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+           version="2.5">
+
+    <servlet>
+        <servlet-name>Init Application</servlet-name>
+        <servlet-class>com.nagornyi.uc.InitServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Init Application</servlet-name>
+        <url-pattern>/admin/initapplication</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AppController</servlet-name>
+        <servlet-class>com.nagornyi.uc.controller.AppController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AppController</servlet-name>
+        <url-pattern>/process</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LiqPayCallbackProcessor</servlet-name>
+        <servlet-class>com.nagornyi.uc.common.liqpay.LiqPayCallbackProcessor</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LiqPayCallbackProcessor</servlet-name>
+        <url-pattern>/lpCallback</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>sessioncleanup</servlet-name>
+        <servlet-class>com.google.apphosting.utils.servlet.SessionCleanupServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>sessioncleanup</servlet-name>
+        <url-pattern>/jobs/sessioncleanup</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>updaterates</servlet-name>
+        <servlet-class>com.nagornyi.uc.currency.UpdateCurrencyServlet</servlet-class>
+        <init-param>
+            <param-name>currencyLoader</param-name>
+            <param-value>bankUaCom</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>updaterates</servlet-name>
+        <url-pattern>/jobs/updaterates</url-pattern>
+    </servlet-mapping>
+
+    <security-role>
+        <role-name>admin</role-name>
+    </security-role>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>admin</web-resource-name>
+            <url-pattern>/admin/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>jsps</web-resource-name>
+            <url-pattern>/jsp/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>cron-jobs</web-resource-name>
+            <url-pattern>/jobs/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/404.html</location>
+    </error-page>
+</web-app>

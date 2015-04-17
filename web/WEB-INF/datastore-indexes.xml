@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<datastore-indexes
+        autoGenerate="true">
+    <datastore-index kind="Trip" ancestor="true" source="manual">
+        <property name="isForth" direction="asc"/>
+        <property name="startDate" direction="asc"/>
+    </datastore-index>
+    <datastore-index kind="Trip" ancestor="true" source="manual">
+        <property name="startDate" direction="asc"/>
+    </datastore-index>
+    <datastore-index kind="Ticket" ancestor="true" source="manual">
+        <property name="status" direction="asc"/>
+    </datastore-index>
+    <datastore-index kind="Ticket" ancestor="false" source="manual">
+        <property name="user" direction="asc"/>
+        <property name="startDate" direction="desc"/>
+    </datastore-index>
+</datastore-indexes>

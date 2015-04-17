@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Home</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/grid.css" type="text/css" media="screen">
+    <script src="js/jquery-1.7.1.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
+    <!--<script src="js/cufon-yui.js" type="text/javascript"></script>-->
+    <!--<script src="js/cufon-replace.js" type="text/javascript"></script>-->
+    <!--<script src="js/Vegur_500.font.js" type="text/javascript"></script>-->
+    <!--<script src="js/Ropa_Sans_400.font.js" type="text/javascript"></script> -->
+    <!--<script src="js/FF-cash.js" type="text/javascript"></script>-->
+    <!--<script src="js/tms-0.3.js" type="text/javascript"></script>-->
+    <!--<script src="js/tms_presets.js" type="text/javascript"></script>-->
+    <!--<script src="js/jquery.easing.1.3.js" type="text/javascript"></script>-->
+    <!--<script src="js/script.js" type="text/javascript"></script>-->
+    <script src="js/ng.js" type="text/javascript"></script>
+    <!--[if lt IE 8]>
+    <div style=' clear: both; text-align:center; position: relative;'>
+        <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+            <img src="http://storage.ie6countdown.com/assets/100/images/banners/warning_bar_0000_us.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today." />
+        </a>
+    </div>
+    <![endif]-->
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="js/html5.js"></script>
+    <link rel="stylesheet" href="css/ie.css" type="text/css" media="screen">
+    <![endif]-->
+</head>
+<body id="page1">
+<header>
+    <div class="border-bot">
+        <div class="main">
+            <h1 class="h1-header">
+                <a class="logo" href="index.html">Україна-Центр</a>
+                <div class="uc"></div>
+                <div class="header-right">
+                    <table>
+                        <tr class="register">
+                            <td>
+                                <a href="#" id="login" style="display: none;" class="italic">Вхід</a>
+                                <a href="#" id="cabinet" style="display: none;" class="italic">Вхід в кабінет</a>
+                            </td>
+                            <td>
+                                <a href="#" id="register" style="display: none;" class="italic">Зареєструватись</a>
+                                <a href="#" id="logout" style="display: none;" class="italic">Вихід</a>
+                            </td>
+                        </tr>
+                        <tr class="lang">
+                            <td style="min-width:60px;" id="currency-container">
+
+                            </td>
+                            <td>
+                                <a class="lang-italy" href="#"></a>
+                                <a class="lang-ukr" href="#"></a>
+                                <a class="lang-eng" href="#"></a>
+                                <a class="lang-rus" href="#"></a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </h1>
+            <nav>
+                <ul class="menu">
+                    <li><a href="index.html">Головна</a></li>
+                    <li><a class="active" href="schedule.html">Розклад</a></li>
+                    <li><a href="tickets.html">Квитки</a></li>
+                    <li><a href="leasing.html">Оренда</a></li>
+                    <li><a href="about.html">Про компанію</a></li>
+                </ul>
+            </nav>
+            <div class="clear"></div>
+        </div>
+    </div>
+
+</header>
+<section id="content">
+    <div class="main">
+        <div class="container_12">
+            <div class="wrapper">
+                <div class="center">
+                    <article>
+                        <h2>Кіровоград-Рим</h2>
+                        <ul class="list-1">
+                            <li>Відправлення з Кіровограду здійснюється кожен четвер об 11:30 з автовокзалу</li>
+                            <li>Відправлення з Риму - кожної неділі об 11:15 з автостанції Тібуртіна</li>
+                        </ul>
+                        <h3>Детальний розклад</h3>
+                        <table class="table table-bordered table-striped table-hover" style=" margin-bottom: 0px;">
+                            <tbody>
+                            <tr>
+                                <td>11:30, <i>четвер</i></td>
+                                <td><b>Кіровоград</b> (АС-1, Олександрійське шосе, 8)</td>
+                                <td>06:00, <i>вівторок</i></td>
+                            </tr>
+                            <tr>
+                                <td>13:30, <i>четвер</i></td>
+                                <td><b>Черкаси</b> (автовокзал, вул. Смілянська, 166а)</td>
+                                <td>04:15, <i>вівторок</i></td>
+                            </tr>
+                            <tr>
+                                <td>17:15, <i>четвер</i></td>
+                                <td><b>Київ</b> (АС "Дачна", проспект Перемоги, 142)</td>
+                                <td>00:30, <i>вівторок</i></td>
+                            </tr>
+                            <tr>
+                                <td>19:15, <i>четвер</i></td>
+                                <td><b>Житомир</b> (автовокзал, вул. Київська, 93)</td>
+                                <td>22:30, <i>понеділок</i></td>
+                            </tr>
+                            <tr>
+                                <td>22:00, <i>четвер</i></td>
+                                <td><b>Рівне</b> (автовокзал, вул. Київська, 40)</td>
+                                <td>19:45, <i>понеділок</i></td>
+                            </tr>
+                            <tr>
+                                <td>01:30, <i>п'ятниця</i></td>
+                                <td><b>Львів</b> (автовокзал, вул. Стрийська, 109)</td>
+                                <td>16:15, <i>понеділок</i></td>
+                            </tr>
+                            <tr>
+                                <td>05:30, <i>п'ятниця</i></td>
+                                <td><b>Чоп / Zagony</b> (UA/H)</td>
+                                <td>12:00, <i>понеділок</i></td>
+                            </tr>
+                            <tr>
+                                <td>13:30, <i>п'ятниця</i></td>
+                                <td><b>Tornyiszentmiklós / Pince</b> (H/SLO)</td>
+                                <td>02:00, <i>понеділок</i></td>
+                            </tr>
+                            <tr>
+                                <td>17:15, <i>п'ятниця</i></td>
+                                <td><b>Fernetiči / Fernetti</b> (SLO/І)</td>
+                                <td>22:15, <i>неділя</i></td>
+                            </tr>
+                            <tr>
+                                <td>19:15, <i>п'ятниця</i></td>
+                                <td><b>Mestre</b> (Viale Stazione)</td>
+                                <td>20:30, <i>неділя</i></td>
+                            </tr>
+                            <tr>
+                                <td>22:00, <i>п'ятниця</i></td>
+                                <td><b>Cesena</b> (Piazzale Karl Marx)</td>
+                                <td>17:45, <i>неділя</i></td>
+                            </tr>
+                            <tr>
+                                <td>00:30, <i>субота</i></td>
+                                <td><b>Perugia</b> (Piazza Vittorio Venetto)</td>
+                                <td>15:15, <i>неділя</i></td>
+                            </tr>
+                            <tr>
+                                <td>01:30, <i>субота</i></td>
+                                <td><b>Foligno</b> (Piazza della Stazzione)</td>
+                                <td>14:15, <i>неділя</i></td>
+                            </tr>
+                            <tr>
+                                <td>02:45, <i>субота</i></td>
+                                <td><b>Terni</b> (Piazza della Stazzione)</td>
+                                <td>13:00, <i>неділя</i></td>
+                            </tr>
+                            <tr>
+                                <td>04:00, <i>субота</i></td>
+                                <td><b>Roma</b> (autostazione Tiburtina)</td>
+                                <td>11:15, <i>неділя</i></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<footer>
+    <div class="main">
+        <div class="container_12">
+            <div class="wrapper">
+                <div class="grid_3">
+                    <div class="spacer-1">
+                        <a href="index.html"><img src="img/logo.png" alt="" style="height: 100px; margin-left: 60px;"></a>
+                    </div>
+                </div>
+                <div class="grid_5">
+                    <div class="indent-top2 spacer-1">
+                        <p class="footer-p">Контакти:</p>Київстар: +380 67 520 2556 <br>МТС: +380 99 289 8928 <br>Email: <a class="link italic" href="#">ukraina.centr@gmail.com</a>
+                    </div>
+                </div>
+                <div class="grid_4">
+                    <div class="indent-top2">
+                        <p class="footer-p">Designed by Ng</p>Phone: +3 8(093) 889 92 67 <br>Email: <a class="link italic" href="#">forartforces@gmail.com</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

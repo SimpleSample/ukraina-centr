@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
+  <application>ukraina-centr</application>
+  <version>1</version>
+  <threadsafe>true</threadsafe>
+  <sessions-enabled>true</sessions-enabled>
+
+    <admin-console>
+        <page name="Passengers" url="/admin/passengers.jsp" />
+        <page name="Users" url="/admin/users.jsp" />
+    </admin-console>
+    <resource-files>
+        <include path="/WEB-INF/templates/**.soy" />
+    </resource-files>
+</appengine-web-app>

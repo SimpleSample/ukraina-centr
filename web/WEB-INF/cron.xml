@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cronentries>
+    <cron>
+        <url>/jobs/sessioncleanup?clear</url>
+        <description>Session cleanup</description>
+        <schedule>every day 00:00</schedule>
+        <timezone>Europe/Kiev</timezone>
+    </cron>
+    <cron>
+        <url>/jobs/updaterates</url>
+        <description>Currency rates update</description>
+        <schedule>every day 12:10</schedule>
+        <timezone>Europe/Kiev</timezone>
+    </cron>
+</cronentries>
