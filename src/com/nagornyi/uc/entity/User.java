@@ -17,7 +17,6 @@ import java.util.Locale;
 public class User extends NamedEntity implements Serializable {
 
     private String name;
-    private String secondName;
     private String surname;
     private String email;
     private String phone;
@@ -40,20 +39,18 @@ public class User extends NamedEntity implements Serializable {
         super(parentKey);
     }
 
+    public String getUsername() {
+        String username = getName();
+        if (getSurname() != null) username += " " + getSurname();
+        return username;
+    }
+
     public String getPassword() {
         return getProperty("password");
     }
 
     public void setPassword(String password) {
         setProperty("password", password);
-    }
-
-    public String getSecondName() {
-        return getProperty("secondName");
-    }
-
-    public void setSecondName(String secondName) {
-        setProperty("secondName", secondName);
     }
 
     public String getSurname() {

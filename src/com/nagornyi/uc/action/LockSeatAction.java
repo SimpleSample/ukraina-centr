@@ -21,7 +21,7 @@ import static com.nagornyi.uc.Constants.*;
  * Date: 09.06.14
  */
 @Authorized
-public class LockTicketAction implements Action {
+public class LockSeatAction implements Action {
 
     @Override
     public void perform(ActionRequest req, ActionResponse resp) throws JSONException {
@@ -37,7 +37,7 @@ public class LockTicketAction implements Action {
         ticket.setUser(req.getUser());
 
         ITicketDAO dao = DAOFacade.getDAO(Ticket.class);
-        if (dao.sameTicketExists(ticket)) throw new UserFriendlyException("На жаль, цей квиток вже заброньовано");
+        if (dao.sameTicketExists(ticket)) throw new UserFriendlyException("На жаль, цей квиток вже придбано");
 
         dao.lockTicket(ticket);
 
@@ -46,7 +46,7 @@ public class LockTicketAction implements Action {
         resp.setDataObject(responseObj);
 
         if (req.getParam(UNLOCK_TICKET_ID) != null) {
-            dao.pollLockedTicket(tripId, (String)req.getParam(UNLOCK_TICKET_ID));
+            dao.revealLockedTicket(tripId, (String) req.getParam(UNLOCK_TICKET_ID));
         }
     }
 }

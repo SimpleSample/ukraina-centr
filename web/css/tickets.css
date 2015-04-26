@@ -16,51 +16,48 @@ input#forth-date, input#back-date {
 }
 
 /*bus popup*/
-div.bus table {
+.bus-scheme {
+    border: 2px solid #727272;
+    padding: 20px 10px 10px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+}
+
+.bus-scheme table {
     background: white;
 }
-div.bus table td a, div.bus table td span {
+.bus-scheme table td a, .bus-scheme table td span {
     padding: 10px 20px;
     display: block;
     text-decoration: none;
     color: white;
+    border-radius: 10px;
+    text-align: center;
 }
-div.bus table td a {
+.bus-scheme table td a {
     background-color: #8CC314;
 }
-div.bus table td a:hover {
+.bus-scheme table td a:hover {
     background-color: #C4F35E;
 }
-div.bus table td a.blocked {
-    background-color: rgb(114, 114, 114);
+.bus-scheme table td a.blocked {
+    background-color: #727272;
+    cursor: default;
 }
-div.bus table td a.active {
+.bus-scheme table td a.active {
     background-color: rgb(218, 126, 18);
-}
-div.bus {
-    box-shadow: 1px 3px 5px #000000;
-}
-.popup-self.black.popup-bus {
-    width: auto;
-}
-
-.popup-bus .btn {
-    margin-top: 10px;
 }
 
 /*trip items*/
 .trip {
     padding: 10px;
-    display: inline-block;
-    width: 98%;
     border-top: 1px solid #A2A2A2;
     border-bottom: 1px solid #A2A2A2;
-    margin: 2px -4px;
+    margin: 2px 0;
     background-color: rgba(145, 145, 145, 0.4);
 }
 
 .trip h4 {
-    font-style: italic;
     font-weight: 100;
     display: inline-block;
 }
@@ -114,10 +111,8 @@ div.bus {
 }
 
 .trip-info {
-    display: inline-block;
     float: left;
-    font-size: 0.9em;
-    line-height: 1.6em;
+    line-height: 1.4em;
     color: #707070;
     padding-left: 20px;
 }
@@ -125,11 +120,10 @@ div.bus {
 .direction, .tickets-title {
     font-size: 24px;
     padding: 8px;
-    font-weight: 900;
+    font-weight: 700;
 }
 
 .buy {
-    display: inline-block;
     float: right;
     margin-top: -8px;
     margin-bottom: 12px;
@@ -146,14 +140,12 @@ div.bus {
 
 /* results + ticket boards interaction*/
 .order-board {
-    display: inline-block;
-    width: 100%;
+    width: 1300px;
+    overflow: hidden;
 }
 .results {
-    padding: 10px 10px 10px 8px;
+    padding: 10px 0;
     width: 840px;
-    margin-left: 10px;
-    overflow:hidden;
     -webkit-transition: width 0.7s ease-in-out;
     -moz-transition: width 0.7s ease-in-out;
     -o-transition: width 0.7s ease-in-out;
@@ -163,27 +155,28 @@ div.bus {
 }
 
 .ticket-board {
-    width: 0%;
-    overflow: hidden;
-    -webkit-transition: width 0.7s ease-in-out;
-    -moz-transition: width 0.7s ease-in-out;
-    -o-transition: width 0.7s ease-in-out;
-    transition: width 0.7s ease-in-out;
+    width: 400px;
     display: inline-block;
     background-color: rgba(145, 145, 145, 0.4);
     white-space: nowrap;
+    padding: 10px 0;
+    margin-left: 6px;
+}
+
+.order-board .results {
+    width: 880px;
 }
 
 .order-board.board-wide .results {
-    width: 440px;
+    width: 470px;
 }
-.order-board.board-wide .ticket-board {
-    width: 400px;
+
+.order-board-wrapper {
+    overflow: hidden;
 }
 
 /*price*/
 .price {
-    padding: 10px;
     position: absolute;
     top: 12px;
     right: 10px;
@@ -198,22 +191,35 @@ span.price-self {
     padding-left: 2px;
 }
 
+.price .price-right {
+    float: right;
+}
+
 /*tickets*/
 
+select.change-currency {
+    float: right;
+    margin-right: 8px;
+    font-size: 20px;
+    height: 30px;
+}
+
+.tickets-title {
+    float: left;
+}
+
+.ticket-area {
+    padding: 0 8px;
+}
+
 .ticket {
+    z-index: 2;
     padding: 5px;
-    width: 380px;
     background-color: rgba(185, 185, 185, 1);
     border: 1px solid #A2A2A2;
-    margin: 2px -4px;
     position: relative;
-    display: block;
-    float: left;
     -moz-box-shadow: 0px 0px 5px #939493;
     -webkit-box-shadow: 0px 0px 5px #939493;
-    z-index: 2;
-    -moz-transition: all 0.3s ease-in-out;
-    -webkit-transition: all 0.3s ease-in-out;
 }
 
 .ticket.card {
@@ -235,44 +241,37 @@ span.price-self {
 }
 
 .ticket-row .ticket-input {
-    background-color: rgba(255, 255, 255, 0);
-    border-top: none;
-    border-right: none;
-    font-style: italic;
     margin-top: 10px;
-    border-left: 1px solid #797979;
-    border-bottom: 1px solid #797979;
 }
 
 .ticket-input::-webkit-input-placeholder { /* WebKit browsers */
-	color:    #8B8B8B;
+    color:    #8B8B8B;
 }
 .ticket-input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-	color:    #8B8B8B;
-	opacity:  1;
+    color:    #8B8B8B;
+    opacity:  1;
 }
 .ticket-input::-moz-placeholder { /* Mozilla Firefox 19+ */
-	color:    #8B8B8B;
-	opacity:  1;
+    color:    #8B8B8B;
+    opacity:  1;
 }
 .ticket-input:-ms-input-placeholder { /* Internet Explorer 10+ */
-	color:    #8B8B8B;
+    color:    #8B8B8B;
 }
 
 .ticket-input.username {
-    width: 60%;
+    width: 250px;
     font-size: 1.4em;
-    height: 1.9em;
+    height: 2em;
 }
 
 .ticket-input.phone {
-    height: 1.4em;
-    font-size: 1.2em;
-    width: 120px;
+    height: 1.6em;
+    width: 115px;
 }
 
 .ticket-input.phone.second {
-    margin-left: 8px;
+    margin-left: 10px;
     border-left: none;
 }
 
@@ -290,16 +289,14 @@ span.price-self {
     padding-bottom: 6px;
 }
 .forth-info, .back-info {
-    display: inline-block;
-    width: 70%;
+    float: left;
 }
 .forth-info .btn {
     width: 50%;
 }
 .ticket-row .btn.btn-green.light {
-    display: inline-block;
-    width: 30%;
     margin-top: 5px;
+    float: right;
 }
 div.price-label {
     padding: 0;
@@ -309,7 +306,8 @@ div.price-label {
 }
 .ticket-row.info-header {
     padding-top: 10px;
-    font-weight: 900;  margin-left: 16px;
+    font-weight: 900;
+    margin-left: 16px;
 }
 
 .button-area .btn {
@@ -318,12 +316,6 @@ div.price-label {
     margin-left: 7px;
     margin-top: 10px;
     margin-bottom: 10px;
-}
-.tickets-title {
-    margin-top: 10px;
-}
-.ticket-area {
-    margin: 0 8px;
 }
 
 .ticket-title span {
@@ -340,14 +332,17 @@ div.price-label {
     font-size: 24px;
 }
 select.ticket-input.select {
-    border-radius: 0;
-    border-bottom: none;
-    border-left: none;
-    height: 1.4em;
+    height: 1.6em;
+    width: 260px;
+    background-color: #fff;
 }
 div.ticket-row.forth {
     padding-top: 14px;
 }
-.ticket-input  option.empty-item {
+.ticket-input option.empty-item {
     color: #A07979;
+}
+
+.trips {
+    padding: 0 8px;
 }

@@ -33,6 +33,13 @@ public class Trip extends EntityWrapper {
         setSeatsNum(seatsNum);
     }
 
+    public String getTripName() {
+        String startCity = getRoute().getFirstCity().getName();
+        String endCity = getRoute().getLastCity().getName();
+
+        return isForth()? startCity + " - " + endCity : endCity + " - " + startCity;
+    }
+
     public boolean isForth() {
         return getProperty("forth");
     }

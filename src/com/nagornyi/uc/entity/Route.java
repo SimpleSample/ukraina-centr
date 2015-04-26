@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * It is supposed that Route is one for every week
+ *
  * @author Nagorny
  * Date: 12.05.14
  */
@@ -116,6 +118,10 @@ public class Route extends EntityWrapper {
 
     public void setLastLinkKey(Key lastLinkKey) {
         setProperty("lastLinkKey", lastLinkKey);
+    }
+
+    public String getRouteName() {
+        return getFirstCity().getName() + " - " + getLastCity().getName();
     }
 
     public City getFirstCity() {

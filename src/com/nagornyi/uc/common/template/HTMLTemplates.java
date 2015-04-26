@@ -100,7 +100,7 @@ public class HTMLTemplates {
         }
 
         SoyMapData data = new SoyMapData();
-        data.put("username", user.getName() + " " +user.getSurname());
+        data.put("username", user.getUsername());
         data.put("tickets", ticketsSoy);
         data.put("price", eurSummaryPrice);
         data.put("realPrice", summaryPrice);

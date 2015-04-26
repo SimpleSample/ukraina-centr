@@ -28,7 +28,7 @@ public class ActionStorage {
         ACTIONS.put("orderExists", OrderExistsAction.class);
         ACTIONS.put("welcome", WelcomeAction.class);
         ACTIONS.put("allTickets", GetAllTicketsAction.class);
-        ACTIONS.put("lockTicket", LockTicketAction.class);
+        ACTIONS.put("lockSeat", LockSeatAction.class);
         ACTIONS.put("ticketsForTrip", TicketsForTripAction.class);
         ACTIONS.put("addUser", AddUserAction.class);
         ACTIONS.put("removeTicket", RemoveTicketAction.class);

@@ -3,6 +3,7 @@ package com.nagornyi.uc.common;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * @author Nagornyi
@@ -16,6 +17,8 @@ public class DateFormatter {
 	}
 
 	public static String defaultFormat(Date date) {
-		return new SimpleDateFormat("d MMMM, yyyy kk:mm", UK_LOCALE).format(date);
+        SimpleDateFormat formatter = new SimpleDateFormat("d MMMM, yyyy kk:mm", UK_LOCALE);
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+		return formatter.format(date);
 	}
 }

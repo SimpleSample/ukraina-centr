@@ -17,8 +17,7 @@ public class FailedOrderTemplate {
     }
 
     private static String get(User user, String orderType) {
-        String name = user.getName();
-        if (user.getSurname() != null) name += " " + user.getSurname();
+        String name = user.getUsername();
 
         return "<table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"640\">\n" +
                 "    <tbody>\n" +

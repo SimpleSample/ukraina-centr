@@ -24,7 +24,7 @@ public interface ITicketDAO extends DAO<Ticket> {
 
     void lockTicket(Ticket ticket);
 
-    Ticket pollLockedTicket(String tripId, String ticketId);
+    Ticket revealLockedTicket(String tripId, String ticketId);
 
     Ticket createReservedTicket(String ticketId, Trip trip, Seat seat, String passenger, String phone1, String phone2, User user,
                                 String startCityId, String endCityId, Date startDate, boolean isPartial, DiscountCategory category, Order order);

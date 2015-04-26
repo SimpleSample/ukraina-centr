@@ -26,6 +26,8 @@ public class BusHelper {
                 seat.setSeatNum(i + letter);
                 if (i == 1 || i == 2) {
                     seat.setInitiallyBlocked(true);
+                } else {
+                    seat.setInitiallyBlocked(false);
                 }
                 seats.add(seat);
             }

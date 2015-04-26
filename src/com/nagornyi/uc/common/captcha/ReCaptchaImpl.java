@@ -15,6 +15,8 @@
  */
 package com.nagornyi.uc.common.captcha;
 
+import com.google.appengine.labs.repackaged.org.json.JSONException;
+import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import com.nagornyi.uc.common.captcha.http.HttpLoader;
 import com.nagornyi.uc.common.captcha.http.SimpleHttpLoader;
 
@@ -22,41 +24,20 @@ import java.net.URLEncoder;
 import java.util.Enumeration;
 import java.util.Properties;
 
-public class ReCaptchaImpl implements ReCaptcha {
+public class ReCaptchaImpl {
 
-	public static final String PROPERTY_THEME = "theme";
-	public static final String PROPERTY_TABINDEX = "tabindex";
-	
-	public static final String HTTP_SERVER = "http://api.recaptcha.net";
-	public static final String HTTPS_SERVER = "https://api-secure.recaptcha.net";
-	public static final String VERIFY_URL = "http://api-verify.recaptcha.net/verify";
-	
+	public static final String VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
+
 	private String privateKey;
-	private String publicKey;
-	private String recaptchaServer = HTTP_SERVER;
-	private boolean includeNoscript = false;
 	private HttpLoader httpLoader = new SimpleHttpLoader();
-	
+
 	public void setPrivateKey(String privateKey) {
 		this.privateKey = privateKey;
 	}
-	public void setPublicKey(String publicKey) {
-		this.publicKey = publicKey;
-	}
-	public void setRecaptchaServer(String recaptchaServer) {
-		this.recaptchaServer = recaptchaServer;
-	}
-	public void setIncludeNoscript(boolean includeNoscript) {
-		this.includeNoscript = includeNoscript;
-	}
-	public void setHttpLoader(HttpLoader httpLoader) {
-		this.httpLoader  = httpLoader;
-	}
 
-	public ReCaptchaResponse checkAnswer(String remoteAddr, String challenge, String response) {
-
-		String postParameters = "privatekey=" + URLEncoder.encode(privateKey) + "&remoteip=" + URLEncoder.encode(remoteAddr) +
-			"&challenge=" + URLEncoder.encode(challenge) + "&response=" + URLEncoder.encode(response);
+	public ReCaptchaResponse checkAnswer(String remoteAddr, String response) {
+		String postParameters = "secret=" + URLEncoder.encode(privateKey) + "&remoteip=" + URLEncoder.encode(remoteAddr) +
+			"&response=" + URLEncoder.encode(response);
 
 		String message = httpLoader.httpPost(VERIFY_URL, postParameters);
 
@@ -64,85 +45,20 @@ public class ReCaptchaImpl implements ReCaptcha {
 			return new ReCaptchaResponse(false, "Null read from server.");
 		}
 
-		String[] a = message.split("\r?\n");
-		if (a.length < 1) {
-			return new ReCaptchaResponse(false, "No answer returned from recaptcha: " + message);
-		}
-		boolean valid = "true".equals(a[0]);
-		String errorMessage = null;
-		if (!valid) {
-			if (a.length > 1)
-				errorMessage = a[1];
-			else
-				errorMessage = "recaptcha4j-missing-error-message";
-		}
-		
-		return new ReCaptchaResponse(valid, errorMessage);
-	}
+        Boolean success = false;
+        String errorMessage = null;
+        try {
+            JSONObject captchaResponse = new JSONObject(message);
+            success = captchaResponse.getBoolean("success");
+        } catch (JSONException e) {
+            try {
+                JSONObject captchaResponse = new JSONObject(message);
+                errorMessage = captchaResponse.getString("error-codes");
+            } catch (JSONException e1) {
+                return new ReCaptchaResponse(false, "Could not parse response: " + message);
+            }
+        }
 
-	public String createRecaptchaHtml(String errorMessage, Properties options) {
-
-		String errorPart = (errorMessage == null ? "" : "&amp;error=" + URLEncoder.encode(errorMessage));
-
-		String message = fetchJSOptions(options);
-
-		message += "<script type=\"text/javascript\" src=\"" + recaptchaServer + "/challenge?k=" + publicKey + errorPart + "\"></script>\r\n";
-
-		if (includeNoscript) {
-			String noscript = "<noscript>\r\n" + 
-					"	<iframe src=\""+recaptchaServer+"/noscript?k="+publicKey + errorPart + "\" height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\r\n" + 
-					"	<textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\"></textarea>\r\n" + 
-					"	<input type=\"hidden\" name=\"recaptcha_response_field\" value=\"manual_challenge\">\r\n" + 
-					"</noscript>";
-			message += noscript;
-		}
-		
-		return message;
-	}
-	
-	public String createRecaptchaHtml(String errorMessage, String theme, Integer tabindex) {
-
-		Properties options = new Properties();
-
-		if (theme != null) {
-			options.setProperty(PROPERTY_THEME, theme);
-		}
-		if (tabindex != null) {
-			options.setProperty(PROPERTY_TABINDEX, String.valueOf(tabindex));
-		}
-
-		return createRecaptchaHtml(errorMessage, options);
-	}
-
-	/**
-	 * Produces javascript array with the RecaptchaOptions encoded.
-	 * 
-	 * @param properties
-	 * @return
-	 */
-	private String fetchJSOptions(Properties properties) {
-
-		if (properties == null || properties.size() == 0) {
-			return "";
-		}
-
-		String jsOptions =
-			"<script type=\"text/javascript\">\r\n" + 
-			"var RecaptchaOptions = {";
-			
-		for (Enumeration e = properties.keys(); e.hasMoreElements(); ) {
-			String property = (String) e.nextElement();
-			
-			jsOptions += property + ":'" + properties.getProperty(property)+"'";
-			
-			if (e.hasMoreElements()) {
-				jsOptions += ",";
-			}
-			
-		}
-
-		jsOptions += "};\r\n</script>\r\n";
-
-		return jsOptions;
+		return new ReCaptchaResponse(success, errorMessage);
 	}
 }

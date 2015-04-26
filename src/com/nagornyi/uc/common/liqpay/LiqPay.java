@@ -16,10 +16,10 @@ public class LiqPay {
     private static String result_url = "http://www.ukraina-centr.com/tickets.html?orderId=";
     private static String server_url = "http://www.ukraina-centr.com/lpCallback";
     private static String language = "ru";
-    private static String sandbox = "0"; // TODO make it config
+    private static String sandbox = "1"; // TODO make it config
     private static String type = "buy";
-    private static String currency = "UAH";
-    private static String description = "Оплата бронювання квитків на сайті www.ukraina-centr.com";
+    private static String currency = "EUR"; // USD, EUR, RUB, UAH
+    private static String description = "Оплата квитків на сайті www.ukraina-centr.com";
 
     public LiqPay() {}
 
@@ -29,11 +29,10 @@ public class LiqPay {
         host = url;
     }
 
-    public static JSONObject getLiqPayReservationJSON(int ticketsNumber, String orderId) throws JSONException {
+    public static JSONObject getLiqPayReservationJSON(double price, String orderId) throws JSONException {
         JSONObject responseObj = new JSONObject();
-        int forOne = 200; // TODO make it config
 
-        HashMap<String, String> liqpayParams = getLiqPayParams(forOne * ticketsNumber, currency, description, orderId);
+        HashMap<String, String> liqpayParams = getLiqPayParams(price, currency, description, orderId);
         for(String param: liqpayParams.keySet()) {
             responseObj.put(param, liqpayParams.get(param));
         }
@@ -92,6 +91,7 @@ public class LiqPay {
 
     public static HashMap<String, String> getLiqPayParams(double amount, String currency, String description, String orderId) {
         HashMap<String, String> params = new HashMap<String, String>();
+        if (sandbox.equals("1")) amount = 5;
         params.put("amount", ""+amount);
         params.put("currency", currency);
         params.put("description", description);

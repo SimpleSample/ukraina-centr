@@ -19,6 +19,7 @@ import com.nagornyi.uc.util.StringUtils;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 import static com.nagornyi.uc.Constants.*;
 
@@ -28,6 +29,7 @@ import static com.nagornyi.uc.Constants.*;
  */
 @Authorized
 public class OrderAction implements Action {
+    private static Logger log = Logger.getLogger(OrderAction.class.getName());
 
     @Override
     public void perform(ActionRequest req, ActionResponse resp) throws JSONException {
@@ -39,6 +41,7 @@ public class OrderAction implements Action {
             User user = req.getUser();
             Order order = new Order(user);
             DAOFacade.save(order);
+            log.info("Processing order for user " + user.getUsername());
             ReservationResult result = reserve(orderObj, user, order);
             if (result.hasAnyFailed()) {
                 throw new UserFriendlyException(processFailed(result, req.getLocale()));
@@ -48,7 +51,12 @@ public class OrderAction implements Action {
                     order.setStatus(Order.Status.SUCCESS);
                     MailFacade.sendSuccessfulReservation(user, result.getAllTickets());
                 } else {
-                    JSONObject liqPayParams = LiqPay.getLiqPayReservationJSON(result.getAllTickets().size(), order.getStringKey());
+                    double resultPrice = 0;
+                    for (Ticket ticket: result.getAllTickets()) {
+                        resultPrice += ticket.getCalculatedPrice();
+                    }
+                    log.info("Calculated price for order " + resultPrice);
+                    JSONObject liqPayParams = LiqPay.getLiqPayReservationJSON(resultPrice, order.getStringKey());
                     resp.setDataObject(liqPayParams);
                 }
                 DAOFacade.save(order);
@@ -66,9 +74,10 @@ public class OrderAction implements Action {
         ReservationResult result = new ReservationResult(forthTrip, backTrip);
         ITicketDAO dao = DAOFacade.getDAO(Ticket.class);
 
-        JSONArray tickets = orderObj.getJSONArray("tickets");
-        for (int i = 0, size = tickets.length(); i < size; i++) {
-            JSONObject ticketObj = tickets.getJSONObject(i);
+        JSONObject tickets = orderObj.getJSONObject("tickets");
+        JSONArray ticketIds = tickets.names();
+        for (int i = 0, size = ticketIds.length(); i < size; i++) {
+            JSONObject ticketObj = tickets.getJSONObject(ticketIds.getString(i));
 
             String passenger = ticketObj.getString("passenger");
             String phone1 = ticketObj.has("phone1")? ticketObj.getString("phone1") : null;
@@ -123,7 +132,7 @@ public class OrderAction implements Action {
             resultString += failedTicketsToString(result.getBackFailedTickets(), backTrip, locale);
         }
 
-        resultString += " вже заброньовані";
+        resultString += " вже придбані";
         return resultString;
     }
 

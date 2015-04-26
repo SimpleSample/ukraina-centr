@@ -89,7 +89,9 @@ public class RouteCache extends EntityCache {
     @Override
     public void fillCache() {
         List<Route> routes = DAOFacade.findAll(Route.class);
+        log.info("Filling routes cache");
         for (Route route: routes) {
+            log.info("loading route " + route.getFirstCity().getName() + " - " + route.getLastCity().getName());
             List<RouteLink> result = new ArrayList<RouteLink>();
             RouteLink first = DAOFacade.findByKey(RouteLink.class, route.getFirstLinkKey());
             //caching properties
@@ -116,6 +118,7 @@ public class RouteCache extends EntityCache {
                 result.add(next);
                 next = next.getNext();
             }
+            log.info("loaded " + result.size() + " route links");
             route.setRouteLinks(result);
             RouteCache.routes.add(route);
         }

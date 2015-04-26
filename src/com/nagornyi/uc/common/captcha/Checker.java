@@ -4,14 +4,16 @@ import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import com.nagornyi.uc.transport.ActionRequest;
 
+import java.util.logging.Logger;
+
 /**
  * @author Nagornyi
  * Date: 5/27/14
  */
 public class Checker {
+    private static Logger log = Logger.getLogger(Checker.class.getName());
 
 	public static boolean isCaptchaValid(ActionRequest req) throws JSONException {
-		JSONObject captchaObj = new JSONObject((String)req.getParam("captcha"));
 		String ipAddress = req.getHeader("X-FORWARDED-FOR");
 		if (ipAddress == null) {
 			ipAddress = req.getRemoteAddr();
@@ -19,9 +21,12 @@ public class Checker {
 		ReCaptchaImpl reCaptcha = new ReCaptchaImpl();
 		reCaptcha.setPrivateKey("6LfUKfQSAAAAAIRN5UWWlwfJ-UAZ6Q2OnL-BiL7f");
 
-		String challenge = captchaObj.getString("challenge");
-		String uresponse = captchaObj.getString("response");
-		ReCaptchaResponse reCaptchaResponse = reCaptcha.checkAnswer(ipAddress, challenge, uresponse);
+		String uresponse = req.getParam("captcha");
+		ReCaptchaResponse reCaptchaResponse = reCaptcha.checkAnswer(ipAddress, uresponse);
+
+        if (!reCaptchaResponse.isValid()) {
+            log.warning("Captcha validation failed: " + reCaptchaResponse.getErrorMessage());
+        }
 
 		return reCaptchaResponse.isValid();
 	}

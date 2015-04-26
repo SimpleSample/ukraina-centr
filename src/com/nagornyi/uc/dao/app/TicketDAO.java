@@ -2,6 +2,7 @@ package com.nagornyi.uc.dao.app;
 
 import com.google.appengine.api.datastore.*;
 import com.nagornyi.uc.cache.TicketCache;
+import com.nagornyi.uc.common.DateFormatter;
 import com.nagornyi.uc.common.DiscountCalculator;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.IPriceDAO;
@@ -12,12 +13,14 @@ import com.nagornyi.uc.entity.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author Nagorny
  * Date: 22.05.14
  */
 public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
+    private static Logger log = Logger.getLogger(TicketDAO.class.getName());
 
     @Override
     protected Ticket createDAOEntity(Entity entity) {
@@ -98,12 +101,14 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
     }
 
     @Override
-    public Ticket pollLockedTicket(String tripId, String ticketId) {
-        return TicketCache.pollLockedTicket(tripId, ticketId);
+    public Ticket revealLockedTicket(String tripId, String ticketId) {
+        return TicketCache.revealLockedTicket(tripId, ticketId);
     }
 
     public Ticket createReservedTicket(String ticketId, Trip trip, Seat seat, String passenger, String phone1, String phone2, User user,
                                String startCityId, String endCityId, Date startDate, boolean isPartial, DiscountCategory category, Order order) {
+        log.info("\tCreating ticket, trip: " + trip.getTripName()+ "("+ DateFormatter.defaultFormat(startDate)+"), seat: " +
+                seat.getSeatNum() + ", passenger: " + passenger);
         Ticket ticket;
         if (ticketId == null) {
             ticket = new Ticket(trip);
@@ -111,8 +116,11 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
             ticket.setUser(user);
         } else {
             ITicketDAO dao = DAOFacade.getDAO(Ticket.class);
-            ticket = dao.pollLockedTicket(trip.getStringKey(), ticketId);
-            if (ticket == null) return null;
+            ticket = dao.revealLockedTicket(trip.getStringKey(), ticketId);
+            if (ticket == null) {
+                log.warning("Could not find ticket " + ticketId + " in cache");
+                return null;
+            }
         }
 
         ticket.setPassenger(passenger);
@@ -129,6 +137,7 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
         ticket.setPartial(isPartial);
 
         double resultPrice = getPrice(startCityId, endCityId, user, category, isPartial);
+        log.info("Calculated price for ticket " + resultPrice);
         ticket.setCalculatedPrice(resultPrice);
 
         if (order != null) ticket.setOrder(order);

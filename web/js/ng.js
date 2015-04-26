@@ -1,6 +1,13 @@
 (function(){
     window.uc = {};
 
+    location.getParam = function (name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results == null ? null : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+
     $(document).on('ready', function() {
         var user = cookies.get('name');
         if (user) {
@@ -39,12 +46,8 @@
     });
 
     function showCurrencyWidget(rate) {
-        if (rate) {
-            window.EURUAH = (rate.toFixed(2));
-            $('#currency-container').append(uc.currencyWidget(EURUAH));
-        } else {
-            $('#currency-container').append(16.09);
-        }
+        window.EURUAH = rate? rate.toFixed(2) : 24.15;
+        $('#currency-container').append(uc.currencyWidget(EURUAH));
     }
 
     function showUpperRightMenu(isLoggedIn) {
@@ -80,17 +83,14 @@
     };
 
     window.register = function(callback) {
-        var  content = window.uc.registerTemplate;
-        var popup = new Popup('Реєстрація', content, 'black', function(popupId) { //TODO localize
-			Recaptcha.create("6LfUKfQSAAAAAN_RtEDkPQnIn9sT5YS0Kp9yK__1",
-				"captcha-form",
-				{
-					theme: 'white',
-					callback: Recaptcha.focus_response_field
-				}
-			);
+        var content = window.uc.registerTemplate;
+        var popup = new Popup('Реєстрація', content, '', function(popupId) { //TODO localize
+            var captchaWidgetId = grecaptcha.render(
+                'captcha-form',
+                {sitekey:"6LfUKfQSAAAAAN_RtEDkPQnIn9sT5YS0Kp9yK__1", theme: 'light'}
+            );
 
-            $(popupId + ' .btn-register').on('click', function(event){
+            $(popupId + ' #btn-register').on('click', function(event){
                 event.preventDefault();
                 var data = {};
                 $(popupId + ' .forms input').each(function(index, element){
@@ -117,12 +117,8 @@
                     new Message(errors, 10000);
                     return false;
                 }
-				var captcha = {
-					challenge: $('[name=recaptcha_challenge_field]').val(),
-					response: $('[name=recaptcha_response_field]').val()
-				};
 
-				data['captcha'] = JSON.stringify(captcha);
+				data['captcha'] = grecaptcha.getResponse(captchaWidgetId);
 
                 var req = new Request('reg', data);
                 req.send(function(data){
@@ -134,12 +130,12 @@
             });
         });
         popup.show();
-    }
+    };
 
     window.login = function(callback) {
         var  content = window.uc.loginTemplate;
-        var popup = new Popup('Вхід', content, 'black', function(popupId) { //TODO localize
-            $(popupId + ' .btn-login').on('click', function(event){
+        var popup = new Popup('Вхід', content, '', function(popupId) { //TODO localize
+            $(popupId + ' #btn-login').on('click', function(event){
                 event.preventDefault();
                 var data = {};
                 $(popupId + ' .forms input').each(function(index, element){
@@ -159,7 +155,6 @@
     }
 
     function onAuthorized(data) {
-        console.log(data);
 		document.cookie = "user=" + data['name'];
 		document.cookie = "name=" + data['name'] + ' ' + data['surname'];
 		document.cookie = "pass=" + data['pass'];
@@ -176,11 +171,11 @@
         });
     }
 
-    window.getDateField = function (inputEl, selectFunc) {
+    window.getDateField = function ($input, selectFunc) {
         var now = new Date();
         var maxDate = new Date(now.getTime() + 3*30*24*60*60*1000);
         return new Pikaday({
-            field: inputEl,
+            field: $input[0],
             firstDay:1,
             defaultDate: now,
             minDate: now,
@@ -235,9 +230,9 @@
             popupZindex = popupZindex + 2;
             this.$popupWrapper = $('<div id="popup-'+this.id+'"></div>');
             this.$popupWrapper.append($('<div class="popup-back dark-op" style="width:'+$(document).width()+'px; height:'+$(document).height()+'px; z-index:'+wrapperZindex+'"></div>'));
-            this.$popup = $('<div class="popup-self ' + this.styles + ' noise" style="left: '+getPopupLeft()+'px; z-index:'+popupZindex+'"></div>');
+            this.$popup = $('<div class="popup-self ' + this.styles + '" style="left: '+getPopupLeft()+'px; z-index:'+popupZindex+'"></div>');
             this.$popupWrapper.append(this.$popup);
-            this.$popup.append($('<div class="popup-header noise"><span class="popup-title">'+this.title+'</span><a href="#" class="popup-close"></a></div>'));
+            this.$popup.append($('<div class="popup-header"><span class="popup-title">'+this.title+'</span><div class="popup-close-block"><a href="#" class="popup-close"></a></div></div>'));
             this.$popupContent = $('<div class="popup-content"><div class="message-container"></div></div>');
             this.$popupContent.append($(this.innerHTML));
             this.$popup.append(this.$popupContent);
@@ -245,7 +240,7 @@
             var that = this;
             $('#popup-'+this.id + ' .popup-close').on('click', function(event) {event.preventDefault(); that.destroy(); return false;});
 
-            if (!this.wasShown && this.onCreated) this.onCreated('#popup-'+this.id);
+            if (!this.wasShown && this.onCreated) this.onCreated.call(this, '#popup-'+this.id);
             this.$popup.css('top', getPopupTop(this.$popup));
             this.isShown = true;
         };
@@ -608,20 +603,20 @@
 (function(){
     window.uc.registerTemplate =
         '<div class="forms">' +
-            '<label><input type="text" id="reg-username" name="username" placeholder="Ім\'я" class="width-100"></label>' +
-            '<label><input type="text" id="reg-surname" name="surname" placeholder="Прізвище" class="width-100"></label>' +
-            '<label><input type="email" id="reg-email" name="email" placeholder="Email" class="width-100"></label>' +
-            '<label><input type="tel" id="reg-phone" name="phone" placeholder="телефон" class="width-100"></label>' +
-            '<label><input type="password" id="reg-pass" name="password" placeholder="Пароль" class="width-100"></label>' +
+            '<label><input type="text" id="reg-username" name="username" placeholder="Ім\'я"></label>' +
+            '<label><input type="text" id="reg-surname" name="surname" placeholder="Прізвище"></label>' +
+            '<label><input type="email" id="reg-email" name="email" placeholder="Email"></label>' +
+            '<label><input type="tel" id="reg-phone" name="phone" placeholder="телефон"></label>' +
+            '<label><input type="password" id="reg-pass" name="password" placeholder="Пароль"></label>' +
 				'<div id="captcha-form"></div>' +
-            '<p><button class="btn btn-register btn-green width-100">Зареєструватись</button></p>' + //TODO localize
+            '<div class="clear-both"><button id="btn-register" class="btn btn-right btn-green">Зареєструватись</button></div>' + //TODO localize
         '</div>';
 
     window.uc.loginTemplate =
         '<div class="forms">' +
-            '<label><input type="email" name="email" placeholder="Email" class="width-100"></label>' +
-            '<label><input type="password" name="password" placeholder="Пароль" class="width-100"></label>' +
-            '<p><button class="btn btn-login btn-green width-100">Увійти</button></p>' + //TODO localize
+            '<label><input type="email" name="email" placeholder="Email"></label>' +
+            '<label><input type="password" name="password" placeholder="Пароль"></label>' +
+            '<div class="clear-both"><button id="btn-login" class="btn btn-right btn-green">Увійти</button></div>' + //TODO localize
         '</div>';
 
     window.uc.currencyWidget = function(eurUah){

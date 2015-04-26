@@ -3,9 +3,11 @@ package com.nagornyi.uc.action.dev;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.nagornyi.uc.Role;
 import com.nagornyi.uc.action.Action;
+import com.nagornyi.uc.action.MD5Salt;
 import com.nagornyi.uc.common.DateFormatter;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.IUserDAO;
+import com.nagornyi.uc.dao.app.UserDAO;
 import com.nagornyi.uc.entity.*;
 import com.nagornyi.uc.helper.BusHelper;
 import com.nagornyi.uc.transport.ActionRequest;
@@ -24,26 +26,20 @@ public class RunScriptsAction implements Action {
 
     @Override
     public void perform(ActionRequest req, ActionResponse resp) throws JSONException {
-        List<Ticket> tickets = DAOFacade.findAll(Ticket.class);
-        for(Ticket ticket: tickets) {
-            if (ticket.getOrder() == null) {
-                User admin = ((IUserDAO)DAOFacade.getDAO(User.class)).getUserByEmail("info@ukraina-centr.com");
-                ticket.setUser(admin);
-            } else {
-                ticket.setUser(ticket.getOrder().getUser());
-            }
-        }
-        DAOFacade.bulkSave(tickets);
-        if (true) return;
+//        UserDAO dao = DAOFacade.getDAO(User.class);
+//        User u =  dao.getUserByEmail("info@ukraina-centr.com");
+//        u.setPassword(MD5Salt.encrypt("uc159753", "info@ukraina-centr.com"));
+//        dao.save(u);
+//        if (true) return;
 
         // adding one user
         User user = new User();
-        user.setPassword("uc159753");
         user.setName("Admin");
         user.setSurname("Admin");
         user.setUserLocale(DateFormatter.UK_LOCALE);
         user.setRole(Role.ADMIN);
         user.setEmail("info@ukraina-centr.com");
+        user.setPassword(MD5Salt.encrypt("uc159753", "info@ukraina-centr.com"));
 
         DAOFacade.save(user);
 

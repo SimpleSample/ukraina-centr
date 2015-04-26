@@ -1,7 +1,12 @@
 package com.nagornyi.uc.action.dev;
 
+import com.nagornyi.uc.common.DateFormatter;
+import com.nagornyi.uc.util.CurrencyUtil;
+
 import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author Nagorny
@@ -10,7 +15,11 @@ import java.util.Calendar;
 public class temp {
     public static void main(String[] args) {
         Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(1400661000000L);
+        c.setTimeInMillis(1429995600000L);
+
+        System.out.println(new SimpleDateFormat().format(new Date(1429995600000L)));
+        c.add(Calendar.DAY_OF_MONTH, 7);
+        System.out.println("Adding 7 days");
         System.out.println(getMonthForInt(c.get(Calendar.MONTH)) + " " + c.get(Calendar.DAY_OF_MONTH) + "; " + getWeekForInt(c.get(Calendar.DAY_OF_WEEK)) +"; " + c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE) + ":" + c.get(Calendar.SECOND));
         int targetDayOfWeek = 4;
         if (c.get(Calendar.DAY_OF_WEEK) > targetDayOfWeek) {
@@ -20,6 +29,8 @@ public class temp {
 
         System.out.println(getMonthForInt(c.get(Calendar.MONTH)) + " " + c.get(Calendar.DAY_OF_MONTH) + "; " + getWeekForInt(c.get(Calendar.DAY_OF_WEEK)) +"; " + c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE) + ":" + c.get(Calendar.SECOND));
         System.out.println(("ag9zfnVrcmFpbmEtY2VudHJyIQsSB0NvdW50cnkiA3VrcgwLEgRDaXR5GICAgICA5LEJDA".hashCode() + "ag9zfnVrcmFpbmEtY2VudHJyIAsSB0NvdW50cnkiAml0DAsSBENpdHkYgICAgIDksQgM".hashCode())*31);
+
+        System.out.println("Currency util: " + CurrencyUtil.round(24.312323, 2));
     }
 
     static String getMonthForInt(int num) {

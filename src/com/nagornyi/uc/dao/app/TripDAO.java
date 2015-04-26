@@ -3,16 +3,20 @@ package com.nagornyi.uc.dao.app;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query;
+import com.nagornyi.uc.common.DateFormatter;
 import com.nagornyi.uc.dao.*;
 import com.nagornyi.uc.entity.*;
+import com.nagornyi.uc.util.DateUtil;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * @author Nagorny
- *         Date: 18.05.14
+ * Date: 18.05.14
  */
 public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
+    private static Logger log = Logger.getLogger(TripDAO.class.getName());
 
     @Override
     protected Trip createDAOEntity(Entity entity) {
@@ -40,46 +44,33 @@ public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
 
     @Override
     public synchronized List<Trip> getTripsByDateRange(Route route, Date startDate, Date endDate, boolean isForth) {
-
+        log.info("Searching trips for date range [" + DateFormatter.defaultFormat(startDate) + " - " + DateFormatter.defaultFormat(endDate)+"]");
         List<Trip> trips = new ArrayList<Trip>();
         Calendar start = Calendar.getInstance();
         start.setTime(startDate);
         Calendar end = Calendar.getInstance();
         end.setTime(endDate);
 
-        int days = (end.get(Calendar.MONTH) - start.get(Calendar.MONTH))*30 + (end.get(Calendar.DAY_OF_MONTH) - start.get(Calendar.DAY_OF_MONTH));
+        int days = DateUtil.getDatesDelta(start, end);
+        log.info("\tDays period - " + days);
         int weeks = days/7;
         Calendar iterEndDate = (Calendar)start.clone();
         iterEndDate.add(Calendar.DAY_OF_MONTH, 7);
         while (weeks != 0) {
-            Query.Filter startDateMinFilter =
-                    new Query.FilterPredicate("startDate",
-                            Query.FilterOperator.GREATER_THAN_OR_EQUAL,
-                            start.getTime());
+            log.info("searching for week [" + DateFormatter.defaultFormat(start.getTime()) + " - " + DateFormatter.defaultFormat(iterEndDate.getTime())+"]");
 
-            Query.Filter startDateMaxFilter =
-                    new Query.FilterPredicate("startDate",
-                            Query.FilterOperator.LESS_THAN_OR_EQUAL,
-                            iterEndDate.getTime());
-
-            Query.Filter startDateRangeFilter =
-                    Query.CompositeFilterOperator.and(startDateMinFilter, startDateMaxFilter);
-
-            Query.Filter isForthFilter =
-                    new Query.FilterPredicate("isForth",
-                            Query.FilterOperator.EQUAL,
-                            isForth);
-
-
-            Query.Filter fullFilter = Query.CompositeFilterOperator.and(startDateRangeFilter, isForthFilter);
-
-            List<Trip> weekTrips = get(route.getKey(), fullFilter, "startDate", Query.SortDirection.ASCENDING);
-            if (weekTrips.isEmpty()) {
-                Key key = createTrip(route, start.getTime(), isForth);
+            Date routeStartDate = isForth? route.getForthStartDate() : route.getBackStartDate();
+            Date routeEndDate = isForth? route.getForthEndDate() : route.getBackEndDate();
+            DateUtil.DatePeriod period = DateUtil.getActualDatePeriodForRoute(start.getTime(), new DateUtil.DatePeriod(routeStartDate, routeEndDate));
+            log.info("Calculated dates: " + DateFormatter.defaultFormat(period.getStartDate()) + " - " + DateFormatter.defaultFormat(period.getEndDate()));
+            Trip trip = getTripByDate(period.getStartDate(), period.getEndDate());
+            if (trip == null) {
+                log.info("Nothing was found");
+                Key key = createTrip(route, period.getStartDate(), period.getEndDate(), isForth);
                 Trip t = getByKey(key);
                 trips.add(t);
             } else {
-                trips.addAll(weekTrips);
+                trips.add(trip);
             }
 
             start.add(Calendar.DAY_OF_MONTH, 7);
@@ -98,7 +89,7 @@ public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
         Calendar end = Calendar.getInstance();
         end.setTime(endDate);
 
-        int days = (end.get(Calendar.MONTH) - start.get(Calendar.MONTH))*30 + (end.get(Calendar.DAY_OF_MONTH) - start.get(Calendar.DAY_OF_MONTH));
+        int days = DateUtil.getDatesDelta(start, end);
         int weeks = days/7;
         Calendar iterEndDate = (Calendar)start.clone();
         iterEndDate.add(Calendar.DAY_OF_MONTH, 7);
@@ -146,61 +137,17 @@ public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
     }
 
     @Override
-    public Key createTrip(Route route, Date targetDate, boolean isForth) {
-
-        Calendar cTargetDate = Calendar.getInstance();
-        cTargetDate.setTime(targetDate);
-        cTargetDate.set(Calendar.MILLISECOND, 0);
-
-        Date startDate = isForth? route.getForthStartDate() : route.getBackStartDate();
-        Date endDate = isForth? route.getForthEndDate() : route.getBackEndDate();
-
-        Calendar cStartDate = Calendar.getInstance();
-        cStartDate.set(Calendar.MILLISECOND, 0);
-        cStartDate.setTime(startDate);
-        Calendar cEndDate = Calendar.getInstance();
-        cEndDate.setTime(endDate);
-        cEndDate.set(Calendar.MILLISECOND, 0);
-
-        cTargetDate.set(Calendar.HOUR_OF_DAY, cStartDate.get(Calendar.HOUR_OF_DAY));
-        cTargetDate.set(Calendar.MINUTE, cStartDate.get(Calendar.MINUTE));
-        cTargetDate.set(Calendar.SECOND, cStartDate.get(Calendar.SECOND));
-
-        int leftDays;
-        if (cTargetDate.get(Calendar.DAY_OF_WEEK) > cStartDate.get(Calendar.DAY_OF_WEEK)) {
-            leftDays = 7 - (cTargetDate.get(Calendar.DAY_OF_WEEK) -  cStartDate.get(Calendar.DAY_OF_WEEK));
-        } else {
-            leftDays = cStartDate.get(Calendar.DAY_OF_WEEK) - cTargetDate.get(Calendar.DAY_OF_WEEK);
-        }
-        cTargetDate.add(Calendar.DAY_OF_MONTH, leftDays);
-
-
-        int tripDurationHours = (cEndDate.get(Calendar.DAY_OF_MONTH) - cStartDate.get(Calendar.DAY_OF_MONTH))*24 +
-                (cEndDate.get(Calendar.HOUR_OF_DAY) - cStartDate.get(Calendar.HOUR_OF_DAY));
-        int tripDurationMinutes = cEndDate.get(Calendar.MINUTE) - cStartDate.get(Calendar.MINUTE);
-        if (tripDurationMinutes < 0) {
-            tripDurationHours--;
-            tripDurationMinutes = 60 + tripDurationMinutes;
-        }
-
-        Calendar cTargetEndDate = (Calendar)cTargetDate.clone();
-
-        cTargetEndDate.add(Calendar.HOUR_OF_DAY, tripDurationHours);
-        cTargetEndDate.add(Calendar.MINUTE, tripDurationMinutes);
-        Date resultStart = cTargetDate.getTime();
-        Date resultEnd = cTargetEndDate.getTime();
-        int seatsNum = route.getBus().getSeatsNum();
-        Trip trip = new Trip(route, resultStart, resultEnd, seatsNum, isForth);
-        Trip existing = getTripByDate(resultStart, resultEnd); //recheck
-        if (existing != null) {
-            return existing.getEntity().getKey();
-        }
+    public Key createTrip(Route route, Date tripStartDate, Date tripEndDate, boolean isForth) {
+        log.info("Creating " + (isForth? "forth" : "back") +" trip for route " + route.getRouteName() +
+                ", date range: "+DateFormatter.defaultFormat(tripStartDate) + " - " + DateFormatter.defaultFormat(tripEndDate));
+        Trip trip = new Trip(route, tripStartDate, tripEndDate, route.getBus().getSeatsNum(), isForth);
         Key saved = save(trip);
         reserveBlocked(route.getBus(), trip);
         return saved;
     }
 
     private void reserveBlocked(Bus bus, Trip trip) {
+        log.info("Reserving initially blocked seats");
         List<Seat> seats = ((ISeatDAO) DAOFacade.getDAO(Seat.class)).getSeats(bus);
         User admin = ((IUserDAO)DAOFacade.getDAO(User.class)).getUserByEmail("info@ukraina-centr.com");
         City routeStartCity = trip.getRoute().getFirstCity();
@@ -210,8 +157,9 @@ public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
 
         for (Seat seat: seats) {
             if (seat.isInitiallyBlocked()) {
+                log.info("Blocking seat " + seat.getSeatNum());
                 Ticket t = ((ITicketDAO)DAOFacade.getDAO(Ticket.class)).createReservedTicket(null, trip, seat,
-                        admin.getName() + " " + admin.getSurname(), null, null, admin, startCityId, endCityId, trip.getStartDate(), true, null, null);
+                        admin.getUsername(), null, null, admin, startCityId, endCityId, trip.getStartDate(), true, null, null);
                 t.setStatus(Ticket.Status.RESERVED);
                 DAOFacade.save(t);
             }
