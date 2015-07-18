@@ -68,6 +68,7 @@ public class RouteCache extends EntityCache {
 			if(!firstCityIsEnd) first--;
 		}
 		log.info("indexes(after correction): first - " + first + ", last - " + last);
+        if (listIdx <= -1) return null; // no routes were found
 
 		Route targetRoute = routes.get(listIdx);
 		List<RouteLink> links = targetRoute.getRouteLinks();
@@ -122,5 +123,11 @@ public class RouteCache extends EntityCache {
             route.setRouteLinks(result);
             RouteCache.routes.add(route);
         }
+    }
+
+    public void reFill() {
+        routes.clear();
+
+        fillCache();
     }
 }

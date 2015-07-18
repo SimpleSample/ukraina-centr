@@ -29,15 +29,13 @@ public class GetAllTicketsAction implements Action {
 
         String cursor = req.getParam("cursor");
         Integer count = Integer.parseInt((String)req.getParam("count"));
+        boolean first = false;
+        if (req.getParam("isInitialLoad") != null && Boolean.parseBoolean((String)(req.getParam("isInitialLoad")))) {
+            first = true;
+        }
 
-        PaginationBatch<Ticket> result = ((ITicketDAO)DAOFacade.getDAO(Ticket.class)).getNextBatch(user, cursor, count);
-//        Collections.sort(tickets, new Comparator<Ticket>() {
-//            @Override
-//            public int compare(Ticket o1, Ticket o2) {
-//                if (o1.getStartDate().getTime() > o2.getStartDate().getTime()) return 1;
-//                else return -1;
-//            }
-//        });
+        ITicketDAO ticketDAO = DAOFacade.getDAO(Ticket.class);
+        PaginationBatch<Ticket> result = ticketDAO.getNextBatch(user, cursor, count);
         List<Ticket> tickets = result.getEntitiesBatch();
         JSONObject respObj = new JSONObject();
         JSONArray ticketObjs = new JSONArray();
@@ -49,6 +47,10 @@ public class GetAllTicketsAction implements Action {
         boolean accepted = user.getRole().level <= Role.PARTNER.level;
         respObj.put("isPartner", accepted);
         respObj.put("cursor", result.getStartCursor());
+
+        if (first) {
+            respObj.put("allPossibleCount", ticketDAO.countAllTicketsForUser(user));
+        }
 
         resp.setDataObject(respObj);
     }

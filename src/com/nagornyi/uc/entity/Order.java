@@ -18,6 +18,7 @@ public class Order extends EntityWrapper {
     private Status status;
     private String transactionId;
     private Date statusChangedDate;
+    private Long externalId;
 
     public Order(Entity entity) {
         super(entity);
@@ -26,14 +27,13 @@ public class Order extends EntityWrapper {
     public Order(User user) {
         super(user.getKey());
         setStatus(Status.PROCESSING);
-        setStatusChangedDate(new Date());
+        Date date = new Date();
+        setStatusChangedDate(date);
+        setProperty("externalId", date.getTime());
     }
 
     public List<Ticket> getTickets() {
-        if (tickets == null) {
-            tickets = DAOFacade.getDAO(Ticket.class).getByProperty("orderId", getKey());
-        }
-        return tickets;
+        return DAOFacade.getDAO(Ticket.class).getByProperty("orderId", getKey());
     }
 
     public User getUser() {
@@ -46,6 +46,36 @@ public class Order extends EntityWrapper {
 
     public void setStatus(Status status) {
         setProperty("status", status.name());
+    }
+
+    public void succeeded() {
+        setStatus(Status.SUCCESS);
+        List<Ticket> tickets = getTickets();
+        for (Ticket ticket: tickets) {
+            ticket.setStatus(Ticket.Status.RESERVED);
+        }
+        DAOFacade.bulkSave(tickets);
+        DAOFacade.save(this);
+    }
+
+    public void processing() {
+        setStatus(Status.PROCESSING);
+        List<Ticket> tickets = getTickets();
+        for (Ticket ticket: tickets) {
+            ticket.setStatus(Ticket.Status.PROCESSING);
+        }
+        DAOFacade.bulkSave(tickets);
+        DAOFacade.save(this);
+    }
+
+    public void failed() {
+        setStatus(Order.Status.FAILURE);
+        List<Ticket> tickets = getTickets();
+        for(Ticket ticket: tickets) {
+            ticket.setStatus(Ticket.Status.INVALID);
+        }
+        DAOFacade.bulkSave(tickets);
+        DAOFacade.save(this);
     }
 
     public String getTransactionId() {
@@ -62,6 +92,10 @@ public class Order extends EntityWrapper {
 
     public void setStatusChangedDate(Date statusChangedDate) {
         setProperty("statusChangedDate", statusChangedDate);
+    }
+
+    public Long getExternalId() {
+        return getProperty("externalId");
     }
 
     public enum Status {

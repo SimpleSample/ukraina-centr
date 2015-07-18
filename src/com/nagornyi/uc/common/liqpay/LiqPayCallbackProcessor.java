@@ -1,8 +1,8 @@
 package com.nagornyi.uc.common.liqpay;
 
-import com.google.appengine.api.datastore.KeyFactory;
 import com.nagornyi.uc.common.mail.MailFacade;
 import com.nagornyi.uc.dao.DAOFacade;
+import com.nagornyi.uc.dao.IOrderDAO;
 import com.nagornyi.uc.entity.Order;
 import com.nagornyi.uc.entity.Ticket;
 import com.nagornyi.uc.entity.User;
@@ -35,32 +35,28 @@ public class LiqPayCallbackProcessor extends HttpServlet {
             String name = (String)names.nextElement();
             liqPayParams.put(name, req.getParameter(name));
         }
-
+        log.info("liqpay params: " + liqPayParams.toString());
         if (!LiqPay.isValid(liqPayParams)) {
-            log.warning("Signature validation failed, liqpay params: " + liqPayParams.toString());
+            log.warning("Signature validation failed");
         } else {
             String status = liqPayParams.get("status");
-            Order order = DAOFacade.findById(Order.class, KeyFactory.stringToKey(liqPayParams.get("order_id")));
+            String order_id_desc = liqPayParams.get("order_id");
+            String orderExternalId = order_id_desc.substring(0, order_id_desc.indexOf(LiqPay.UC_KEY));
+            log.info("order_id: " + orderExternalId);
+            IOrderDAO dao = DAOFacade.getDAO(Order.class);
+            Order order = dao.findByExternalId(Long.valueOf(orderExternalId));
             List<Ticket> tickets = order.getTickets();
             User user = order.getUser();
             order.setTransactionId(liqPayParams.get("transaction_id"));
 
-            if ("success".equals(status) || "sandbox".equals(status)) {
-                order.setStatus(Order.Status.SUCCESS);
-                for (Ticket ticket: tickets) {
-                    ticket.setStatus(Ticket.Status.RESERVED);
-                }
-                DAOFacade.bulkSave(tickets);
-                DAOFacade.save(order);
-                MailFacade.sendSuccessfulReservation(user, tickets);
-            } else if ("failure".equals(status)) {
-                order.setStatus(Order.Status.FAILURE);
-                for(Ticket ticket: tickets) {
-                    ticket.setStatus(Ticket.Status.INVALID);
-                }
-                DAOFacade.bulkSave(tickets);
-                DAOFacade.save(order);
+            if ("failure".equals(status)) {
+                order.failed();
                 MailFacade.sendFailedReservation(user);
+            } else if ("cash_wait".equals(status) || "processing".equals(status)) {
+                order.processing();
+            } else {
+                order.succeeded();
+                MailFacade.sendSuccessfulReservation(user, tickets);
             }
         }
     }

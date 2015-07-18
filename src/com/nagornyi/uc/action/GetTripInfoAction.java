@@ -33,8 +33,8 @@ public class GetTripInfoAction implements Action {
 		Calendar end = Calendar.getInstance();
 		end.add(Calendar.DAY_OF_MONTH, period);
 		ITripDAO dao = DAOFacade.getDAO(Trip.class);
-		List<Trip> trips = dao.getTripsByDateRange(route, start.getTime(), end.getTime(), true);
-		trips.addAll(dao.getTripsByDateRange(route, start.getTime(), end.getTime(), false));
+		List<Trip> trips = dao.getOrCreateTripsByDateRange(route, start.getTime(), end.getTime(), true);
+		trips.addAll(dao.getOrCreateTripsByDateRange(route, start.getTime(), end.getTime(), false));
 
 		for (Trip trip: trips) {
 

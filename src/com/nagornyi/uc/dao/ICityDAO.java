@@ -11,4 +11,6 @@ import java.util.List;
 public interface ICityDAO extends DAO<City> {
 
 	List<City> getAllCities();
+
+    City getByName(String name);
 }

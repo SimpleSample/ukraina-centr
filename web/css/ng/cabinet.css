@@ -1,0 +1,57 @@
+.ui-accordion .ui-accordion-header {
+    font-size: 1.3em;
+}
+
+.table-tickets>tbody>tr>td {
+    font-size:13px;
+}
+
+.ui-accordion .ui-accordion-header.ui-state-default {
+    border: 1px solid #F7B72F;
+    background: #F3E1BA;
+    border-radius: 0;
+}
+
+.ui-accordion .ui-accordion-header.ui-state-hover {
+    border: 1px solid #F7B72F;
+    background: #F7B72F;
+    border-radius: 0;
+}
+
+.ui-accordion .ui-accordion-content {
+    border-radius: 0;
+}
+
+.ui-accordion .forms-inline-list input {
+    height: 2.8em;
+    min-width: 320px;
+    background: #F3F1E9;
+    box-shadow: inset -1px 1px 3px 0 rgba(0,0,0,0.1);
+    -webkit-box-shadow: inset -1px 1px 3px 0px rgba(0,0,0,0.1);
+    -moz-box-shadow: inset -1px 1px 3px 0px rgba(0,0,0,0.1);
+}
+
+.ui-accordion .ui-accordion-header.ui-accordion-icons {
+    padding: .2em .5em .2em 2.2em;
+}
+
+a.change-ticket-date {
+    background-image: url(../../img/crossed-arrows-dis.png);
+    width: 32px;
+    height: 32px;
+    display: block;
+}
+
+a.change-ticket-date:hover {
+    background-image: url(../../img/crossed-arrows.png);
+}
+
+#avail-trips {
+    display: inline-block;
+    float: left;
+}
+
+#avail-seats {
+    display: inline-block;
+    margin-left: 10px;
+}

@@ -1,7 +1,8 @@
 package com.nagornyi.uc.action.dev;
 
-import com.nagornyi.uc.common.DateFormatter;
+import com.nagornyi.uc.common.liqpay.LiqPay;
 import com.nagornyi.uc.util.CurrencyUtil;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -31,6 +32,12 @@ public class temp {
         System.out.println(("ag9zfnVrcmFpbmEtY2VudHJyIQsSB0NvdW50cnkiA3VrcgwLEgRDaXR5GICAgICA5LEJDA".hashCode() + "ag9zfnVrcmFpbmEtY2VudHJyIAsSB0NvdW50cnkiAml0DAsSBENpdHkYgICAgIDksQgM".hashCode())*31);
 
         System.out.println("Currency util: " + CurrencyUtil.round(24.312323, 2));
+
+        String test = "MyTest"+ LiqPay.UC_KEY;
+
+        System.out.println(test.substring(0, test.indexOf(LiqPay.UC_KEY)));
+
+        System.out.println(RandomStringUtils.random(8, true, true));
     }
 
     static String getMonthForInt(int num) {

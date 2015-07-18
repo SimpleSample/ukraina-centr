@@ -24,6 +24,7 @@ public class ActionStorage {
         ACTIONS.put("run", RunScriptsAction.class);
         ACTIONS.put("clearDB", ClearDBAction.class);
         ACTIONS.put("search", SearchTripsAction.class);
+        ACTIONS.put("searchForWeekdays", SearchTripsForWeekdaysAction.class);
         ACTIONS.put("order", OrderAction.class);
         ACTIONS.put("orderExists", OrderExistsAction.class);
         ACTIONS.put("welcome", WelcomeAction.class);
@@ -35,6 +36,7 @@ public class ActionStorage {
         ACTIONS.put("changePass", ChangePassAction.class);
         ACTIONS.put("otherTrips", GetTripsAction.class);
         ACTIONS.put("changeDate", ChangeDateAction.class);
+        ACTIONS.put("renewPass", RenewPasswordAction.class);
     }
 
     public static void register (String key, Class<? extends Action> actionClass) {

@@ -30,7 +30,9 @@ public class ChangeDateAction implements Action {
 
         Ticket newTicket = new Ticket(trip);
         newTicket.setSeat(seat);
-        newTicket.setOrder(ticket.getOrder());
+        if (ticket.getOrder() != null) {
+            newTicket.setOrder(ticket.getOrder());
+        }
         newTicket.setCalculatedPrice(ticket.getCalculatedPrice());
         newTicket.setStatus(ticket.getStatus());
         newTicket.setPassenger(ticket.getPassenger());

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<div id="ticket0" class="ticket one-way active" style="z-index:5;">
+    <div class="ticket-row">
+        <div class="ticket-title">Замовлення #1</div>
+        <div class="price">
+            <div class="price-disc clear-both">
+                <div class="price-right"><span class="sign">€</span><span class="price-self">108</span></div>
+            </div>
+            <div class="price-full"><span class="price-self">120</span></div>
+        </div>
+    </div>
+    <div class="ticket-row">
+        <input type="text" value="Артем Нагорний" placeholder="Ім'я і прізвище" class="ticket-input username">
+    </div>
+    <div class="ticket-row">
+        <input type="text" value="0938899267" placeholder="Телефон" class="ticket-input phone">
+        <input type="text" value="0938899267" placeholder="Телефон" class="ticket-input phone second">
+    </div>
+    <div class="ticket-row">
+        <select class="ticket-input select">
+            <option id="discount-BABY">Дитина до 4-х років</option>
+            <option id="discount-CHILD">Дитина до 12-ти років</option>
+            <option id="discount-STUDENT">Студент</option>
+            <option id="discount-OLDMAN">Пенсіонер</option>
+            <option id="discount-FORSIX">Член групи з 6-ти чол.</option>
+            <option id="discount-NONE" selected="">Без знижок</option>
+        </select>
+    </div>
+    <div class="ticket-row">
+        <textarea placeholder="примітка" class="ticket-input ticket-note"></textarea>
+    </div>
+    <div class="ticket-row">
+        <div class="forth-info">
+            <div class="forth-info-trip">Житомир - Фоліньо</div>
+            <div class="forth-info-date">25 червня, 2015 19:15</div>
+            <button class="btn btn-green light forth">Місце #<span class="forth-trip-seat">6d</span>
+            </button>
+        </div>
+        <div class="back-info">
+            <div class="back-info-trip">Фоліньо - Житомир</div>
+            <div class="back-info-date">21 червня, 2015 14:15</div>
+            <button class="btn btn-green light back">Місце #<span class="back-trip-seat">4d</span>
+            </button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

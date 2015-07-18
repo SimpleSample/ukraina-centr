@@ -16,9 +16,11 @@ public interface ITripDAO extends DAO<Trip> {
 
     List<Trip> getOtherTrips(Trip trip);
 
-    List<Trip> getTripsForTwoMonths(Route route, Calendar startDate, boolean isForth);
+    List<Trip> getOrCreateTripsForTwoMonths(Route route, Calendar startDate, boolean isForth);
 
-    List<Trip> getTripsByDateRange(Route route, Date startDate, Date endDate, boolean isForth);
+    List<Trip> getOrCreateTripsByDateRange(Route route, Date startDate, Date endDate, boolean isForth);
+
+    Trip getOrCreateTrip(Route route, Date startDate, boolean isForth);
 
     List<Trip> getTripsByDateRange(Route route, Date startDate, Date endDate);
 

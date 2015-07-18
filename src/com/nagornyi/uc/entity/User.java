@@ -45,6 +45,16 @@ public class User extends NamedEntity implements Serializable {
         return username;
     }
 
+    public String getPartnerName() {
+        String name = getName();
+        String surname = getSurname();
+
+        if (name == null) return surname;
+        if (surname == null) return name;
+
+        return name + "(" + surname + ")";
+    }
+
     public String getPassword() {
         return getProperty("password");
     }
@@ -115,6 +125,9 @@ public class User extends NamedEntity implements Serializable {
 
     public boolean isPartner() {
         return getRole().equals(Role.PARTNER);
+    }
+    public boolean isAdmin() {
+        return getRole().equals(Role.ADMIN);
     }
 
     public Locale getUserLocale() {

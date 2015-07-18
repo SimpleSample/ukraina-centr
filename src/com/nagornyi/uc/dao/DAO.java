@@ -1,9 +1,11 @@
 package com.nagornyi.uc.dao;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Query;
 import com.nagornyi.uc.entity.BaseEntity;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Nagorny
@@ -30,4 +32,8 @@ public interface DAO<Entity extends BaseEntity> {
     List<Key> save(List<Entity> wrappers);
 
     void delete(Entity entity);
+
+    Set<Key> deleteAll();
+
+    Set<Key> deleteForQuery(Query query);
 }

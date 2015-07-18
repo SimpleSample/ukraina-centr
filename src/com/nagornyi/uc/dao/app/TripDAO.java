@@ -36,14 +36,14 @@ public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
     }
 
     @Override
-    public List<Trip> getTripsForTwoMonths(Route route, Calendar startDate, boolean isForth) {
+    public List<Trip> getOrCreateTripsForTwoMonths(Route route, Calendar startDate, boolean isForth) {
         Calendar c2 = (Calendar)startDate.clone();
         c2.add(Calendar.DAY_OF_MONTH, 60);
-        return getTripsByDateRange(route, startDate.getTime(), c2.getTime(), isForth);
+        return getOrCreateTripsByDateRange(route, startDate.getTime(), c2.getTime(), isForth);
     }
 
     @Override
-    public synchronized List<Trip> getTripsByDateRange(Route route, Date startDate, Date endDate, boolean isForth) {
+    public synchronized List<Trip> getOrCreateTripsByDateRange(Route route, Date startDate, Date endDate, boolean isForth) {
         log.info("Searching trips for date range [" + DateFormatter.defaultFormat(startDate) + " - " + DateFormatter.defaultFormat(endDate)+"]");
         List<Trip> trips = new ArrayList<Trip>();
         Calendar start = Calendar.getInstance();
@@ -51,7 +51,7 @@ public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
         Calendar end = Calendar.getInstance();
         end.setTime(endDate);
 
-        int days = DateUtil.getDatesDelta(start, end);
+        int days = DateUtil.getDaysDelta(start, end);
         log.info("\tDays period - " + days);
         int weeks = days/7;
         Calendar iterEndDate = (Calendar)start.clone();
@@ -59,25 +59,30 @@ public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
         while (weeks != 0) {
             log.info("searching for week [" + DateFormatter.defaultFormat(start.getTime()) + " - " + DateFormatter.defaultFormat(iterEndDate.getTime())+"]");
 
-            Date routeStartDate = isForth? route.getForthStartDate() : route.getBackStartDate();
-            Date routeEndDate = isForth? route.getForthEndDate() : route.getBackEndDate();
-            DateUtil.DatePeriod period = DateUtil.getActualDatePeriodForRoute(start.getTime(), new DateUtil.DatePeriod(routeStartDate, routeEndDate));
-            log.info("Calculated dates: " + DateFormatter.defaultFormat(period.getStartDate()) + " - " + DateFormatter.defaultFormat(period.getEndDate()));
-            Trip trip = getTripByDate(period.getStartDate(), period.getEndDate());
-            if (trip == null) {
-                log.info("Nothing was found");
-                Key key = createTrip(route, period.getStartDate(), period.getEndDate(), isForth);
-                Trip t = getByKey(key);
-                trips.add(t);
-            } else {
-                trips.add(trip);
-            }
+            trips.add(getOrCreateTrip(route, start.getTime(), isForth));
 
             start.add(Calendar.DAY_OF_MONTH, 7);
             iterEndDate.add(Calendar.DAY_OF_MONTH, 7);
             weeks--;
         }
         return trips;
+    }
+
+    @Override
+    public Trip getOrCreateTrip(Route route, Date startDate, boolean isForth) {
+        Date routeStartDate = isForth? route.getForthStartDate() : route.getBackStartDate();
+        Date routeEndDate = isForth? route.getForthEndDate() : route.getBackEndDate();
+        DateUtil.DatePeriod period = DateUtil.getActualDatePeriodForRoute(startDate, new DateUtil.DatePeriod(routeStartDate, routeEndDate));
+        log.info("Calculated dates: " + DateFormatter.defaultFormat(period.getStartDate()) + " - " + DateFormatter.defaultFormat(period.getEndDate()));
+
+        Trip trip = getTripByDate(period.getStartDate(), period.getEndDate());
+        if (trip == null) {
+            log.info("Nothing was found, creating...");
+            Key key = createTrip(route, period.getStartDate(), period.getEndDate(), isForth);
+            return getByKey(key);
+        } else {
+            return trip;
+        }
     }
 
     @Override
@@ -89,7 +94,7 @@ public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
         Calendar end = Calendar.getInstance();
         end.setTime(endDate);
 
-        int days = DateUtil.getDatesDelta(start, end);
+        int days = DateUtil.getDaysDelta(start, end);
         int weeks = days/7;
         Calendar iterEndDate = (Calendar)start.clone();
         iterEndDate.add(Calendar.DAY_OF_MONTH, 7);
@@ -159,7 +164,7 @@ public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
             if (seat.isInitiallyBlocked()) {
                 log.info("Blocking seat " + seat.getSeatNum());
                 Ticket t = ((ITicketDAO)DAOFacade.getDAO(Ticket.class)).createReservedTicket(null, trip, seat,
-                        admin.getUsername(), null, null, admin, startCityId, endCityId, trip.getStartDate(), true, null, null);
+                        admin.getUsername(), null, null, admin, startCityId, endCityId, trip.getStartDate(), true, null, null, null);
                 t.setStatus(Ticket.Status.RESERVED);
                 DAOFacade.save(t);
             }

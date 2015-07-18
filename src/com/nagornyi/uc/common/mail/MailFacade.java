@@ -29,4 +29,12 @@ public class MailFacade {
         String template = FailedOrderTemplate.getFailedReservation(user);
         new MailSender(user, template).send();
     }
+
+    public static void sendRenewPass(User user, String newPass) {
+        String template = HTMLTemplates.getRenewPassTemplate(user, newPass);
+        new MailSender(user, template)
+                .includeAdmin(false)
+                .setSubject(MailSender.UC_SUBJECT +"Відновлення паролю")
+                .send();
+    }
 }

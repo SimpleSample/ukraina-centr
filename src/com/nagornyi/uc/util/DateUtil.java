@@ -10,7 +10,7 @@ import java.util.Date;
  */
 public class DateUtil {
 
-    public static int getDatesDelta(Calendar start, Calendar end) {
+    public static int getDaysDelta(Calendar start, Calendar end) {
         return (end.get(Calendar.MONTH) - start.get(Calendar.MONTH))*30 + (end.get(Calendar.DAY_OF_MONTH) - start.get(Calendar.DAY_OF_MONTH));
     }
 

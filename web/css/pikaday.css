@@ -1,9 +1,9 @@
 @charset "UTF-8";
 
 /*!
-* Pikaday
-* Copyright © 2014 David Bushell | BSD & MIT license | http://dbushell.com/
-*/
+ * Pikaday
+ * Copyright © 2014 David Bushell | BSD & MIT license | http://dbushell.com/
+ */
 
 .pika-single {
     z-index: 9999;
@@ -149,6 +149,8 @@ http://nicolasgallagher.com/micro-clearfix-hack/
 .pika-button {
     cursor: pointer;
     display: block;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
     outline: none;
     border: 0;
     margin: 0;
@@ -179,6 +181,24 @@ http://nicolasgallagher.com/micro-clearfix-hack/
     border-radius: 3px;
 }
 
+.is-inrange .pika-button {
+    background: #D5E9F7;
+}
+
+.is-startrange .pika-button {
+    color: #fff;
+    background: #6CB31D;
+    box-shadow: none;
+    border-radius: 3px;
+}
+
+.is-endrange .pika-button {
+    color: #fff;
+    background: #33aaff;
+    box-shadow: none;
+    border-radius: 3px;
+}
+
 .is-disabled .pika-button {
     pointer-events: none;
     cursor: default;
@@ -187,8 +207,14 @@ http://nicolasgallagher.com/micro-clearfix-hack/
 }
 
 .pika-button:hover {
-    color: #fff !important;
-    background: #ff8000 !important;
-    box-shadow: none !important;
-    border-radius: 3px !important;
+    color: #fff;
+    background: #ff8000;
+    box-shadow: none;
+    border-radius: 3px;
+}
+
+/* styling for abbr */
+.pika-table abbr {
+    border-bottom: none;
+    cursor: help;
 }

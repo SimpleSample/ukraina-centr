@@ -1,6 +1,7 @@
 package com.nagornyi.uc.dao;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.repackaged.org.apache.commons.collections.CollectionUtils;
 import com.nagornyi.uc.dao.app.AppEngineFactory;
 import com.nagornyi.uc.entity.BaseEntity;
 
@@ -27,8 +28,8 @@ public class DAOFacade {
     }
 
     public static <E extends BaseEntity> List<Key> bulkSave(List<E> entities) {
+        if (CollectionUtils.isEmpty(entities)) return Collections.emptyList();
         E ent = entities.iterator().next();
-        if (ent == null) return Collections.emptyList();
 
         return ((DAO<E>)getDAO(ent.getClass())).save(entities);
     }

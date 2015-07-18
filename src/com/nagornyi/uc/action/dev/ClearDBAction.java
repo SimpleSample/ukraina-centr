@@ -1,7 +1,9 @@
 package com.nagornyi.uc.action.dev;
 
 import com.google.appengine.labs.repackaged.org.json.JSONException;
+import com.nagornyi.uc.Role;
 import com.nagornyi.uc.action.Action;
+import com.nagornyi.uc.action.Authorized;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.entity.*;
 import com.nagornyi.uc.transport.ActionRequest;
@@ -13,7 +15,7 @@ import java.util.List;
  * @author Nagornyi
  *         Date: 30.06.14
  */
-//@Authorized(role = Role.ADMIN)
+@Authorized(role = Role.ADMIN)
 public class ClearDBAction implements Action {
     
     @Override

@@ -17,30 +17,41 @@ import java.util.logging.Logger;
  * Date: 31.05.14
  */
 public class MailSender {
+    public static final String UC_SUBJECT = "[ukraina-centr.com] ";
     Logger log = Logger.getLogger(MailSender.class.getName());
 
     private User user;
     private String message;
-    private String subject = "[ukraina-centr.com] Підтвердження бронювань";
+    private boolean includeAdmin = true;
+    private String subject = UC_SUBJECT + "Підтвердження придбання квитків";
 
     public MailSender(User user, String message) {
         this.user = user;
         this.message = message;
     }
 
-    public void setUser(User user) {
+    public MailSender setUser(User user) {
         this.user = user;
+        return this;
     }
 
-    public void setMessage(String message) {
+    public MailSender setMessage(String message) {
         this.message = message;
+        return this;
     }
 
-    public void setSubject(String subject) {
+    public MailSender setSubject(String subject) {
         this.subject = subject;
+        return this;
+    }
+
+    public MailSender includeAdmin(boolean includeAdmin) {
+        this.includeAdmin = includeAdmin;
+        return this;
     }
 
     public void send() {
+        log.info("Sending mail to " + user.getEmail());
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
 
@@ -49,8 +60,10 @@ public class MailSender {
             msg.setFrom(new InternetAddress("info@ukraina-centr.com", "Україна-Центр", "utf-8"));
             msg.addRecipient(Message.RecipientType.TO,
                     new InternetAddress(user.getEmail(), user.getName(), "utf-8"));
-            msg.addRecipient(Message.RecipientType.CC,
-                    new InternetAddress("info@ukraina-centr.com", "Admin", "utf-8"));
+            if (includeAdmin) {
+                msg.addRecipient(Message.RecipientType.CC,
+                        new InternetAddress("info@ukraina-centr.com", "Admin", "utf-8"));
+            }
             msg.setSubject(subject, "utf-8");
 
             Multipart mp = new MimeMultipart();

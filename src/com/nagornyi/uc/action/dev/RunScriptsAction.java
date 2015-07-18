@@ -3,10 +3,10 @@ package com.nagornyi.uc.action.dev;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.nagornyi.uc.Role;
 import com.nagornyi.uc.action.Action;
+import com.nagornyi.uc.action.Authorized;
 import com.nagornyi.uc.action.MD5Salt;
 import com.nagornyi.uc.common.DateFormatter;
 import com.nagornyi.uc.dao.DAOFacade;
-import com.nagornyi.uc.dao.IUserDAO;
 import com.nagornyi.uc.dao.app.UserDAO;
 import com.nagornyi.uc.entity.*;
 import com.nagornyi.uc.helper.BusHelper;
@@ -17,20 +17,26 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
+ *
+ * new Request('run', {}).send(function(){});
+ *
  * @author Nagorny
  * Date: 14.05.14
  */
+@Authorized
 public class RunScriptsAction implements Action {
     private static String SETRA_HTML = "<div class=\"bus bus-setra\"><table><tbody><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\" class=\"active\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\" class=\"blocked\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><span>1c</span></td><td><span>1c</span></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr></tbody></table></div>";
     private static final Logger log = Logger.getLogger(RunScriptsAction.class.getName());
 
     @Override
     public void perform(ActionRequest req, ActionResponse resp) throws JSONException {
-//        UserDAO dao = DAOFacade.getDAO(User.class);
-//        User u =  dao.getUserByEmail("info@ukraina-centr.com");
-//        u.setPassword(MD5Salt.encrypt("uc159753", "info@ukraina-centr.com"));
-//        dao.save(u);
-//        if (true) return;
+        UserDAO dao = DAOFacade.getDAO(User.class);
+        User u =  dao.getUserByEmail("forartforces@gmail.com");
+//        u.setRole(Role.USER);
+        u.setPassword(MD5Salt.encrypt("Fhntv1234", "forartforces@gmail.com"));
+        dao.save(u);
+
+        if (true) return;
 
         // adding one user
         User user = new User();

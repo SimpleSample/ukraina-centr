@@ -6,6 +6,7 @@ import com.nagornyi.uc.entity.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Enumeration;
 import java.util.Locale;
 
 /**
@@ -21,6 +22,16 @@ public class ActionRequest {
 
     public <T> T getParam(String name) {
         return (T)realRequest.getParameter(name);
+    }
+
+    public String serializeAllParams() {
+        StringBuilder builder = new StringBuilder();
+        Enumeration<String> names = realRequest.getParameterNames();
+        while (names.hasMoreElements()) {
+            String next = names.nextElement();
+            builder.append(next).append("=").append(realRequest.getParameter(next)).append(", ");
+        }
+        return builder.toString();
     }
 
     public HttpSession getSession() {

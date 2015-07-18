@@ -8,6 +8,7 @@ import com.nagornyi.uc.cache.BusCache;
 import com.nagornyi.uc.cache.RouteCache;
 import com.nagornyi.uc.common.DiscountCalculator;
 import com.nagornyi.uc.common.RouteSearchResult;
+import com.nagornyi.uc.common.UserFriendlyException;
 import com.nagornyi.uc.common.price.DiscountHelper;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.IPriceDAO;
@@ -46,6 +47,11 @@ public class SearchTripsAction implements Action {
         cStartDate.set(Calendar.MILLISECOND, 0);
         String endDate = req.getParam("endDate");
 
+        RouteSearchResult searchResult = getTrips(startCityId, endCityId, tzOffset, cStartDate);
+        if (searchResult == null) {
+            throw new UserFriendlyException("Не знайдено маршруту для обраних міст");
+        }
+
         JSONObject result = new JSONObject();
 
         Price price = ((IPriceDAO)DAOFacade.getDAO(Price.class)).getPriceByCities(startCityId, endCityId);
@@ -55,7 +61,6 @@ public class SearchTripsAction implements Action {
             discountedPrice = new DiscountCalculator().calculate(resultingPrice, req.getUser().getDiscount());
         }
 
-        RouteSearchResult searchResult = getTrips(startCityId, endCityId, tzOffset, cStartDate);
         List<Trip> trips = searchResult.getTrips();
 
         Route route = searchResult.getRoute();
@@ -121,12 +126,14 @@ public class SearchTripsAction implements Action {
         trip.put("seats", seatsArray);
     }
 
-    private RouteSearchResult getTrips(String startCityId, String endCityId, String tzOffset, Calendar c) {
+    protected RouteSearchResult getTrips(String startCityId, String endCityId, String tzOffset, Calendar c) {
         RouteSearchResult result = RouteCache.getRoute(KeyFactory.stringToKey(startCityId), KeyFactory.stringToKey(endCityId));
+        if (result == null) return null; // no route found
+
         Calendar c2 = (Calendar)c.clone();
         c2.add(Calendar.DAY_OF_MONTH, 20); //TODO configure
         ITripDAO dao = DAOFacade.getDAO(Trip.class);
-        List<Trip> trips = dao.getTripsByDateRange(result.getRoute(), c.getTime(), c2.getTime(), result.isForth());
+        List<Trip> trips = dao.getOrCreateTripsByDateRange(result.getRoute(), c.getTime(), c2.getTime(), result.isForth());
         result.setTrips(trips);
         return result;
     }

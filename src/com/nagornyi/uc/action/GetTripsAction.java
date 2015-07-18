@@ -39,7 +39,7 @@ public class GetTripsAction implements Action {
 
         ITripDAO dao = DAOFacade.getDAO(Trip.class);
 
-        List<Trip> trips = dao.getTripsForTwoMonths(route, Calendar.getInstance(), currentTrip.isForth());
+        List<Trip> trips = dao.getOrCreateTripsForTwoMonths(route, Calendar.getInstance(), currentTrip.isForth());
         JSONArray tripsArr = new JSONArray();
         for (Trip trip: trips) {
             JSONObject trp = new JSONObject();

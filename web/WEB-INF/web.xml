@@ -35,11 +35,56 @@
 
     <servlet>
         <servlet-name>sessioncleanup</servlet-name>
-        <servlet-class>com.google.apphosting.utils.servlet.SessionCleanupServlet</servlet-class>
+        <servlet-class>com.nagornyi.uc.CleanupServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>sessioncleanup</servlet-name>
         <url-pattern>/jobs/sessioncleanup</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>tickets</servlet-name>
+        <jsp-file>/tickets.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>tickets</servlet-name>
+        <url-pattern>/tickets</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>schedule</servlet-name>
+        <jsp-file>/schedule.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>schedule</servlet-name>
+        <url-pattern>/schedule</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>leasing</servlet-name>
+        <jsp-file>/leasing.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>leasing</servlet-name>
+        <url-pattern>/leasing</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>about</servlet-name>
+        <jsp-file>/about.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>about</servlet-name>
+        <url-pattern>/about</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>cabinet</servlet-name>
+        <jsp-file>/cabinet.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>cabinet</servlet-name>
+        <url-pattern>/cabinet</url-pattern>
     </servlet-mapping>
 
     <servlet>

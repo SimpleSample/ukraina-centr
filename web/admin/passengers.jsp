@@ -7,12 +7,17 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <html>
 <head>
-    <link rel="stylesheet" href="css/kube.css" type="text/css" media="screen">
-    <link rel="stylesheet" href="css/admin.css" type="text/css" media="screen">
-    <link rel="stylesheet" href="css/print-style.css" type="text/css" media="print" />
-    <script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script>
-    <script src="../js/ng.js" type="text/javascript"></script>
-    <script src="js/ng.admin.js" type="text/javascript"></script>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/favicon.png">
+    <link href='http://fonts.googleapis.com/css?family=Roboto:300,400&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
+    <link href="${pageContext.request.contextPath}/admin/css/kube.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="${pageContext.request.contextPath}/css/ng/popup.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="${pageContext.request.contextPath}/admin/css/admin.css" rel="stylesheet" type="text/css" media="screen">
+    <link href="${pageContext.request.contextPath}/admin/css/print-style.css" type="text/css" rel="stylesheet" media="print" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="${pageContext.request.contextPath}/js/EventBus.js" type="text/javascript"></script>
+    <script src="${pageContext.request.contextPath}/js/ng/ng.common.js" type="text/javascript"></script>
+    <script src="${pageContext.request.contextPath}/admin/js/ng.admin.js" type="text/javascript"></script>
 </head>
 <body>
 <%
@@ -54,8 +59,8 @@
                 </select>
 
                 <div class="forms-desc">Оберіть необхідний маршрут</div>
-                <div class="btn-leftside">
-                    <button id="search-tickets" class="btn btn-green">Пошук</button>
+                <div class="clear-both">
+                    <button id="search-tickets" class="btn btn-green btn-right">Пошук</button>
                 </div>
             </label>
         </div>
@@ -76,8 +81,8 @@
             <tbody id="tickets">
             </tbody>
         </table>
-        <div class="btn-leftside no-print">
-            <button id="print-results" class="btn btn-yellow" style="display: none;">Друк</button>
+        <div class="clear-both no-print">
+            <button id="print-results" class="btn btn-yellow btn-right" style="display: none;">Друк</button>
         </div>
     </div>
 </div>

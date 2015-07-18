@@ -1,10 +1,11 @@
 package com.nagornyi.uc.dao;
 
+import com.google.appengine.api.datastore.Key;
 import com.nagornyi.uc.entity.*;
-import com.nagornyi.uc.transport.ActionResponse;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Nagorny
@@ -12,9 +13,9 @@ import java.util.List;
  */
 public interface ITicketDAO extends DAO<Ticket> {
 
-    int getFreeSeatsNumberForTrip(Trip trip);
-
     PaginationBatch<Ticket> getNextBatch(User user, String startCursor, int limit);
+
+    int countAllTicketsForUser(User user);
 
     List<Seat> getUnavailableSeatsForTrip(Trip trip);
 
@@ -27,5 +28,9 @@ public interface ITicketDAO extends DAO<Ticket> {
     Ticket revealLockedTicket(String tripId, String ticketId);
 
     Ticket createReservedTicket(String ticketId, Trip trip, Seat seat, String passenger, String phone1, String phone2, User user,
-                                String startCityId, String endCityId, Date startDate, boolean isPartial, DiscountCategory category, Order order);
+                                String startCityId, String endCityId, Date startDate, boolean isPartial, DiscountCategory category, Order order, String note);
+
+    List<Ticket> getTicketsForUserByPeriod(User user, Date endDate);
+
+    Set<Key> deleteTicketsForUserByPeriod(User user, Date endDate);
 }

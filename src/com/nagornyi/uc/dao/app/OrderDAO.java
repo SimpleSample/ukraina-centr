@@ -24,4 +24,9 @@ public class OrderDAO extends EntityDAO<Order> implements IOrderDAO {
     public void cancelOrder(String orderId) {
 
     }
+
+    @Override
+    public Order findByExternalId(Long externalId) {
+        return getByProperty("externalId", externalId).iterator().next();
+    }
 }

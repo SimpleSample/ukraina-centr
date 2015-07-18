@@ -5,7 +5,9 @@ import com.nagornyi.uc.dao.DAO;
 import com.nagornyi.uc.entity.EntityWrapper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -52,12 +54,7 @@ public class EntityDAO<E extends EntityWrapper> implements DAO<E> {
         if (parent != null) {
             query.setAncestor(parent);
         }
-        List<Entity> entities = datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
-        List<E> result = new ArrayList<E>();
-        for (Entity entity: entities) {
-            result.add(createDAOEntity(entity));
-        }
-        return result;
+        return getByQuery(query);
     }
 
     @Override
@@ -77,7 +74,12 @@ public class EntityDAO<E extends EntityWrapper> implements DAO<E> {
                 .addFilter(prop,
                         Query.FilterOperator.EQUAL,
                         propValue);
-        List<Entity> entities = datastore.prepare(q).asList(FetchOptions.Builder.withDefaults());
+
+        return getByQuery(q);
+    }
+
+    public List<E> getByQuery(Query query) {
+        List<Entity> entities = datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
         List<E> result = new ArrayList<E>();
         for (Entity entity: entities) {
             result.add(createDAOEntity(entity));
@@ -92,23 +94,15 @@ public class EntityDAO<E extends EntityWrapper> implements DAO<E> {
     @Override
     public List<E> getByParent(Key parentKey) {
         Query query = new Query(getKind()).setAncestor(parentKey);
-        List<Entity> entities = datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
-        List<E> result = new ArrayList<E>();
-        for (Entity entity: entities) {
-            result.add(createDAOEntity(entity));
-        }
-        return result;
+
+        return getByQuery(query);
     }
 
     @Override
     public List<E> getAll() {
         Query query = new Query(getKind());
-        List<Entity> entities = datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
-        List<E> result = new ArrayList<E>();
-        for (Entity entity: entities) {
-            result.add(createDAOEntity(entity));
-        }
-        return result;
+
+        return getByQuery(query);
     }
 
     @Override
@@ -135,4 +129,24 @@ public class EntityDAO<E extends EntityWrapper> implements DAO<E> {
         datastore.delete(entity.getEntity().getKey());
     }
 
+    @Override
+    public Set<Key> deleteAll() {
+        Query q = new Query(getKind());
+
+        return deleteForQuery(q);
+    }
+
+    @Override
+    public Set<Key> deleteForQuery(Query query) {
+        query.setKeysOnly();
+        List<Entity> entities = datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
+
+        Set<Key> keys = new HashSet<Key>(entities.size());
+
+        for (Entity e : entities) {
+            keys.add(e.getKey());
+        }
+        if (!keys.isEmpty()) datastore.delete(keys);
+        return keys;
+    }
 }

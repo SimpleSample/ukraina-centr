@@ -14,7 +14,7 @@ import com.nagornyi.uc.entity.*;
 import com.nagornyi.uc.transport.ActionRequest;
 import com.nagornyi.uc.transport.ActionResponse;
 import com.nagornyi.uc.util.ActionUtil;
-import com.nagornyi.uc.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -47,8 +47,8 @@ public class OrderAction implements Action {
                 throw new UserFriendlyException(processFailed(result, req.getLocale()));
             } else {
                 DAOFacade.bulkSave(result.getAllTickets());
-                if (user.isPartner()) {
-                    order.setStatus(Order.Status.SUCCESS);
+                if (user.isPartner() || user.isAdmin()) {
+                    order.succeeded();
                     MailFacade.sendSuccessfulReservation(user, result.getAllTickets());
                 } else {
                     double resultPrice = 0;
@@ -56,7 +56,10 @@ public class OrderAction implements Action {
                         resultPrice += ticket.getCalculatedPrice();
                     }
                     log.info("Calculated price for order " + resultPrice);
-                    JSONObject liqPayParams = LiqPay.getLiqPayReservationJSON(resultPrice, order.getStringKey());
+
+                    String order_desc = LiqPay.getPaymentDescription(order, user, result.getAllTickets());
+                    JSONObject liqPayParams = LiqPay.getLiqPayReservationJSON(resultPrice, order.getStringKey(), order_desc);
+                    log.info("Liq pay params: " + liqPayParams.toString());
                     resp.setDataObject(liqPayParams);
                 }
                 DAOFacade.save(order);
@@ -89,9 +92,11 @@ public class OrderAction implements Action {
             String forthTicketId = ticketObj.has("forthTicketId")? (String)ticketObj.get("forthTicketId") : null;
             String forthSeatId = (String)ticketObj.get("forthSeatId");
             Seat forthSeat = DAOFacade.findById(Seat.class, KeyFactory.stringToKey(forthSeatId));
+            String note = ticketObj.has("note") && ticketObj.get("note") instanceof String?
+                    (String) ticketObj.get("note") : null;
 
             Ticket ticket = dao.createReservedTicket(forthTicketId, forthTrip, forthSeat, passenger, phone1, phone2, currentUser,
-                    startCityId, endCityId, startDate, backTrip != null, category, order);
+                    startCityId, endCityId, startDate, backTrip != null, category, order, note);
 
             if (ticket != null) {
                 result.addTicket(ticket);
@@ -105,7 +110,7 @@ public class OrderAction implements Action {
                 Seat backSeat = DAOFacade.findById(Seat.class, KeyFactory.stringToKey(backSeatId));
 
                 Ticket backTicket = dao.createReservedTicket(backTicketId, backTrip, backSeat, passenger, phone1, phone2, currentUser,
-                        endCityId, startCityId, backStartDate, true, category, order);
+                        endCityId, startCityId, backStartDate, true, category, order, note);
 
                 if(backTicket != null) {
                     result.addTicket(backTicket);

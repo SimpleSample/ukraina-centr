@@ -10,4 +10,6 @@ import com.nagornyi.uc.entity.Ticket;
 public interface IOrderDAO extends DAO<Order> {
 
     void cancelOrder(String orderId);
+
+    Order findByExternalId(Long externalId);
 }

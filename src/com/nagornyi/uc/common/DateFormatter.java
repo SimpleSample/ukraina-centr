@@ -21,4 +21,10 @@ public class DateFormatter {
         formatter.setTimeZone(TimeZone.getTimeZone("GMT+3"));
 		return formatter.format(date);
 	}
+
+    public static String defaultShortFormat(Date date) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yy");
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+        return formatter.format(date);
+    }
 }

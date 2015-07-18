@@ -10,9 +10,7 @@ import com.nagornyi.uc.dao.ITicketDAO;
 import com.nagornyi.uc.dao.PaginationBatch;
 import com.nagornyi.uc.entity.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -22,6 +20,8 @@ import java.util.logging.Logger;
 public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
     private static Logger log = Logger.getLogger(TicketDAO.class.getName());
 
+    private DaoQuery ticketQuery = new DaoQuery();
+
     @Override
     protected Ticket createDAOEntity(Entity entity) {
         return new Ticket(entity);
@@ -30,15 +30,6 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
     @Override
     protected String getKind() {
         return "Ticket";
-    }
-
-    @Override
-    public int getFreeSeatsNumberForTrip(Trip trip) {
-        int count = countForQuery(new Query(getKind()).setAncestor(trip.getKey()).
-                setFilter(new Query.FilterPredicate("status",
-                        Query.FilterOperator.NOT_EQUAL,
-                        Ticket.Status.INVALID.idx)));
-        return trip.getSeatsNum() - count - TicketCache.getLockedCount(trip.getStringKey());
     }
 
     @Override
@@ -59,6 +50,14 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
         }
 
         return result;
+    }
+
+    @Override
+    public int countAllTicketsForUser(User user) {
+        Query query = new Query(getKind())
+                .setFilter(new Query.FilterPredicate("user", Query.FilterOperator.EQUAL, user.getEmail()))
+                .addSort("startDate", Query.SortDirection.DESCENDING);
+        return countForQuery(query);
     }
 
     @Override
@@ -105,10 +104,13 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
         return TicketCache.revealLockedTicket(tripId, ticketId);
     }
 
+    @Override
     public Ticket createReservedTicket(String ticketId, Trip trip, Seat seat, String passenger, String phone1, String phone2, User user,
-                               String startCityId, String endCityId, Date startDate, boolean isPartial, DiscountCategory category, Order order) {
+                               String startCityId, String endCityId, Date startDate, boolean isPartial, DiscountCategory category, Order order, String note) {
+
+        if (category == null) category = DiscountCategory.NONE;
         log.info("\tCreating ticket, trip: " + trip.getTripName()+ "("+ DateFormatter.defaultFormat(startDate)+"), seat: " +
-                seat.getSeatNum() + ", passenger: " + passenger);
+                seat.getSeatNum() + ", passenger: " + passenger + ", discount: " + category.getDiscount().getName());
         Ticket ticket;
         if (ticketId == null) {
             ticket = new Ticket(trip);
@@ -141,6 +143,7 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
         ticket.setCalculatedPrice(resultPrice);
 
         if (order != null) ticket.setOrder(order);
+        if (note != null) ticket.setNote(note);
 
         return ticket;
     }
@@ -152,5 +155,42 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
         if (user.getDiscount() != null) discounts.add(user.getDiscount());
         if (category != null) discounts.add(category.getDiscount());
         return new DiscountCalculator().calculate(isPartial? p.getPriceBoth()/2 : p.getPrice(), discounts);
+    }
+
+    @Override
+    public List<Ticket> getTicketsForUserByPeriod(User user, Date endDate) {
+        Query query = ticketQuery.getTicketsForUserByPeriodQuery(user, endDate);
+
+        return getByQuery(query);
+    }
+
+    @Override
+    public Set<Key> deleteTicketsForUserByPeriod(User user, Date endDate) {
+        Query query = ticketQuery.getTicketsForUserByPeriodQuery(user, endDate);
+
+        return deleteForQuery(query);
+    }
+
+
+    // queries
+
+    public class DaoQuery {
+
+        public Query getTicketsForUserByPeriodQuery(User user, Date endDate) {
+            if (endDate == null) endDate = new Date();
+
+            Query.FilterPredicate userFilter = new Query.FilterPredicate("user",
+                    Query.FilterOperator.EQUAL,
+                    user.getEmail());
+
+            Query.FilterPredicate endDateLessThan = new Query.FilterPredicate("startDate",
+                    Query.FilterOperator.LESS_THAN_OR_EQUAL,
+                    endDate);
+
+            Query.Filter resultFilter =
+                    Query.CompositeFilterOperator.and(userFilter, endDateLessThan);
+
+            return new Query(getKind()).setFilter(resultFilter);
+        }
     }
 }

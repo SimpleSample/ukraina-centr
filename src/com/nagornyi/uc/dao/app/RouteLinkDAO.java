@@ -25,18 +25,18 @@ public class RouteLinkDAO extends EntityDAO<RouteLink> implements IRouteLinkDAO 
     }
 
     public List<RouteLink> getRouteLinksByCity (Key cityId) {
-        Query.Filter birthYearMinFilter =
+        Query.Filter nextCityEquals =
                 new Query.FilterPredicate("nextCity",
                         Query.FilterOperator.EQUAL,
                         cityId);
 
-        Query.Filter birthYearMaxFilter =
+        Query.Filter previousCityEquals =
                 new Query.FilterPredicate("previousCity",
                         Query.FilterOperator.EQUAL,
                         cityId);
 
         Query.Filter birthYearRangeFilter =
-                Query.CompositeFilterOperator.or(birthYearMinFilter, birthYearMaxFilter);
+                Query.CompositeFilterOperator.or(nextCityEquals, previousCityEquals);
 
         return getByFilter(birthYearRangeFilter);
     }

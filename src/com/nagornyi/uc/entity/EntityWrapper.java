@@ -86,4 +86,8 @@ public abstract class EntityWrapper implements BaseEntity {
         parentKey = getEntity().getParent();
         stringParentKey = KeyFactory.keyToString(parentKey);
     }
+
+    public void flush() {
+
+    }
 }

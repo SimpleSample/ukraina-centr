@@ -2,24 +2,35 @@ package com.nagornyi.uc.common.liqpay;
 
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.nagornyi.uc.common.DateFormatter;
+import com.nagornyi.uc.entity.Order;
+import com.nagornyi.uc.entity.Ticket;
+import com.nagornyi.uc.entity.User;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class LiqPay {
+    private static Logger log = Logger.getLogger(LiqPay.class.getName());
 //    private Proxy __PROXY = null;
 //    private String __PROXY_AUTH = null;
 
     private static String host = "https://www.liqpay.com/api/";
     private static String pub_key = "i30587714188";
     private static String priv_key = "fc1iwzi5oHaOhSqME8H849tqSuNi8At1x3g2RdqY";
-    private static String result_url = "http://www.ukraina-centr.com/tickets.html?orderId=";
-    private static String server_url = "http://www.ukraina-centr.com/lpCallback";
+//    private static String result_url = "http://our-little-baby.appspot.com/tickets.html?orderId=";
+    private static String result_url = "http://www.ukraina-centr.com/tickets?orderId=";//TODO
+    private static String server_url = "http://www.ukraina-centr.com/lpCallback"; //TODO
+//    private static String server_url = "http://our-little-baby.appspot.com/lpCallback";
     private static String language = "ru";
-    private static String sandbox = "1"; // TODO make it config
+    private static String sandbox = "0"; // TODO make it config
     private static String type = "buy";
     private static String currency = "EUR"; // USD, EUR, RUB, UAH
     private static String description = "Оплата квитків на сайті www.ukraina-centr.com";
+    public static String UC_KEY = "@;";
 
     public LiqPay() {}
 
@@ -29,14 +40,55 @@ public class LiqPay {
         host = url;
     }
 
-    public static JSONObject getLiqPayReservationJSON(double price, String orderId) throws JSONException {
+    public static JSONObject getLiqPayReservationJSON(double price, String orderId, String orderDesc) throws JSONException {
         JSONObject responseObj = new JSONObject();
 
-        HashMap<String, String> liqpayParams = getLiqPayParams(price, currency, description, orderId);
+
+        HashMap<String, String> liqpayParams = getLiqPayParams(price, currency, description, orderId, orderDesc);
         for(String param: liqpayParams.keySet()) {
             responseObj.put(param, liqpayParams.get(param));
         }
         return responseObj;
+    }
+
+    public static String getPaymentDescription(Order order, User user, List<Ticket> tickets) {
+        Ticket ticket = null;
+        Ticket backTicket = null;
+        for (Ticket ticket1: tickets) {
+            if (ticket1.getTrip().isForth()) {
+                ticket = ticket1;
+            } else {
+                backTicket = ticket1;
+            }
+        }
+        StringBuilder result = new StringBuilder(""+order.getExternalId()).append(LiqPay.UC_KEY).append(" ").append(user.getUsername());
+
+        if (ticket == null && backTicket != null) {
+            ticket = backTicket;
+            backTicket = null;
+        }
+        // we don't know which ticket is actually forth, so ...
+        if (ticket != null && backTicket != null) {
+            if (ticket.getStartDate().getTime() > backTicket.getStartDate().getTime()) {
+                Ticket temp = ticket;
+                ticket = backTicket;
+                backTicket = temp;
+            }
+        }
+        if (ticket != null) {
+            String userTrip = ticket.getStartCity().getLocalizedName(Locale.ENGLISH) + " - " + ticket.getEndCity().getLocalizedName(Locale.ENGLISH);
+            result.append(", ").append(userTrip);
+            String startDate = DateFormatter.defaultShortFormat(ticket.getStartDate());
+            result.append(", ").append(startDate);
+        }
+
+        if (backTicket != null) {
+            String startBackDate = DateFormatter.defaultShortFormat(backTicket.getStartDate());
+            result.append(", повернення: ").append(startBackDate);
+
+        }
+        log.info("order_id length: " + result.toString().length());
+        return result.toString();
     }
 
     @SuppressWarnings("unchecked")
@@ -89,13 +141,12 @@ public class LiqPay {
 
     }
 
-    public static HashMap<String, String> getLiqPayParams(double amount, String currency, String description, String orderId) {
+    public static HashMap<String, String> getLiqPayParams(double amount, String currency, String description, String orderId, String orderDesc) {
         HashMap<String, String> params = new HashMap<String, String>();
-        if (sandbox.equals("1")) amount = 5;
         params.put("amount", ""+amount);
         params.put("currency", currency);
         params.put("description", description);
-        params.put("order_id", orderId);
+        params.put("order_id", orderDesc);
         params.put("type", type);
         params.put("result_url", result_url+orderId);
         params.put("server_url", server_url);

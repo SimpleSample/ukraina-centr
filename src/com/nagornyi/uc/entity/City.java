@@ -4,6 +4,7 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -84,4 +85,12 @@ public class City extends LocalizedNamesEntity implements Comparable<City> {
 	public int compareTo(City o) {
 		return this.getName().compareTo(o.getName());
 	}
+
+    public static City valueOf(String name, String engName, String itName, String rusName, Country country, boolean isHidden) {
+        Map<Locale, String> locales = new HashMap<Locale, String>();
+        locales.put(Locale.ENGLISH, engName);
+        locales.put(Locale.ITALIAN, itName);
+        locales.put(Locale.forLanguageTag("ru"), rusName);
+        return new City(name, locales, country, isHidden);
+    }
 }

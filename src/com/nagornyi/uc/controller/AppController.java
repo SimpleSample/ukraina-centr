@@ -61,7 +61,7 @@ public class AppController extends HttpServlet {
         if (!gotError) {
 
             try {
-                log("Performing Action " + action.getClass().getSimpleName());
+                log("Performing Action " + action.getClass().getSimpleName() +". \n Params: " + request.serializeAllParams());
                 action.perform(request, response);
             } catch (UserFriendlyException e) {
                 log("Couldn't perform action " + actionAlias, e);

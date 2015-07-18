@@ -1,82 +1,85 @@
 {namespace templates}
 /**
  * @param username user name
- * @param isPartner is user a partner
  * @param tickets user ordered tickets
  * @param price price for all tickets in euro
- * @param realPrice price for all tickets in uah
+ * @param orderId order id
  */
 {template .reserve}
-<table align="left" border="0" cellpadding="0" cellspacing="0" width="640">
+<table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:1000px;">
     <tbody>
     <tr>
-        <td align="left" style="line-height:23px;font-size:1px" valign="top">&nbsp;</td>
-    </tr>
-    <tr>
         <td align="left" style="font-size:20px;line-height:28px;font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546" valign="top">
-            <h1 style="font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;font-size:30px;line-height:38px;color:#454546;font-weight:normal">
-                Вітаємо Вас{if not $isPartner}, {$username}{/if}!
+            <h1 style="font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;font-size:30px;line-height:38px;color:#454546;font-weight:normal; margin: 10px 0;">
+                Вітаємо Вас, {$username}!
             </h1>
-            Ви вдало придбали {length($tickets)} {if length($tickets)==1} квиток {elseif length($tickets) > 1 and length($tickets)<5} квитка {else} квитків {/if} на сайті <a href="http://www.ukraina-centr.com" style="color:#8bd61a;text-decoration:none" target="_blank">www.ukraina-centr.com</a>.
-            Деталі оплати:
+            <div>Ви вдало придбали {length($tickets)} {if length($tickets)==1} квиток {elseif length($tickets) > 1 and length($tickets)<5} квитка {else} квитків {/if} на сайті <a href="http://www.ukraina-centr.com" style="color:#8bd61a;text-decoration:none" target="_blank">www.ukraina-centr.com</a>.</div>
+            <div>Номер замовлення <b>#{$orderId}</b>.</div>
+            <div>Деталі оплати:</div>
         </td>
     </tr>
     <tr>
-        <td align="left" style="line-height:23px;font-size:1px" valign="top">&nbsp;</td>
-    </tr>
-    <tr>
-        <td bgcolor="#ffffff">
-            <table align="left" border="0" cellpadding="0" cellspacing="0" style="float:left;border:1px solid #ffffff;font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546" width="640">
+        <td style="padding-top: 20px;">
+            <table align="left" border="0" cellpadding="0" cellspacing="0" style="float:left;border:1px solid #ffffff; border-bottom: 1px solid #868686; font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546;" width="100%">
                 <tbody>
                 <tr>
-                    <td align="center" style="font-size:20px;line-height:48px;border-bottom:3px solid #eeebeb" valign="middle"><b>Пасажир</b>
+                    <td align="center" style="font-size:20px;height:40px; padding: 0 10px;border-bottom: 3px solid #868686;" valign="middle"><b>Пасажир</b>
                     </td>
-                    <td align="center" style="font-size:20px;line-height:48px;border-bottom:3px solid #eeebeb" valign="middle"><b>Маршрут</b>
+                    <td align="center" style="font-size:20px;height:40px; padding: 0 10px;border-bottom: 3px solid #868686;" valign="middle"><b>Телефон</b>
                     </td>
-                    <td align="center" style="font-size:20px;line-height:48px;border-bottom:3px solid #eeebeb" valign="middle"><b>Дата відправлення</b>
+                    <td align="center" style="font-size:20px;height:40px; padding: 0 10px;border-bottom: 3px solid #868686;" valign="middle"><b>Маршрут</b>
                     </td>
-                    <td align="center" style="font-size:20px;line-height:48px;border-bottom:3px solid #eeebeb" valign="middle"><b>Місце</b>
+                    <td align="center" style="font-size:20px;height:40px; padding: 0 10px;border-bottom: 3px solid #868686;" valign="middle"><b>Дата відправлення</b>
                     </td>
+                    <td align="center" style="font-size:20px;height:40px; padding: 0 10px;border-bottom: 3px solid #868686;" valign="middle"><b>Місце</b>
+                    </td>
+                    <td align="center" style="font-size:20px;height:40px; padding: 0 10px;border-bottom: 3px solid #868686;" valign="middle"><b>Примітка</b>
+                                        </td>
                 </tr>
                 {foreach $ticket in $tickets}
                  <tr>
-                    <td align="center" style="font-size:16px;line-height:38px;border-bottom:1px solid #eeebeb" valign="middle">{$ticket.passenger}</td>
-                    <td align="center" style="font-size:16px;line-height:38px;border-bottom:1px solid #eeebeb" valign="middle">{$ticket.route}</td>
-                    <td align="center" style="font-size:16px;line-height:38px;border-bottom:1px solid #eeebeb" valign="middle">{$ticket.startDate}</td>
-                    <td align="center" style="font-size:16px;line-height:38px;border-bottom:1px solid #eeebeb" valign="middle">{$ticket.seat}</td>
+                    <td align="left" style="font-size:16px;min-height:38px;line-height: 22px;" valign="middle"><b>{$ticket.passenger}</b></td>
+                    <td align="center" style="font-size:16px;min-height:38px;line-height: 22px;" valign="middle">{if $ticket.phone1 != null}<div>{$ticket.phone1}</div>{/if}{if $ticket.phone2 != null}<div>{$ticket.phone2}</div>{/if}</td>
+                    <td align="center" style="font-size:16px;min-height:38px;line-height: 22px;" valign="middle">{$ticket.route}</td>
+                    <td align="center" style="font-size:16px;min-height:38px;line-height: 22px;" valign="middle">{$ticket.startDate}</td>
+                    <td align="center" style="font-size:16px;min-height:38px;line-height: 22px;" valign="middle">{$ticket.seat}</td>
+                    <td align="left" style="font-size:16px;min-height:38px;line-height: 22px;" valign="middle">{$ticket.note}</td>
                  </tr>
                 {/foreach}
             </table>
         </td>
     </tr>
     <tr>
-        <td align="left" style="line-height:23px;font-size:1px" valign="top">&nbsp;</td>
-    </tr>
-    <tr>
         <td bgcolor="#ffffff">
-    <table align="center" border="0" cellpadding="0" cellspacing="0" style="border:1px solid #ffffff">
+    <table align="right" border="0" cellpadding="0" cellspacing="0" style="border:1px solid #ffffff">
         <tbody>
         <tr>
-        <td align="left" style="padding-right:10px;line-height:28px;font-size:16px;font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546" valign="bottom">
+        <td align="left" style="padding-right:10px;line-height:22px;font-size:16px;font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546" valign="bottom">
             Ціна квитків:
         </td>
-        <td align="left" style="line-height:38px;font-size:34px;font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546" valign="top">
-        <b>{$price}€ <span style="font-weight:100">або</span> {$realPrice}₴</b></td>
+        <td align="left" style="padding-right: 20px; line-height:38px;font-size:34px;font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546" valign="top">
+        <b>{$price}€</b></td>
         </tr>
         </tbody>
     </table>
         </td>
     </tr>
     <tr>
-        <td align="left" style="line-height:23px;font-size:1px" valign="top">&nbsp;</td>
+        <td align="left" style="padding-top: 20px;font-size: 20px;line-height:28px;font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546" valign="top">
+            Дякуємо Вам за довіру та приємних подорожей з <a href="http://www.ukraina-centr.com" style="color:#8bd61a;text-decoration:none" target="_blank">www.ukraina-centr.com</a>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#ffffff" style="padding-top: 20px; font-family: 'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif; color: #454546;">
+            Просимо Вас за день до виїзду підтвердити свою поїздку за одним з телефонів:
+            <div><a href="tel:%2B393391108044" value="+393391108044" target="_blank">+393391108044</a>,</div>
+            <div><a href="tel:%2B393294037611" value="+393294037611" target="_blank">+393294037611</a>,</div>
+            <div><a href="tel:%2B380675202556" value="+380675202556" target="_blank">+380675202556</a>,</div>
+            <div><a href="tel:%2B380992898928" value="+380992898928" target="_blank">+380992898928</a></div>
+        </td>
     </tr>
     <tr>
         <td align="left" style="line-height:23px;font-size:1px" valign="top">&nbsp;</td>
-    </tr>
-    <tr>
-    <td align="left" style="font-size:24px;line-height:28px;font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546" valign="top">
-        Дякуємо Вам за довіру та приємних подорожей з <a href="http://www.ukraina-centr.com" style="color:#8bd61a;text-decoration:none" target="_blank">www.ukraina-centr.com</a>
-    </td>
     </tr>
     </tbody>
 </table>

@@ -19,11 +19,14 @@ $(document).on('ready', function() {
             var tickets = data['tickets'];
             for (var i = 0, size = tickets.length; i < size; i++) {
                 var ticket = tickets[i];
+                var paymentInfo = ticket['price'] || '';
+                if (paymentInfo) paymentInfo += '€';
                 var transactionId = ticket['transactionId'];
-                if (transactionId != '') {
-                    transactionId = '20€ ('+transactionId+')';
+                if (transactionId) {
+                    paymentInfo += ' ('+transactionId+')';
                 }
-                var item = $('<tr id="'+ticket['id']+'"><td><a class="remove-ticket" href="#"><img class="delete"></a></td><td>'+ticket['trip']+'</td>' + '<td>'+ticket['phones']+'</td>' +'<td>'+ticket['passenger']+'</td>' +'<td>'+ticket['seat']+'</td><td>'+ticket['transactionId']+'</td><td></td></tr>');
+                var note = ticket['note']? ticket['note'] : '';
+                var item = $('<tr id="'+ticket['id']+'"><td><a class="remove-ticket" href="#"><img class="delete" src="img/delete.jpeg" width="24" height="24" border="0" alt="Delete"></a></td><td>'+ticket['trip']+'</td>' + '<td>'+ticket['phones']+'</td>' +'<td>'+ticket['passenger']+'</td>' +'<td>'+ticket['seat']+'</td><td>'+paymentInfo+'</td><td>'+note+'</td></tr>');
                 $ticketsTable.append(item);
             }
             $printResults.show();
@@ -40,7 +43,6 @@ $(document).on('ready', function() {
         return false;
     });
 
-    var $tripsSearch = $('.forms.show-trips');
     $printResults.on('click', function(event){
         window.print();
     });
@@ -55,7 +57,7 @@ $(document).on('ready', function() {
         data['lang'] = $('.forms.add-user').find('#user-langs').find(':selected').attr('data-role');
 
         new Request('addUser', data).send(function(data){
-            new Popup('Підтвердження', '<div>Користувач успішно створений</div>', 'white').show();
+            new Popup('Підтвердження', '<div>Користувач успішно створений</div>', '').show();
         });
     });
 

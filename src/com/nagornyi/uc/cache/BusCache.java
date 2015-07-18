@@ -20,9 +20,7 @@ public class BusCache extends EntityCache {
 
     @Override
     public void fillCache() {
-        IBusDAO dao = DAOFacade.getDAO(Bus.class);
-
-        List<Bus> bs = dao.getAll();
+        List<Bus> bs = DAOFacade.findAll(Bus.class);
         for (Bus bus: bs) {
             bus.getSeats();
             buses.put(bus.getStringKey(), bus);

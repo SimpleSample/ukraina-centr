@@ -30,6 +30,7 @@ public class Ticket extends EntityWrapper {
     private double calculatedPrice;
     private Order order;
     private User user;
+    private String note;
 
     public Ticket(Trip trip) {
         super(trip.getEntity().getKey());
@@ -94,6 +95,13 @@ public class Ticket extends EntityWrapper {
         return Status.valueOf(i);
     }
 
+    public String getPhones() {
+        String phones = "";
+        if (getPhone1() != null) phones += getPhone1();
+        if (getPhone2() != null) phones += ", "+getPhone2();
+        return phones;
+    }
+
     public void setStatus(Status status) {
         setProperty("status", status.idx);
     }
@@ -138,6 +146,14 @@ public class Ticket extends EntityWrapper {
         setProperty("calculatedPrice", calculatedPrice);
     }
 
+    public String getNote() {
+        return getProperty("note");
+    }
+
+    public void setNote(String note) {
+        setProperty("note", note);
+    }
+
     public Order getOrder() {
         if (order == null) {
             Key orderKey = getProperty("orderId");
@@ -156,14 +172,13 @@ public class Ticket extends EntityWrapper {
         JSONObject obj = new JSONObject();
         obj.put("id", getStringKey());
         obj.put("passenger", getPassenger());
-        String phone = "";
-        if (getPhone1() != null) phone += getPhone1()+", ";
-        if (getPhone2() != null) phone += getPhone2();
-        obj.put("phones", phone);
+        obj.put("phones", getPhones());
         obj.put("trip", getStartCity().getLocalizedName(locale) + " - " + getEndCity().getLocalizedName(locale));
         obj.put("startDate", DateFormatter.format(getStartDate(), locale));
         obj.put("seat", getSeat().getSeatNum());
         obj.put("status", getStatus().name());
+        obj.put("price", getCalculatedPrice());
+        obj.put("note", getNote());
         return obj;
     }
 
