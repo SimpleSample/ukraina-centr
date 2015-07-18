@@ -1,0 +1,270 @@
+.user-board {
+    padding-left: 60px;
+}
+
+.profile-menu {
+    width: 56px;
+    position: absolute;
+    left: 20px;
+}
+
+.profile-workplace {
+    width: 100%;
+    display: inline-block;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.16);
+}
+
+.profile-menu-list {
+    border-radius: 5px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.16);
+    margin-right: 10px;
+}
+
+.profile-menu-list__item {
+    background-color: #fff;
+    padding: 10px 20px;
+    color: #747474;
+    font-size: 18px;
+    cursor: pointer;
+    font-weight: 100;
+    position: relative;
+    min-height: 45px;
+    transition: all 0.3s ease;
+}
+
+.profile-menu-list__item:before {
+    content: ' ';
+    top: 10px;
+    left: 10px;
+    position: absolute;
+    width: 24px;
+    height: 24px;
+}
+
+li.profile-menu-list__item:hover {
+    border: 1px solid #D0D0D0;
+    background-color: #EDEDED;
+    color: #282828;
+}
+
+.profile-menu-list__item:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.profile-menu-list__item:last-child {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.profile-menu-list__item a {
+    color: #747474;
+}
+
+.profile-menu-list__item.green {
+    border-left: 4px solid #9EF10F;
+}
+
+.profile-menu-list__item.green:before {
+    background: url(../img/history_icon.png) no-repeat;
+}
+
+.profile-menu-list__item.green:hover:before {
+    background: url(../img/history_icon_green.png) no-repeat;
+}
+
+.profile-menu-list__item.yellow {
+    border-left: 4px solid #FFE800;
+}
+
+.profile-menu-list__item.yellow:before {
+    background: url(../img/change_icon.png) no-repeat;
+}
+
+.profile-menu-list__item.yellow:hover:before {
+    background: url(../img/change_icon_yellow.png) no-repeat;
+}
+
+.profile-menu-list__item.red {
+    border-left: 4px solid #F10F76;
+}
+
+.profile-menu-list__item.red:before {
+    background: url(../img/personal_icon.png) no-repeat;
+}
+
+.profile-menu-list__item.red:hover:before {
+    background: url(../img/personal_icon_red.png) no-repeat;
+}
+
+.profile-menu-list__item.blue {
+    border-left: 4px solid #74B2F9;
+}
+
+.profile-menu-list__item.blue:before {
+    background: url(../img/logout_icon.png) no-repeat;
+}
+
+.profile-menu-list__item.blue:hover:before {
+    background: url(../img/logout_icon_blue.png) no-repeat;
+}
+
+.profile-menu-list__item_text {
+    padding-left: 20px;
+    display: none;
+}
+
+/*tablesaw customization*/
+.history-table {
+    overflow-x: auto;
+    padding: 10px 0;
+}
+
+.history-table .tablesaw thead {
+    border: none;
+    background: none;
+    border-bottom: 3px solid #C8C8C8;
+    border-top: 1px solid #C8C8C8;
+}
+
+.history-table .tablesaw .tablesaw-cell-content, .history-table .tablesaw td {
+    color: #747474;
+    font-weight: 100;
+}
+
+.history-table .tablesaw .tablesaw-cell-label {
+    font-family: 'Roboto', sans-serif;
+    text-transform: none;
+    font-weight: normal;
+    font-size: 16px;
+}
+
+.history-table .tablesaw thead tr:first-child th {
+    font-family: 'Roboto', sans-serif;
+    border-right: none;
+}
+
+.history-table .tablesaw tbody tr {
+    transition: all 0.3s ease;
+}
+
+.history-table .tablesaw tbody tr:hover {
+    background-color: rgba(158, 241, 15, 0.47);
+}
+
+.history-table .tablesaw-bar .btn.btn-select {
+    margin-top: -2px;
+}
+
+.history-table .tablesaw-bar .tablesaw-advance a.tablesaw-nav-btn.down:before {
+    left: .35em;
+}
+
+.history-table .tablesaw-sortable .tablesaw-sortable-head button,
+.history-table .tablesaw-sortable thead tr th {
+    text-transform: none;
+    color: #747474;
+    font-size: 18px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.history-table .tablesaw-advance-dots li i {
+    vertical-align: super;
+}
+
+.history-table .tablesaw-bar .tablesaw-toolbar .btn-select:after {
+    padding-top: 1.2em;
+    padding-right: 1.6em;
+}
+
+.history-table .tablesaw-sortable-switch, .history-table .tablesaw-modeswitch {
+    padding-left: 10px;
+}
+
+.history-table .tablesaw-advance {
+    padding-right: 10px;
+}
+
+.history-table .tablesaw-toolbar label {
+    margin-right: 0;
+}
+
+.history-table .tablesaw-bar .btn.btn-select {
+    border: 1px solid #C8C8C8;
+}
+
+@media (max-width: 39.9375em) {
+    .history-table .tablesaw .tablesaw-cell-content {
+        float: right;
+    }
+}
+
+/*pager*/
+.tablesaw-pager {
+    font-size: 18px;
+    padding: 10px;
+}
+
+.tablesaw-pager-container .pager-element {
+    border: 1px solid #DFDFDF;
+    padding: 5px 10px;
+    transition: all 0.3s ease;
+}
+.tablesaw-pager-container {
+    float: right;
+}
+
+.pager-element.disabled a {
+    color: #DFDFDF;
+    cursor: not-allowed;
+}
+
+.pager-element.disabled:hover {
+    background-color: #FFF;
+}
+
+.pager-element.pager-prev {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.pager-element.pager-next {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.tablesaw-pager-container .pager-element:hover {
+    background-color: rgba(158, 241, 15, 0.47);
+}
+
+.pager-element.active a {
+    color: #fff;
+}
+
+.pager-element.active {
+    background-color: #9DCC37;
+    border: 1px solid #9DCC37;
+}
+
+@media (min-width: 768px) {
+    .user-board {
+        padding-left: 0;
+    }
+
+    .profile-menu {
+        width: 20%;
+        position: relative;
+        display: inline-block;
+        left:0;
+    }
+
+    .profile-menu-list__item_text {
+        display: block;
+    }
+
+    .profile-workplace {
+        width: 79%;
+    }
+}

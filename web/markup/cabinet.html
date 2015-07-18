@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <link href='http://fonts.googleapis.com/css?family=Roboto:300,400&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../css/bootstrap.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="../css/reset.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="../css/ng/popup.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="../css/ng/style.css" type="text/css" media="screen">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <script src="../js/jquery-1.7.1.min.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js?hl=uk&render=explicit" async defer></script>
+    <script src="../js/EventBus.js" type="text/javascript"></script>
+    <script src="../js/ng/ng.common.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="../markup/cabinet.css"/>
+    <link rel="stylesheet" href="../css/tablesaw.css"/>
+    <script src="../js/jquery-ui.min.js"></script>
+    <script>
+        Tablesaw = {
+        i18n: {
+            modes: [ 'Stack', 'Swipe', 'Toggle' ],
+            columns: 'Кол<span class=\"a11y-sm\">онк</span>и',
+            columnBtnText: 'Колонки',
+            columnsDialogError: 'Колонки недоступні.',
+            sort: 'Сортування'
+        }
+    };
+    </script>
+    <script src="../js/tablesaw.js" type="text/javascript"></script>
+    <script src="../js/ng/ng.cabinet.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="../css/ng/cabinet.css" />
+    <title></title>
+</head>
+<body>
+<header class="uc-page-header">
+    <div class="container">
+        <div class="clear-both">
+            <a class="logo" href="../">
+                <img src="../img/logo.png" alt="Україна-Центр">
+            </a>
+            <div class="uc"><img src="../img/UC.png"></div>
+            <div class="header-right">
+                <div class="auth-links clear-both">
+                    <a href="#" id="login" style="display: none;" class="italic">header.login</a>
+                    <a href="#" id="cabinet" style="display: none;" class="italic">header.cabinet</a>
+                    <a href="#" id="register" style="display: none;" class="italic">header.register</a>
+                    <a href="#" id="logout" style="display: none;" class="italic">header.logout</a>
+                </div>
+                <div class="bottom-header-line clear-both">
+                    <div style="min-width:60px;" id="currency-container"></div>
+                    <div class="lang">
+                        <a id="flag-it" class="flag" href="#"><img src="../img/flag-italy.png"></a>
+                        <a id="flag-ukr" class="flag active" href="#"><img src="../img/flag-ukraine.png"></a>
+                        <a id="flag-en" class="flag" href="#"><img src="../img/flag-uk.png"></a>
+                        <a id="flag-ru" class="flag" href="#"><img src="../img/rus.png"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav class="navbar uc-navbar">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+
+                </div>
+                <div id="navbar" class="navbar-collapse collapse in">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>&nbsp;</li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<div class="container-fluid page-content">
+    <div class="container pad-container">
+        <article>
+            <div id="message-container"></div>
+            <h2>cabinet.personal_cabinet</h2>
+            <div class="user-board" style="width: 100%;">
+                <div class="profile-menu">
+                    <ul class="profile-menu-list">
+                        <li class="profile-menu-list__item green">
+                            <a href="#" id="order-history" class="profile-menu-list__item_text">Історія замовлень</a>
+                        </li>
+                        <li class="profile-menu-list__item yellow">
+                            <a href="#" id="password-change" class="profile-menu-list__item_text">Зміна паролю</a>
+                        </li>
+                        <li class="profile-menu-list__item red">
+                            <a href="#" id="personal-data" class="profile-menu-list__item_text">Особисті дані</a>
+                        </li>
+                        <li class="profile-menu-list__item blue">
+                            <a href="#" id="cabinet-logout" class="profile-menu-list__item_text">Вихід</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="profile-workplace">
+                    <div class="history-table">
+                        <table class="tablesaw tablesaw-swipe tablesaw-sortable" data-tablesaw-mode-exclude="columntoggle" data-tablesaw-mode="swipe" data-tablesaw-sortable="" data-tablesaw-sortable-switch="" data-tablesaw-minimap="" data-tablesaw-mode-switch="">
+                            <thead>
+                            <tr>
+                                <th data-tablesaw-sortable-col data-tablesaw-sortable-switch data-tablesaw-priority="persist">Пасажир</th>
+                                <th data-tablesaw-priority="6">Телефони</th>
+                                <th data-tablesaw-sortable-col data-tablesaw-sortable-switch data-tablesaw-priority="4">Маршрут</th>
+                                <th data-tablesaw-sortable-col data-tablesaw-sortable-switch data-tablesaw-priority="4">Дата відправлення</th>
+                                <th data-tablesaw-priority="2">Місце</th>
+                                <th data-tablesaw-sortable-col data-tablesaw-sortable-switch data-tablesaw-priority="6">Статус</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            
+                            </tbody>
+                        </table>
+                        <div class="tablesaw-pager">
+                            <div class="tablesaw-pager-container">
+                                <table>
+                                    <tr>
+                                        <td><div class="pager-element pager-prev"><a href="#">Prev</a></div></td>
+                                        <td><div class="pager-element"><a href="#">1</a></div></td>
+                                        <td><div class="pager-element"><a href="#">2</a></div></td>
+                                        <td><div class="pager-element"><a href="#">3</a></div></td>
+                                        <td><div class="pager-element pager-next"><a href="#">Next</a></div></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+<footer class="uc-page-footer">
+    <div class="container">
+        <div class="col-sm-4 spacer-1">
+            <div class="footer-logo">
+                <a href="../">
+                    <img src="../img/logo.png" alt="Україна-Центр">
+                </a>
+            </div>
+        </div>
+        <div class="col-sm-4 spacer-1">
+            <p class="footer-p">Contacts:</p>Kyivstar: +380 67 520 2556 <br>MTC: +380 99 289 8928 <br>Email: <a class="link italic" href="#">ukraina.centr@gmail.com</a>
+        </div>
+        <div class="col-sm-4">
+            <p class="footer-p">Designed by Ng</p>
+            <p class="footer-p">Email: <a class="link italic" href="#">forartforces@gmail.com</a></p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    $(document).ready(function() {
+        $('#order-history').on('click tap', function(eve){
+            eve.preventDefault();
+
+            return false;
+        });
+        $('#password-change').on('click tap', function(eve){
+            eve.preventDefault();
+            var popup = new Popup('Зміна паролю', window.uc.changePassTemplate, '', function(popupId) {
+                $(popupId + ' #btn-change-pass').click(function(event){
+                    event.preventDefault();
+                    var popupEl = $(popupId);
+                    var $old = popupEl.find('#user-password-old');
+                    var oldVal = $old.val();
+                    var newVal = popupEl.find('#user-password').val();
+                    var isOldPassValid = /^[0-9a-zA-Z]{8,}$/.test(oldVal);
+                    var isNewPassValid = /^[0-9a-zA-Z]{8,}$/.test(newVal);
+                    if (!isOldPassValid || !isNewPassValid) {
+                        new Message(clientBundle.password_should_be_at_least_8_symbols_long, 5000);
+                        return;
+                    }
+
+                    new Request("changePass", {oldPass: oldVal, newPass: newVal}).send(function(data) {
+                        popup.destroy();
+                        if (data && data['newPass']) {
+                            if ($old.hasClass('input-error')) $old.removeClass('input-error');
+                            new Popup(clientBundle.password_change, '<div>'+clientBundle.password_was_changed_successfully+'</div>','').show();
+                        } else {
+                            $changePass.find('#user-password-old').addClass('input-error');
+                            new Popup(clientBundle.password_change, '<div>'+clientBundle.old_password_is_not_correct+'</div>', '').show();
+                        }
+                    });
+                    return false;
+                });
+
+            });
+            popup.show();
+            return false;
+        });
+        $('#personal-data').on('click tap', function(eve){
+            eve.preventDefault();
+
+            return false;
+        });
+        $('#cabinet-logout').on('click tap', function(eve){
+            eve.preventDefault();
+            window.logout(function(){
+                window.location.href = '/';
+            });
+
+            return false;
+        });
+        
+        setTimeout(function () {
+            $('.history-table tbody').append('<tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDurIQJDA"><td>Odmin Admin</td><td></td><td>Чезене - Кіровоград</td><td>24 жовтня, 2015 11:15</td><td>2b</td><td>RESERVED</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDuwYwJDA">                    <td>Мdmin Admin</td><td></td><td>Вінниця - Кіровоград</td><td>25 квітня, 2015 11:15</td><td>2a</td><td>PROCESSING</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDu2pUJDA">                    <td>зdmin Admin</td><td class="ticket-trip"></td><td>КРим - Кіровоград</td><td>5 вересня, 2015 11:15</td><td>1a</td><td>RESERVED</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDurIQKDA">                    <td>trdmin Admin</td><td class="ticket-trip"></td><td>Рим - Кіровоград</td><td>25 жовтня, 2015 11:15</td><td>2d</td><td>PROCESSING</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDuwYwKDA">                    <td>раdmin Admin</td><td class="ticket-trip"></td><td>СРим - Кіровоград</td><td>25 жовтня, 2015 11:15</td><td>1b</td><td>RESERVED</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDu2pUKDA">                    <td>Admin Admin</td><td></td><td>Рим - Кіровоград</td><td>25 жовтня, 2015 11:15</td><td>1d</td><td>PROCESSING</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDurIQLDA">                    <td>Admin Admin</td><td></td><td>Рим - Кіровоград</td><td>25 жовтня, 2015 11:15</td><td>1c</td><td>RESERVED</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDu2pULDA">                    <td>Admin Admin</td><td></td><td>Рим - Кіровоград</td><td>25 жовтня, 2015 11:15</td><td>2c</td><td>PROCESSING</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgK6OngoMCxIGVGlja2V0GICAgICumYAJDA">                    <td>Admin Admin</td><td></td><td>Рим - Кіровоград</td><td>18 жовтня, 2015 11:15</td><td>2b</td><td>RESERVED</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgK6OngoMCxIGVGlja2V0GICAgICu54gJDA">                    <td>Admin Admin</td><td></td><td>Рим - Кіровоград</td><td>18 жовтня, 2015 11:15</td><td>2a</td><td>PROCESSING</td></tr>');
+//            $('.history-table table').table().data( "table" ).refresh();
+        }, 5000);
+    });
+    var clientBundle = clientBundle || {};
+    clientBundle.old_password="Старий пароль";
+    clientBundle.new_one="Новий пароль";
+    clientBundle.change_it="Змінити";
+
+    window.uc.changePassTemplate =
+            '<div class="forms">' +
+            '<label><input type="password" name="password" id="user-password-old" placeholder="'+clientBundle.old_password+'"></label>' +
+            '<label><input type="password" name="password" id="user-password" placeholder="'+clientBundle.new_one+'"></label>' +
+            '<div class="clear-both">' +
+            '<button id="btn-change-pass" class="btn btn-left btn-green">'+clientBundle.change_it+'</button>' +
+            '</div>' +
+            '</div>';
+</script>
+</body>
+</html>
