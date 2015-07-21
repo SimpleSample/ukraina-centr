@@ -41,10 +41,24 @@ MiscUtils = {
             result = CurrencyUtils.round(result, -1);
         }
         return result;
+    },
+
+    adjustWeekDay: function(date, weekDay) {
+        var dateWeekDay = date.getDay();
+        var daysToAdd = 0;
+        if (dateWeekDay < weekDay) {
+            daysToAdd = weekDay - dateWeekDay;
+        } else {
+            daysToAdd = 7 - dateWeekDay + weekDay;
+        }
+
+        var miliseconds = date.getTime() + daysToAdd * 24 * 60* 60 * 1000;
+        return new Date(miliseconds);
     }
 };
 
 (function() {
+    var UKRAINE = "ag9zfnVrcmFpbmEtY2VudHJyEAsSB0NvdW50cnkiA3Vrcgw";
     var clientBundle = window.clientBundle;
     function getCleanState() {
         return {
@@ -61,6 +75,7 @@ MiscUtils = {
             selectedBackTrip: null,
 
             currency: 'uah',
+            serverLockedTickets: [],
             order: {
                 tickets: {}
             }
@@ -147,22 +162,6 @@ MiscUtils = {
             return State.bothDirections;
         },
 
-        setForthTrip: function(forthTrips) {
-            State.forthTrips = forthTrips;
-        },
-
-        getForthTrip: function() {
-            return State.forthTrips;
-        },
-
-        setBackTrip: function(backTrips) {
-            State.backTrips = backTrips;
-        },
-
-        getBackTrip: function() {
-            return State.backTrips;
-        },
-
         setSelectedForthTrip: function(selectedForthTrip) {
             State.selectedForthTrip = selectedForthTrip;
         },
@@ -184,15 +183,39 @@ MiscUtils = {
         },
 
         removeTicket: function(ticketId) {
+            var ticket = this.getTicket(ticketId);
             delete State.order.tickets[ticketId];
+            return ticket;
         },
 
         getTicket: function(ticketId) {
             return State.order.tickets[ticketId];
         },
 
+        getTickets: function() {
+            return State.order.tickets;
+        },
+
         getOrder: function() {
             return State.order;
+        },
+
+        getServerLockedTickets: function() {
+            return State.serverLockedTickets;
+        },
+
+        addServerLockedTicket: function(tripId, ticketId) {
+            State.serverLockedTickets[State.serverLockedTickets.length] = {tripId:tripId, ticketId: ticketId};
+        },
+
+        removeServerLockedTicket: function(tripId, ticketId) {
+            for (var i = 0; i < State.serverLockedTickets.length; i++) {
+                var ticketToUnlock = State.serverLockedTickets[i];
+                if (ticketToUnlock.tripId === tripId && ticketToUnlock.ticketId === ticketId) {
+                    State.serverLockedTickets.splice(i, 1);
+                    return;
+                }
+            }
         }
     };
 
@@ -211,6 +234,8 @@ MiscUtils = {
         this.currentForthDate = null;
         this.currentBackDate = null;
         this.currentBackDirection = false;
+
+        this.isCurrentForth = true;
     };
 
     SelectionBoard.prototype = {
@@ -231,7 +256,15 @@ MiscUtils = {
                 that.$startCitySelect.on('change', function() {
                     var id = that.$startCitySelect.val()? MiscUtils.getSelectedId(that.$startCitySelect, 1) : null;
                     var newStartCity = id? dataStore.get(id) : null;
+                    var temp = UKRAINE == newStartCity.country;
+                    if (that.isCurrentForth != temp){
+                        var forthDayOfWeek = temp? 4 : 0;
+                        var backDayOfWeek = temp? 0 : 4;
+                        forthDateWidget.setDate(MiscUtils.adjustWeekDay(new Date(), forthDayOfWeek));
+                        backDateWidget.setDate(MiscUtils.adjustWeekDay(selectedForthDate, backDayOfWeek));
+                    }
                     that.onStartCityChange(newStartCity);
+                    that.isCurrentForth = temp;
                 });
 
                 that.$endCitySelect.on('change', function() {
@@ -250,23 +283,47 @@ MiscUtils = {
                 });
             });
 
-            var forthDateWidget = getDateField(this.$forthDatePicker, function(date) {
-                that.currentForthDate = date.getTime();
-                if (date.getTime() > backDateWidget.getDate().getTime()) {
-                    backDateWidget.setDate(new Date(date.getTime()+24*60*60*1000));
-                }
-            });
+            var forthDayOfWeek = that.isCurrentForth? 4 : 0;
+            var backDayOfWeek = that.isCurrentForth? 0 : 4;
+            var selectedForthDate = MiscUtils.adjustWeekDay(new Date(), forthDayOfWeek);
+            var forthDateWidget =
+                new DateField(this.$forthDatePicker)
+                        .setSelectedDate(selectedForthDate)
+                        .setSelectFunction(function(date) {
+                            that.currentForthDate = date.getTime();
+                            if (date.getTime() > backDateWidget.getDate().getTime()) {
+                                var dayOfWeek = that.isCurrentForth? 0 : 4;
+                                backDateWidget.setDate(MiscUtils.adjustWeekDay(date, dayOfWeek));
+                            }
+                        })
+                        .setDisableDayFunction(function(date) {
+                            var dayOfWeek = that.isCurrentForth? 4 : 0;
+                            if (date.getDay() !== dayOfWeek) return true;
+                        })
+                        .createPikaday();
+
             this.currentForthDate = forthDateWidget.getDate().getTime();
 
-            var backDateWidget = getDateField(this.$backDatePicker, function(date) {
-                that.currentBackDate = date.getTime();
-                if (date.getTime() < forthDateWidget.getDate().getTime()) {
-                    forthDateWidget.setDate(new Date());
-                }
-            });
+            var selectedBackDate = MiscUtils.adjustWeekDay(selectedForthDate, backDayOfWeek);
+            var backDateWidget =
+                new DateField(this.$backDatePicker)
+                        .setSelectedDate(selectedBackDate)
+                        .setSelectFunction(function(date) {
+                            that.currentBackDate = date.getTime();
+                            if (date.getTime() < forthDateWidget.getDate().getTime()) {
+                                var dayOfWeek = that.isCurrentForth? 4 : 0;
+                                forthDateWidget.setDate(MiscUtils.adjustWeekDay(new Date(), dayOfWeek));
+                            }
+                        })
+                        .setDisableDayFunction(function(date) {
+                            var dayOfWeek = that.isCurrentForth? 0 : 4;
+                            if (date.getDay() !== dayOfWeek) return true;
+                        })
+                        .createPikaday();
+
             this.currentBackDate = backDateWidget.getDate().getTime();
 
-            $('#search-trips').click(function(event) {
+            $('#show-tickets').click(function(event) {
                 event.preventDefault();
                 if (!that.validateInputs()) return false;
 
@@ -314,82 +371,74 @@ MiscUtils = {
 
     window.OrderBoard = function ($orderBoard) {
         this.$orderBoard = $orderBoard;
-        this.$division = $('#division');
 
         this.ticketsBoard = new TicketsBoard();
-        this.tripsBoard = new TripsBoard(this.ticketsBoard);
-
-        var that = this;
-        EventBus.addEventListener('ticket_added', function(event) {
-            if (that.ticketsBoard.getTicketsSize() == 1) {
-                that.$orderBoard.addClass('board-wide');
-            }
-        });
-        EventBus.addEventListener('before_ticket_removed', function(event) {
-            if (that.ticketsBoard.getTicketsSize() == 1) {
-                that.$orderBoard.removeClass('board-wide');
-            }
-        });
+        this.tripsBoard = new TripsBoard($orderBoard, this.ticketsBoard);
     };
 
     OrderBoard.prototype = {
         constructor : OrderBoard,
 
         searchTrips: function (startCityId, endCityId, forthDate, backDate, bothDirections) {
-            StateManager.setStartCity(dataStore.get(startCityId));
-            StateManager.setEndCity(dataStore.get(endCityId));
-            StateManager.setForthDate(forthDate);
-            StateManager.setBackDate(backDate);
-            StateManager.setBothDirections(bothDirections);
-
             var that = this;
+            this.clean(function() {
+                StateManager.setStartCity(dataStore.get(startCityId));
+                StateManager.setEndCity(dataStore.get(endCityId));
+                StateManager.setForthDate(forthDate);
+                StateManager.setBackDate(backDate);
+                StateManager.setBothDirections(bothDirections);
 
-            var data = {
-                startCityId: startCityId,
-                endCityId: endCityId,
-                startDate: forthDate,
-                tzOffset: MiscUtils.getTimezoneOffset()
-            };
-            if (bothDirections) {
-                data['endDate'] = backDate;
-            }
-
-            new Request('search', data).send(function(data) {
-                that.clean();
-                if (!data['forthTrips']) {
-                    that.$orderBoard.hide();
-                    new Message(clientBundle.could_not_find_ticket_for_chosen_date, 10000);
-                    return;
-                }
-                that.$division.show();
-                if (StateManager.getBothDirections() && !data['backTrips']) {
-                    StateManager.setBothDirections(false);
+                var data = {
+                    startCityId: startCityId,
+                    endCityId: endCityId,
+                    startDate: forthDate,
+                    tzOffset: MiscUtils.getTimezoneOffset()
+                };
+                if (bothDirections) {
+                    data['endDate'] = backDate;
                 }
 
-                that.tripsBoard.setTrips(data['forthTrips'], data['backTrips']);
-                that.ticketsBoard.setDiscounts(data['discounts']);
+                new Request('searchForWeekdays', data).send(function(data) {
+                    if (!data['forthTrips']) {
+                        that.tripsBoard.hide();
+                        new Message(clientBundle.could_not_find_ticket_for_chosen_date, 10000);
+                        return;
+                    }
+                    if (StateManager.getBothDirections() && !data['backTrips']) {
+                        StateManager.setBothDirections(false);
+                    }
 
-                that.tripsBoard.drawLayout();
-                that.$orderBoard.show();
+                    that.tripsBoard.setTrips(data['forthTrips'], data['backTrips']);
+                    that.ticketsBoard.setDiscounts(data['discounts']);
+
+                    that.tripsBoard.drawLayout();
+                    that.tripsBoard.show();
+                });
             });
         },
 
-        clean: function() {
+        clean: function(callback) {
+            var that = this;
             this.tripsBoard.clean();
-            this.ticketsBoard.clean();
+            this.ticketsBoard.clean(function(){
+                that.tripsBoard.hide(function() {
+                    StateManager.clearState();
+                    if (callback) callback();
+                });
+            });
         }
     };
 
-    window.TripsBoard = function (ticketsBoard) {
+    window.TripsBoard = function ($container, ticketsBoard) {
 
+        this.$container = $container;
         this.ticketsBoard = ticketsBoard;
         this.trips = {};
 
+        this.$tripsBoard = $('.results');
         this.$forthTrips = $('#forth-trips');
         this.$backTrips = $('#back-trips');
-
-        this.currentForthTrip = null;
-        this.currentBackTrip = null;
+        this.$createTicketBtn = this.$tripsBoard.find('#create-ticket');
 
         this.init();
     };
@@ -399,124 +448,103 @@ MiscUtils = {
 
         init: function() {
             var that = this;
-            this.$forthTrips.on('click', function(event) {
+            this.$createTicketBtn.click(function(event) {
                 event.preventDefault();
-                var $forthTripEl = $(event.target);
-                if ($forthTripEl.prop('tagName') !== 'A' && that.ticketsBoard.hasNoTickets()) {
-                    return false;
-                }
-                if ($forthTripEl.prop('tagName') === 'A' && !isAuthorized()) {
+                if (!isAuthorized()) {
                     new Message(clientBundle.login_to_perform_this_operation, 10000);
                     return false;
                 }
-                if (!$forthTripEl.hasClass('trip')) {
-                    $forthTripEl = $forthTripEl.parents('.trip');
-                    if (!$forthTripEl.length) return false;
-                }
 
-                that.setTripElementActive($forthTripEl);
-                that.currentForthTrip = dataStore.get($forthTripEl.attr('id'));
-                var isInitial = false;
-                if(StateManager.getBothDirections() && !that.currentBackTrip) {
-                    that.currentBackTrip = StateManager.getBackTrip()[0];
-                    that.setTripElementActive($('#'+that.currentBackTrip.id));
-                    isInitial = true;
-                }
-
-                if (!StateManager.getSelectedForthTrip() || that.currentForthTrip.id != StateManager.getSelectedForthTrip().id) {
-                    that.ticketsBoard.changeTrip(that.currentForthTrip);
-                }
-                if (StateManager.getBothDirections() && (isInitial || !StateManager.getSelectedBackTrip() || that.currentBackTrip.id != StateManager.getSelectedBackTrip().id)) {
-                    that.ticketsBoard.changeTrip(that.currentBackTrip);
-                }
-                if ($(event.target).prop('tagName') === 'A') {
-                    that.ticketsBoard.addTicketElement(that.currentForthTrip, that.currentBackTrip);
-                }
+                that.ticketsBoard.addTicketElement(StateManager.getSelectedForthTrip(), StateManager.getSelectedBackTrip());
+                that.$createTicketBtn.addClass('btn-hidden');
+                that.$tripsBoard.addClass('bordered');
             });
-
-            this.$backTrips.on('click', function(event) {
-                event.preventDefault();
-                var $backTripEl = $(event.target);
-                if ($backTripEl.hasClass('disabled')) return false;
-                if (that.ticketsBoard.hasNoTickets()) return false;
-
-                if(!$backTripEl.hasClass('trip')) {
-                    $backTripEl = $backTripEl.parents('.trip');
-                    if($backTripEl.length === 0) return false;
+            EventBus.addEventListener('ticket_removed', function(event) {
+                if (that.ticketsBoard.getTicketsSize() == 0) {
+                    that.$tripsBoard.removeClass('bordered');
+                    that.$createTicketBtn.removeClass('btn-hidden');
                 }
-
-                var backTripId = $backTripEl.attr('id');
-                if (that.currentBackTrip && that.currentBackTrip.id === backTripId) return false;
-
-                that.setTripElementActive($backTripEl);
-                that.currentBackTrip = dataStore.get(backTripId);
-
-                that.ticketsBoard.changeTrip(that.currentBackTrip);
             });
         },
 
         setTrips: function(forthTrips, backTrips) {
-            function setTrips(trips, isForth) {
-                for (var i = 0, size = trips.length; i < size; i++) {
-                    var trip = trips[i];
-                    trip.isForth = isForth;
-                    trip.lockedSeats = [];
-                    dataStore.set(trip, 'Trip');
-                    var seats = trip['seats'];
-                    for (var j = 0; j < seats.length; j++) {
-                        var seat = seats[j];
-                        if (!dataStore.get(seat.id)) dataStore.set(seat, 'Seat');
-                    }
+            function setTrip(trip, isForth) {
+                trip.isForth = isForth;
+                trip.lockedSeats = [];
+                dataStore.set(trip, 'Trip');
+                var seats = trip['seats'];
+                for (var j = 0; j < seats.length; j++) {
+                    var seat = seats[j];
+                    if (!dataStore.get(seat.id)) dataStore.set(seat, 'Seat');
                 }
             }
 
-            setTrips(forthTrips, true); StateManager.setForthTrip(forthTrips);
+            var forthTrip = forthTrips[0];
+            setTrip(forthTrip, true); StateManager.setSelectedForthTrip(forthTrip);
             if (backTrips) {
-                setTrips(backTrips, false);
-                StateManager.setBackTrip(backTrips);
+                var backTrip = backTrips[0];
+                setTrip(backTrip, false);
+                StateManager.setSelectedBackTrip(backTrip);
             }
         },
 
         drawLayout: function() {
-            function drawTripsBlock($tripsBlock, trips, startCity, endCity) {
+            function drawTripsBlock($tripsBlock, trip, startCity, endCity) {
                 var route = startCity.name + ' - ' + endCity.name;
                 $tripsBlock.append($(uc.tripGroupTemplate(route)));
-                var $trips = $tripsBlock.find('.trips');
-                for (var i = 0, size = trips.length; i < size; i++) {
-                    var trip = trips[i];
-                    $trips.append($(uc.tripTemplate(trip)));
-                }
+                $tripsBlock.find('.trips').append($(uc.tripTemplate(trip)));
                 $tripsBlock.show();
             }
 
-            drawTripsBlock(this.$forthTrips, StateManager.getForthTrip(), StateManager.getStartCity(), StateManager.getEndCity());
+            drawTripsBlock(this.$forthTrips, StateManager.getSelectedForthTrip(), StateManager.getStartCity(), StateManager.getEndCity());
 
-            if (StateManager.getBackTrip()) {
-                drawTripsBlock(this.$backTrips, StateManager.getBackTrip(), StateManager.getEndCity(), StateManager.getStartCity());
+            if (StateManager.getSelectedBackTrip()) {
+                drawTripsBlock(this.$backTrips, StateManager.getSelectedBackTrip(), StateManager.getEndCity(), StateManager.getStartCity());
             } else {
                 this.$backTrips.hide();
             }
+
         },
 
-        setTripElementActive: function($tripElement) {
-            $tripElement.parent().find('.trip.active').removeClass('active');
-            $tripElement.addClass('active');
+        show: function() {
+            var that = this;
+            this.$container.animate({
+                height: "toggle"
+            }, 300, function() {
+                that.$createTicketBtn.removeClass('btn-hidden');
+            });
+        },
+
+        hide: function(callback) {
+            var that = this;
+            this.ticketsBoard.hide(function(){
+                if (that.$container.css('display') == 'none') {
+                    if (callback) callback();
+                    return;
+                }
+
+                that.$createTicketBtn.addClass('btn-hidden');
+                that.$tripsBoard.removeClass('bordered');
+                that.$container.animate({
+                    height: "toggle"
+                }, 300, function() {
+                    if (callback) callback();
+                });
+            });
         },
 
         clean: function() {
             this.$forthTrips.empty();
             this.$backTrips.empty();
 
-            StateManager.setForthTrip(null);
-            StateManager.setBackTrip(null);
-
-            this.currentForthTrip = null;
-            this.currentBackTrip = null;
+            StateManager.setSelectedForthTrip(null);
+            StateManager.setSelectedBackTrip(null);
         }
     };
 
     window.TicketsBoard = function () {
         this.discounts = {};
+        this.serverLockedTickets = {};
 
         this.$ticketBoard = $('.ticket-board');
         this.$tickets = $('#tickets');
@@ -529,17 +557,18 @@ MiscUtils = {
         init: function() {
             var that = this;
             this.$tickets.click(function(event){
+                if (event.target === that.$tickets[0]) return;
+
                 var $target = $(event.target);
+                var $ticket = $target.parents('.ticket');
+                if (!$ticket.hasClass('active')) {
+                    that.$tickets.find('.ticket.active').removeClass('active');
+                    $ticket.addClass('active');
+                }
                 if ($target.prop('tagName') === 'BUTTON') {
                     var trip = $target.hasClass('forth')? StateManager.getSelectedForthTrip() : StateManager.getSelectedBackTrip();
                     var ticketId = $target.parents('.ticket').attr('id');
                     new BusSchemePopup(StateManager.getTicket(ticketId), trip).show();
-                } else {
-                    var $ticket = $target.parents('.ticket');
-                    if (!$ticket.hasClass('active')) {
-                        that.$tickets.find('.ticket.active').removeClass('active');
-                        $ticket.addClass('active');
-                    }
                 }
             });
             this.$tickets.change(function(event) {
@@ -554,6 +583,8 @@ MiscUtils = {
                     } else {
                         ticket['phone1'] = $changedElement.val();
                     }
+                } else if ($changedElement.hasClass('ticket-note')) {
+                    ticket['note'] = $changedElement.val();
                 }
             });
             this.$ticketBoard.find('#add-ticket').on('click', function(event) {
@@ -571,6 +602,15 @@ MiscUtils = {
                 }
                 that.buyTickets();
             });
+
+            EventBus.addEventListener('ticket_removed', function(event) {
+                that.onTicketPriceChanged();
+            });
+
+            EventBus.addEventListener('ticket_added', function(event) {
+                that.onTicketPriceChanged();
+            });
+
             //todo restore when uah prices will be appropriate
 //            var $changeCurrency = this.$ticketBoard.find('.change-currency');
 //            $changeCurrency.find('#'+UserSettings.currency).attr('selected', 'selected');
@@ -614,39 +654,48 @@ MiscUtils = {
                 return;
             }
 
-            var ticketTempl = uc.ticketTemplate(this.getUsername(), this.getPhone(), StateManager.getStartCity(), StateManager.getEndCity(),
-                forthTrip, forthSeat, backTrip, backSeat, this.discounts);
+            var $ticketTempl = $(uc.ticketTemplate(this.getUsername(), this.getPhone(), StateManager.getStartCity(), StateManager.getEndCity(),
+                forthTrip, forthSeat, backTrip, backSeat, this.discounts));
             this.$tickets.find('.ticket.active').removeClass('active');
             var isFirstTicket = this.hasNoTickets();
-            this.$tickets.append(ticketTempl);
+            this.$tickets.append($ticketTempl);
             var $ticketsChilds = this.$tickets.children();
             if (isFirstTicket) {
-                this.$ticketBoard.show();
+                this.show(function() {
+                    $ticketTempl.animate({
+                        opacity: 1
+                    }, 300);
+                });
+            } else {
+                $ticketTempl.animate({
+                    opacity: 1
+                }, 300);
             }
-            EventBus.dispatch('ticket_added');
             var $thisTicket = $($ticketsChilds[$ticketsChilds.length-1]);
             StateManager.addTicket(this.createTicketObject($thisTicket.attr('id'), forthTrip, forthSeat, backSeat));
+            EventBus.dispatch('ticket_added');
             var that = this;
             $thisTicket.find('.ticket-input.select').on('change', function(event) {
                 that.recalculatePrice($thisTicket, MiscUtils.getSelectedId($(this), 9));
-
             });
         },
 
         createTicketObject: function(id, trip, forthSeat, backSeat) {
             var ticket = {
                 id: id,
-                price: trip['price'],
-                discPrice: trip['discPrice'],
+                price: trip['price'], // full price for the tickets of this trip
+                discPrice: trip['discPrice'], //price including personal discounts
+                resultDiscPrice: 0, //calculated on client basing on 'price' or 'discPrice'
                 discountId: 'NONE',
-                forthSeatId: forthSeat.id,
-                forthSeatNum: forthSeat['seatNum'],
+                seatId: forthSeat.id,
+                seatNum: forthSeat['seatNum'],
                 startCity: StateManager.getStartCity().id,
                 endCity: StateManager.getEndCity().id,
                 rawStartDate: StateManager.getSelectedForthTrip()['rawStartDate'],
                 passenger: this.getUsername(),
                 phone1: this.getPhone(),
-                phone2: this.getPhone()
+                phone2: this.getPhone(),
+                note: null
             };
 
             if (StateManager.getBothDirections()) {
@@ -659,38 +708,46 @@ MiscUtils = {
         },
 
         removeTicket: function($ticketElement) {
-            var ticket = StateManager.getTicket($ticketElement.attr('id'));
-            var forthSeatId = ticket['forthSeatId'];
-            var backSeatId = ticket['backSeatId'];
+            var ticket = StateManager.removeTicket($ticketElement.attr('id'));
+            var forthSeatId = ticket.seatId;
+            var backSeatId = ticket.backSeatId;
 
             var lockedForthSeats = StateManager.getSelectedForthTrip()['lockedSeats'];
-            var idx = lockedForthSeats.indexOf(forthSeatId);
+            var idx = $.inArray(forthSeatId, lockedForthSeats);
             lockedForthSeats.splice(idx, 1);
 
             if (backSeatId) {
                 var lockedBackSeats = StateManager.getSelectedBackTrip()['lockedSeats'];
-                idx = lockedBackSeats.indexOf(backSeatId);
+                idx = $.inArray(backSeatId, lockedBackSeats);
                 lockedBackSeats.splice(idx, 1);
             }
 
-            EventBus.dispatch('before_ticket_removed');
-            if (this.getTicketsSize() == 1) {
-                setTimeout(function() {
-                    $ticketElement.remove();
-                }, 800);
-            } else {
-                $ticketElement.remove();
-                var $first = $(this.$tickets.children()[0]);
-                $first.removeClass('card');
-                $first.addClass('active');
-            }
+            this.invokeTicketUnlock(ticket);
 
-            EventBus.dispatch('ticket_removed');
+            var that = this;
+            $ticketElement.animate({
+                opacity: 0
+            }, 300, function() {
+                if (that.getTicketsSize() != 1) {
+                    $ticketElement.remove();
+                    var $first = $(that.$tickets.children()[0]);
+                    if ($first) {
+                        $first.removeClass('card');
+                        $first.addClass('active');
+                    }
+                    EventBus.dispatch('ticket_removed', ticket);
+                } else {
+                    that.hide(function () {
+                        $ticketElement.remove();
+                        EventBus.dispatch('ticket_removed', ticket);
+                    });
+                }
+            });
         },
 
         buyTickets: function() {
             var order = StateManager.getOrder();
-            order['forthTripId'] = StateManager.getSelectedForthTrip().id;
+            order['tripId'] = StateManager.getSelectedForthTrip().id;
             if (StateManager.getBothDirections()) order['backTripId'] = StateManager.getSelectedBackTrip().id;
 
             for (var ticketId in order.tickets) if (order.tickets.hasOwnProperty(ticketId)) {
@@ -727,45 +784,31 @@ MiscUtils = {
             });
         },
 
-        changeTrip: function (newTrip) {
-            var that = this;
-            var route = '';
-            var styleClass = '';
-            var prevTrip = null;
-            if (newTrip.isForth) {
-                prevTrip = StateManager.getSelectedForthTrip();
-                StateManager.setSelectedForthTrip(newTrip);
-                route = StateManager.getStartCity().name + ' - ' + StateManager.getEndCity().name;
-                styleClass = 'forth';
-            } else {
-                prevTrip = StateManager.getSelectedBackTrip();
-                StateManager.setSelectedBackTrip(newTrip);
-                route = StateManager.getEndCity().name + ' - ' + StateManager.getStartCity().name;
-                styleClass = 'back';
+        invokeTicketUnlock: function(ticket, callback) {
+            var ticketsToUnlock = [];
+            if (ticket.ticketId) {
+                ticketsToUnlock[ticketsToUnlock.length] = {
+                    tripId : StateManager.getSelectedForthTrip().id,
+                    ticketId : ticket.ticketId
+                };
             }
-            if (prevTrip) prevTrip['lockedSeats'] = [];
-            this.$ticketBoard.find('.ticket').each(function(index, element){
-                var $element = $(element);
-                var newSeat = that.getNextFreeSeatForTrip(newTrip);
-                //TODO send bulk request to reserve these seats
-                if (!newSeat) {
-                    that.removeTicket($element);
-                    return;
-                }
-                var ticket = StateManager.getTicket($element.attr('id'));
-                if (newTrip.isForth) {
-                    ticket['rawStartDate'] = newTrip['rawStartDate'];
-                } else {
-                    ticket['rawBackStartDate'] = newTrip['rawStartDate'];
-                }
-                ticket[styleClass + 'SeatId'] = newSeat.id;
-                ticket[styleClass + 'SeatNum'] = newSeat['seatNum'];
-
-                $element.find('.'+styleClass+'-info-trip').text(route);
-                $element.find('.'+styleClass+'-info-date').text(newTrip['startDate']);
-                $element.find('.'+styleClass+'-trip-seat').text(newSeat['seatNum']);
-                $element.find('.'+styleClass+'-trip-seat').attr('id', newSeat['id']);
-            });
+            if (ticket.backTicketId) {
+                ticketsToUnlock[ticketsToUnlock.length] = {
+                    tripId : StateManager.getSelectedBackTrip().id,
+                    ticketId : ticket.backTicketId
+                };
+            }
+            if (ticketsToUnlock.length) {
+                new Request('unlockTickets', {tickets: JSON.stringify(ticketsToUnlock)}).send(function() {
+                    for (var i = 0; i < ticketsToUnlock.length; i++) {
+                        var ticket = ticketsToUnlock[i];
+                        StateManager.removeServerLockedTicket(ticket.tripId, ticket.ticketId);
+                    }
+                    if (callback) callback();
+                });
+            } else {
+                if (callback) callback();
+            }
         },
 
         getNextFreeSeatForTrip: function(trip) {
@@ -773,7 +816,8 @@ MiscUtils = {
             var availableSeats = trip['seats'];
             for (var i = 0; i < availableSeats.length; i++) {
                 var availableSeat = availableSeats[i];
-                if (reservedSeats.indexOf(availableSeat.id) < 0) {
+
+                if ($.inArray(availableSeat.id, reservedSeats) < 0) {
                     reservedSeats[reservedSeats.length] = availableSeat.id;
                     return availableSeat;
                 }
@@ -813,12 +857,13 @@ MiscUtils = {
 
             var fullPrice = ticket['price'];
             var price = ticket['discPrice'];
-            var resultPrice = parseInt(StringUtils.isEmpty(fullPrice)? price : fullPrice);
+            var resultPrice = fullPrice? fullPrice : price;
             var result = MiscUtils.calculatePrice(resultPrice, discount);
             if (UserSettings.currency == 'uah') {
                 resultPrice = CurrencyUtils.round(resultPrice * EURUAH, -1);
                 result = CurrencyUtils.round(result * EURUAH, -1);
             }
+            ticket.resultDiscPrice = result;
             $discPrice.text(result);
             $fullPrice.text(resultPrice);
             $ticket.find('.price .sign').text(UserSettings.currencySign);
@@ -828,17 +873,76 @@ MiscUtils = {
             } else {
                 if ($fullPriceDiv.hasClass('hide')) $fullPriceDiv.removeClass('hide');
             }
+            this.onTicketPriceChanged();
         },
 
-        clean: function() {
+        onTicketPriceChanged: function() {
+            var tickets = StateManager.getTickets();
+            var discSum = 0;
+            var fullSum = 0;
+            for (var ticketId in tickets) if (tickets.hasOwnProperty(ticketId)) {
+                var ticket = tickets[ticketId];
+                var fullPrice = ticket['price'];
+                var price = ticket.resultDiscPrice;
+                fullSum += fullPrice;
+                discSum += (price? price : fullPrice);
+            }
+
+            var $summaryDiscPriceElement = this.$ticketBoard.find('#sum-disc-price');
+            var $summaryFullPriceElement = this.$ticketBoard.find('#sum-full-price');
+            $summaryDiscPriceElement.text(discSum);
+            if (fullSum == discSum) {
+                $summaryFullPriceElement.hide();
+            } else {
+                $summaryFullPriceElement.text(fullSum);
+                $summaryFullPriceElement.show();
+            }
+        },
+
+        show: function(callback) {
+            var that = this;
+             this.$ticketBoard.animate({
+                 height: "toggle"
+             }, 400, function() {
+                 if (callback) callback();
+                 //showing price block
+                 that.$ticketBoard.find('.ticket-price-sum').animate({
+                     opacity: 1
+                 }, 200);
+             });
+        },
+
+        hide: function(callback) {
+            var ticketPriceSum = this.$ticketBoard.find('.ticket-price-sum');
+            if (ticketPriceSum.css('opacity') === '0') {
+                if (callback) callback();
+                return;
+            }
+            var that = this;
+            //hiding price block
+            ticketPriceSum.animate({
+                opacity: 0
+            }, 200, function() {
+                that.$ticketBoard.animate({
+                    height: "toggle"
+                }, 400, function() {
+                    if (callback) callback();
+                });
+            });
+        },
+
+        clean: function(callback) {
             this.$tickets.empty();
             this.discounts = {};
-
-//            StateManager.getSelectedForthTrip()['lockedSeats'] = [];
-//            if (StateManager.getBothDirections()) {
-//                StateManager.getSelectedBackTrip()['lockedSeats'] = [];
-//            }
-
+            this.serverLockedTickets = {};
+            var ticketsToUnlock = StateManager.getServerLockedTickets();
+            if (ticketsToUnlock.length) {
+                new Request('unlockTickets', {tickets: JSON.stringify(ticketsToUnlock)}).send(function() {
+                    if (callback) callback();
+                });
+            } else {
+                if (callback) callback();
+            }
             StateManager.getOrder().tickets = {};
         }
     };
@@ -847,7 +951,7 @@ MiscUtils = {
         var that = this;
         this.allSeats = trip['seats'];
         this.lockedSeats = trip['lockedSeats'];
-        this.initialSeatId = trip.isForth? ticket['forthSeatId'] : ticket['backSeatId'];
+        this.initialSeatId = trip.isForth? ticket['seatId'] : ticket['backSeatId'];
 
         this.popup = new Popup(clientBundle.bus_scheme, setraBus, 'popup-bus', function(popupId) {
             var $popupEl = $(popupId);
@@ -855,7 +959,8 @@ MiscUtils = {
                 var seat = that.allSeats[i];
                 var $current = $popupEl.find('#seat-'+seat['seatNum']);
                 $current.attr('seatId', seat.id);
-                if (that.lockedSeats.indexOf(seat.id) >= 0) continue;
+
+                if ($.inArray(seat.id, that.lockedSeats) >= 0) continue;
 
                 $current.removeClass('blocked');
             }
@@ -868,14 +973,16 @@ MiscUtils = {
             $popupEl.find('.bus-setra').on('click', function(event){
                 var $target = $(event.target);
                 if ($target.prop('tagName') === 'A') {
+                    event.preventDefault();
                     var temp = $target.attr('seatId');
-                    if (that.lockedSeats.indexOf(temp) >= 0) return false;
+                    if ($.inArray(temp, that.lockedSeats) >= 0) return false;
 
                     choice = temp;
 
                     var $prevActive = $popupEl.find('a.active');
                     $prevActive.removeClass('active');
                     if (!$target.hasClass('active')) $target.addClass('active');
+                    return false;
                 }
             });
             $popupEl.find('#bus-seat-cancel').on('click', function(){
@@ -883,24 +990,35 @@ MiscUtils = {
             });
 
             $popupEl.find('#bus-seat-ok').on('click', function() {
-                that.lockedSeats.splice(that.lockedSeats.indexOf(that.initialSeatId), 1);
+                that.lockedSeats.splice($.inArray(that.initialSeatId, that.lockedSeats), 1);
                 that.lockedSeats[that.lockedSeats.length] = choice;
 
                 var seat = dataStore.get(choice);
-                var data = {tripId: trip.id, seatId: choice};
-                var prevTicketId = trip.isForth? ticket['forthTicketId'] : ticket['backTicketId'];
-                if (prevTicketId) data['unlockTicketId'] = prevTicketId;
+                var ticketCopy = JSON.parse(JSON.stringify(ticket));
+                if (trip.isForth) {
+                    ticketCopy['seatId'] = choice;
+                    ticketCopy.seatNum = dataStore.get(choice).seatNum;
+                } else {
+                    ticketCopy['backSeatId'] = choice;
+                    ticketCopy.backSeatNum = dataStore.get(choice).seatNum;
+                }
+                var data = {tripId: trip.id, forth: trip.isForth, ticket: JSON.stringify(ticketCopy)};
+                var prevTicketId = trip.isForth? ticket['ticketId'] : ticket['backTicketId'];
+                if (prevTicketId) {
+                    data.unlockTicketId = prevTicketId;
+                }
 
                 new Request('lockSeat', data).send(function(data) {
                     if (trip.isForth) {
-                        ticket['forthTicketId'] = data['ticketId'];
-                        ticket['forthSeatId'] = seat.id;
-                        ticket['forthSeatNum'] = seat['seatNum'];
+                        ticket['ticketId'] = data['ticketId'];
+                        ticket['seatId'] = seat.id;
+                        ticket['seatNum'] = seat['seatNum'];
                     } else {
                         ticket['backTicketId'] = data['ticketId'];
                         ticket['backSeatId'] = seat.id;
                         ticket['backSeatNum'] = seat['seatNum'];
                     }
+                    StateManager.addServerLockedTicket(trip.id, data.ticketId);
                     var $seatButton = $('#'+ticket.id).find('#'+that.initialSeatId);
                     $seatButton.text(seat['seatNum']);
                     $seatButton.attr('id', seat['id']);
@@ -938,7 +1056,6 @@ MiscUtils = {
             var startDate = trip['startDate'];
             var endDate = trip['endDate'];
             var seatCount = trip['seats'].length;
-            var isForth = trip.isForth;
             return '<div id='+tripId+' class="trip">' +
                 '<div><h4>'+clientBundle.trip+' '+startCity+' - '+endCity+'</h4>' + '<span class="available-seats">'+seatCount+' '+clientBundle.seats+'</span></div>' +
                 '<div class="clear-both">' +
@@ -950,59 +1067,56 @@ MiscUtils = {
                 '</div>'
         };
 
-        window.uc.ticketTemplate = function(user, phone, startCity, endCity, forthTrip, forthSeat, backTrip, backSeat, discounts){
-            var price = forthTrip['price'];
-            var discPrice = forthTrip['discPrice'];
-            var forthRoute = startCity.name + ' - ' + endCity.name; //TODO make a method
-            var forthDate = forthTrip['startDate'];
+        window.uc.ticketTemplate = function(user, phone, startCity, endCity, forthTrip, forthSeat, backTrip, backSeat, discounts) {
+            var price = forthTrip? forthTrip.price : backTrip.price;
+            var discPrice = forthTrip? forthTrip.discPrice : backTrip.discPrice;
 
-            var resultPrice = discPrice? discPrice : price;
+            var resultPrice = discPrice ? discPrice : price;
             var discountOptions = '';
             for (var i = 0, size = discounts.length; i < size; i++) {
-                discountOptions += '<option id="discount-'+discounts[i].id+'" '+
-                    (discounts[i].id==='NONE'? 'selected':'')+'>'+discounts[i].text+'</option>';
+                discountOptions += '<option id="discount-' + discounts[i].id + '" ' +
+                    (discounts[i].id === 'NONE' ? 'selected' : '') + '>' + discounts[i].text + '</option>';
             }
             if (UserSettings.currency == 'uah') {
-                resultPrice = CurrencyUtils.round(parseInt(resultPrice) * EURUAH, -1);
-                if (discPrice) price = CurrencyUtils.round(parseInt(price) * EURUAH, -1);
+                resultPrice = CurrencyUtils.round(resultPrice * EURUAH, -1);
+                if (discPrice) price = CurrencyUtils.round(price * EURUAH, -1);
             }
             var ticketsCount = $('.tickets').children().length;
-            var clazz = 'ticket active'+(backTrip? '':' one-way')+ (ticketsCount === 0? '':' card');
+            var clazz = 'ticket active' + (forthTrip && backTrip ? '' : ' one-way') + (ticketsCount === 0 ? '' : ' card');
             var start =
-                '<div id="ticket'+ticketsCount+'" class="' +clazz+ '" style="z-index:'+(ticketsCount+5)+';">'+
+                '<div id="ticket' + ticketsCount + '" class="' + clazz + '" style="z-index:' + (ticketsCount + 5) + ';">' +
+                '<div class="ticket-row">'+
+                '<div class="ticket-title">Квиток #'+(++ticketsCount)+'</div>'+
+                    '<div class="price">'+
+                    '<div class="price-disc clear-both"><div class="price-right"><span class="sign">'+UserSettings.currencySign+'</span><span class="price-self">'+resultPrice+'</span></div></div>'+
+                    '<div class="price-full '+(discPrice?'' : 'hide')+'"><span class="price-self">'+(discPrice? price : '')+'</span></div>'+
+                    '</div>'+
+                    '</div>'+
                 '<div class="ticket-row">'+
                 '<input type="text" '+(user? 'value="'+user+'"':'')+' placeholder="'+clientBundle.name_and_surname+'" class="ticket-input username">'+
-
-                '<div class="price">'+
-                '<div class="price-disc clear-both"><div class="price-right"><span class="sign">'+UserSettings.currencySign+'</span><span class="price-self">'+resultPrice+'</span></div></div>'+
-                '<div class="price-full '+(discPrice?'' : 'hide')+'"><span class="price-self">'+(discPrice? price : '')+'</span></div>'+
-                '</div>'+
                 '</div>'+
                 '<div class="ticket-row">' +
                 '<input type="text" '+(phone? 'value="'+phone+'"':'')+' placeholder="'+clientBundle.phone+'" class="ticket-input phone">' +
                 '<input type="text" '+(phone? 'value="'+phone+'"':'')+' placeholder="'+clientBundle.phone+'" class="ticket-input phone second">' +
                 '</div>' +
                 '<div class="ticket-row"><select class="ticket-input select">'+discountOptions+'</select></div>'+
-                '<div class="ticket-row clear-both forth">'+
-                '<div class="forth-info">' +
-                '<span class="forth-info-trip">'+forthRoute+'</span>' +
-                '<span class="forth-info-date">'+forthDate+'</span>'+
+                '<div class="ticket-row">'+
+                '<textarea placeholder="примітка" class="ticket-input ticket-note"></textarea>'+
                 '</div>'+
-                '<button class="btn btn-green light forth">'+clientBundle.seat+' #<span id="'+forthSeat.id+'" class="forth-trip-seat">'+forthSeat['seatNum']+'</span></button>'+
-                '</div>';
-            if (!backTrip) return start + '</div>';
+                '<div class="ticket-row">'+
+                    ticketTripInfo(forthTrip, forthSeat, true);
+            if (!backTrip) return start + '</div></div>';
+                    return start + ticketTripInfo(backTrip, backSeat, false) + '</div></div>';
+        };
 
-            var backRoute = endCity.name  + ' - ' + startCity.name;
-            var backDate = backTrip['startDate'];
-            return start +
-                '<div class="ticket-row clear-both back">'+
-                '<div class="back-info">' +
-                '<span class="back-info-trip">'+backRoute+'</span>' +
-                '<span class="back-info-date">'+backDate+'</span>'+
-                '</div>'+
-                '<button class="btn btn-green light back">'+clientBundle.seat+' #<span id="'+backSeat.id+'" class="back-trip-seat">'+backSeat['seatNum']+'</span></button>'+
-                '</div>'+
-                '</div>';
+        function ticketTripInfo(trip, seat, isForth) {
+            var route = trip.routeFirstCity +' - '+ trip.routeEndCity;
+            return '<div class="ticket__trip-info">' +
+                        '<div>'+route+'</div>' +
+                        '<div>'+trip.startDate+'</div>'+
+                        '<button class="btn btn-green light '+(isForth?'forth':'back')+'">'+
+                            clientBundle.seat+' #<span id="'+seat.id+'">'+seat.seatNum+'</span></button>'+
+                    '</div>';
         }
     })();
 
@@ -1025,7 +1139,7 @@ MiscUtils = {
     $(document).ready(function() {
         StateManager.init();
 
-        var selectionBoard = new SelectionBoard($('.forms-inline-list'));
+        var selectionBoard = new SelectionBoard($('.c-banner-search-input-container'));
         selectionBoard.init();
 
         var locationOrderId = location.getParam('orderId');

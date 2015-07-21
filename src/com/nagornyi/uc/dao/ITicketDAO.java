@@ -17,6 +17,8 @@ public interface ITicketDAO extends DAO<Ticket> {
 
     int countAllTicketsForUser(User user);
 
+    int countReservedTicketsForTrip(Trip trip);
+
     List<Seat> getUnavailableSeatsForTrip(Trip trip);
 
     List<Ticket> getTicketsForTrip(Trip trip);

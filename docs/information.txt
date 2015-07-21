@@ -1,0 +1,3 @@
+Decisions:
+1. All dates are calculated based on ukrainian time (should be UTC)
+2. All users are identified by the email (should be some other id)

@@ -39,6 +39,9 @@ public class LiqPayCallbackProcessor extends HttpServlet {
         if (!LiqPay.isValid(liqPayParams)) {
             log.warning("Signature validation failed");
         } else {
+            if (LiqPay_v3.isVersion3(liqPayParams)) {
+                liqPayParams = LiqPay_v3.parseParams(liqPayParams);
+            }
             String status = liqPayParams.get("status");
             String order_id_desc = liqPayParams.get("order_id");
             String orderExternalId = order_id_desc.substring(0, order_id_desc.indexOf(LiqPay.UC_KEY));

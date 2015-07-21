@@ -7,7 +7,6 @@ import com.nagornyi.uc.entity.User;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Enumeration;
-import java.util.Locale;
 
 /**
  * @author Nagorny
@@ -38,11 +37,6 @@ public class ActionRequest {
         return realRequest.getSession();
     }
 
-    public Locale getLocale() {
-        String locale = (String)realRequest.getSession().getAttribute("loc");
-        if (locale == null) return null;
-        return Locale.forLanguageTag(locale);
-    }
 
 	public String getRemoteAddr() {
 		return realRequest.getRemoteAddr();
@@ -59,6 +53,10 @@ public class ActionRequest {
     public User getUser() {
         if (!isAuthorized()) return null;
         return ((IUserDAO)DAOFacade.getDAO(User.class)).getUserByEmail((String)getSession().getAttribute("email"));
+    }
 
+    public boolean checkRequiredParams(String... keys) {
+        for(String key: keys) if (getParam(key) == null) return false;
+        return true;
     }
 }

@@ -10,6 +10,7 @@ import com.nagornyi.uc.common.DiscountCalculator;
 import com.nagornyi.uc.common.RouteSearchResult;
 import com.nagornyi.uc.common.UserFriendlyException;
 import com.nagornyi.uc.common.price.DiscountHelper;
+import com.nagornyi.uc.context.RequestContext;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.IPriceDAO;
 import com.nagornyi.uc.dao.ITicketDAO;
@@ -35,7 +36,7 @@ public class SearchTripsAction implements Action {
 
     @Override
     public void perform(ActionRequest req, ActionResponse resp) throws JSONException {
-        Locale loc = req.getLocale();
+        Locale loc = RequestContext.getLocale();
         SimpleDateFormat formatter = new SimpleDateFormat("d MMMM, yyyy kk:mm", loc);
 
         String tzOffset = req.getParam("tzOffset");
@@ -72,10 +73,10 @@ public class SearchTripsAction implements Action {
         JSONArray tripsArray = new JSONArray();
 
         for (Trip trip: trips) {
-			Date realStartDate = new Date(trip.getStartDate().getTime() + searchResult.getStartMilis());
-			Date realEndDate = new Date(trip.getEndDate().getTime() - searchResult.getEndMilis());
+            Date realStartDate = new Date(trip.getStartDate().getTime() + searchResult.getStartMilis());
+            Date realEndDate = new Date(trip.getEndDate().getTime() - searchResult.getEndMilis());
 
-			JSONObject tr = new JSONObject();
+            JSONObject tr = new JSONObject();
             tr.put("id", KeyFactory.keyToString(trip.getEntity().getKey()));
             tr.put("routeFirstCity", routeFirstCityStr);
             tr.put("routeEndCity", routeLastCityStr);
@@ -96,17 +97,17 @@ public class SearchTripsAction implements Action {
             List<Trip> backTrips = backSearchResult.getTrips();
             JSONArray backTripsArray = new JSONArray();
             for (Trip trip: backTrips) {
-				Date realStartDate = new Date(trip.getStartDate().getTime() + backSearchResult.getStartMilis());
-				Date realEndDate = new Date(trip.getEndDate().getTime() - backSearchResult.getEndMilis());
+                Date realStartDate = new Date(trip.getStartDate().getTime() + backSearchResult.getStartMilis());
+                Date realEndDate = new Date(trip.getEndDate().getTime() - backSearchResult.getEndMilis());
 
                 JSONObject tr = new JSONObject();
                 tr.put("id", KeyFactory.keyToString(trip.getEntity().getKey()));
                 tr.put("routeFirstCity", routeLastCityStr);
                 tr.put("routeEndCity", routeFirstCityStr);
-				tr.put("startDate", formatter.format(realStartDate));
-				tr.put("rawStartDate",realStartDate.getTime());
-				tr.put("endDate", formatter.format(realEndDate));
-				tr.put("rawEndDate", realEndDate.getTime());
+                tr.put("startDate", formatter.format(realStartDate));
+                tr.put("rawStartDate",realStartDate.getTime());
+                tr.put("endDate", formatter.format(realEndDate));
+                tr.put("rawEndDate", realEndDate.getTime());
                 tr.put("price", resultingPrice);
                 if (discountedPrice != 0) tr.put("discPrice", discountedPrice);
                 fillSeats(tr, searchAvailableSeats(KeyFactory.keyToString(route.getBusKey()), trip));

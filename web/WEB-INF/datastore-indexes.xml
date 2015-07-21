@@ -6,6 +6,7 @@
         <property name="startDate" direction="asc"/>
     </datastore-index>
     <datastore-index kind="Trip" ancestor="true" source="manual">
+        <property name="forth" direction="asc"/>
         <property name="startDate" direction="asc"/>
     </datastore-index>
     <datastore-index kind="Ticket" ancestor="true" source="manual">

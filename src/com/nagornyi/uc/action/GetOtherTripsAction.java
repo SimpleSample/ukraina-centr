@@ -5,7 +5,7 @@ import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import com.nagornyi.uc.cache.BusCache;
-import com.nagornyi.uc.common.DateFormatter;
+import com.nagornyi.uc.common.date.DateFormatter;
 import com.nagornyi.uc.common.UserFriendlyException;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.ITicketDAO;
@@ -22,30 +22,30 @@ import java.util.List;
  * @author Nagornyi
  * Date: 03.07.14
  */
-public class GetTripsAction implements Action {
+@Authorized
+public class GetOtherTripsAction implements Action {
 
     @Override
     public void perform(ActionRequest req, ActionResponse resp) throws JSONException {
         String ticketId = req.getParam("ticketId");
         Ticket ticket = DAOFacade.findById(Ticket.class, KeyFactory.stringToKey(ticketId));
         if (ticket.getStartDate().getTime() < new Date().getTime()) {
+            //TODO this check should be performed when ticket is saved
             throw new UserFriendlyException("Даний квиток є простроченим. Оберіть, будь ласка, активний квиток");
         }
-        Trip currentTrip = ticket.getTrip();
         User user = req.getUser();
+        Trip currentTrip = ticket.getTrip();
         Route route = currentTrip.getRoute();
-        String routeFirstCity = route.getFirstCity().getLocalizedName(user.getUserLocale());
-        String routeLastCity = route.getLastCity().getLocalizedName(user.getUserLocale());
 
         ITripDAO dao = DAOFacade.getDAO(Trip.class);
 
-        List<Trip> trips = dao.getOrCreateTripsForTwoMonths(route, Calendar.getInstance(), currentTrip.isForth());
+        List<Trip> trips = dao.getOrCreateTripsForTwoMonths(route, Calendar.getInstance(), currentTrip.isRouteForth());
         JSONArray tripsArr = new JSONArray();
         for (Trip trip: trips) {
             JSONObject trp = new JSONObject();
             trp.put("id", trip.getStringKey());
-            trp.put("startCity", trip.isForth() ? routeFirstCity : routeLastCity);
-            trp.put("endCity", trip.isForth() ? routeLastCity : routeFirstCity);
+            trp.put("startCity", trip.getStartCity().getName());
+            trp.put("endCity", trip.getEndCity().getName());
             trp.put("allSeatsCount", trip.getSeatsNum());
             List<Ticket> tickets = DAOFacade.findByParent(Ticket.class, trip.getEntity().getKey());
             trp.put("reservedSeatsCount", tickets.size());
@@ -58,7 +58,7 @@ public class GetTripsAction implements Action {
         resp.setDataObject(respObj);
     }
 
-    private void fillSeats(JSONObject trip, List<Seat> seats) throws JSONException {
+    private static void fillSeats(JSONObject trip, List<Seat> seats) throws JSONException {
         JSONArray seatsArray = new JSONArray();
         for(Seat seat: seats) {
             seatsArray.put(seat.toJSON());

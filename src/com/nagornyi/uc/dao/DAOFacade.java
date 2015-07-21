@@ -1,9 +1,9 @@
 package com.nagornyi.uc.dao;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.repackaged.org.apache.commons.collections.CollectionUtils;
 import com.nagornyi.uc.dao.app.AppEngineFactory;
 import com.nagornyi.uc.entity.BaseEntity;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;

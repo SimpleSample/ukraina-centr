@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../favicon.png">
+    <link href='http://fonts.googleapis.com/css?family=Roboto:300,400&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
+
+    <title>Admin Dashboard</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- Custom styles for this template -->
+    <link href="../admin/css/dashboard.css" rel="stylesheet">
+    <link href="../admin/css/adminpage.tickets.css" rel="stylesheet">
+    <link href="../css/tablesaw.css" rel="stylesheet"/>
+    <link href="../css/ng/tablesaw.custom.css" rel="stylesheet"/>
+    <link href="../css/ng/tickets.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Україна-Центр</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Settings</a></li>
+                <li><a href="#">Profile</a></li>
+                <li><a href="#">Help</a></li>
+            </ul>
+            <form class="navbar-form navbar-right">
+                <input type="text" class="form-control" placeholder="Search...">
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar sidebar-swiped">
+            <div class="sidebar-inner">
+                <ul class="nav nav-sidebar">
+                    <li><a href="#">Огляд</a></li>
+                    <li class="active"><a href="#">Пасажири</a></li>
+                    <li><a href="#">Користувачі</a></li>
+                    <li><a href="#">Партнери</a></li>
+                    <li><a href="#">Місця</a></li>
+                    <li><a href="#">Репорти</a></li>
+                    <li><a id="scan-barcode" href="zxing://scan/?ret=http%3A%2F%2Four-little-baby.appspot.com%2Fmarkup%2Fadminpage.html%3Fsome%3D%7BRAWCODE%7D">Scan barcode</a></li>
+                </ul>
+                <div class="swipe-area">
+                    <div class="toggle-sidebar-inner">
+                        <a id="toggle-sidebar-link" href="#"><span class="glyphicon"></span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <div class="dropdown header-dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <span>Рейс - </span><span class="dropdown-value">Кіровоград-Рим, 28 серпня 2015 року</span>
+                    <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li><a href="#">Separated link</a></li>
+                </ul>
+            </div>
+
+
+            <div class="row placeholders">
+                <div id="available-seats" class="col-md-6">
+                    <div class="bus-scheme bus-setra"><table><tbody><tr><td><a id="seat-1a" class="blocked" href="#">1a</a></td><td><a id="seat-1b" class="blocked" href="#">1b</a></td><td><span> </span></td><td><a id="seat-1c" class="blocked" href="#">1c</a></td><td><a id="seat-1d" class="blocked" href="#">1d</a></td></tr><tr><td><a id="seat-2a" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAwAoM">2a</a></td><td><a id="seat-2b" class="blocked" href="#">2b</a></td><td><span> </span></td><td><a id="seat-2c" class="blocked" href="#">2c</a></td><td><a id="seat-2d" class="blocked" href="#">2d</a></td></tr><tr><td><a id="seat-3a" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAoAoM">3a</a></td><td><a id="seat-3b" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAoAkM">3b</a></td><td><span> </span></td><td><a id="seat-3c" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAoAsM">3c</a></td><td><a id="seat-3d" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA4AgM">3d</a></td></tr><tr><td><a id="seat-4a" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA4AoM">4a</a></td><td><a id="seat-4b" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA4AkM">4b</a></td><td><span> </span></td><td><a id="seat-4c" class="active" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA4AsM">4c</a></td><td><a id="seat-4d" class="blocked" href="#">4d</a></td></tr><tr><td><a id="seat-5a" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAkAoM">5a</a></td><td><a id="seat-5b" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAkAkM">5b</a></td><td><span> </span></td><td><a id="seat-5c" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAkAsM">5c</a></td><td><a id="seat-5d" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA0AgM">5d</a></td></tr><tr><td><a id="seat-6a" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA0AoM">6a</a></td><td><a id="seat-6b" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA0AkM">6b</a></td><td><span> </span></td><td><a id="seat-6c" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA0AsM">6c</a></td><td><a id="seat-6d" class="blocked" href="#">6d</a></td></tr><tr><td><a id="seat-7a" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAsAoM">7a</a></td><td><a id="seat-7b" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAsAkM">7b</a></td><td><span> </span></td><td><a id="seat-7c" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAsAsM">7c</a></td><td><a id="seat-7d" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA8AgM">7d</a></td></tr><tr><td><a id="seat-8a" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA8AoM">8a</a></td><td><a id="seat-8b" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA8AkM">8b</a></td><td><span> </span></td><td><span> </span></td><td><span> </span></td></tr><tr><td><a id="seat-9a" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA8AsM">9a</a></td><td><a id="seat-9b" class="blocked" href="#">9b</a></td><td><span> </span></td><td><a id="seat-9c" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAiAoM">9c</a></td><td><a id="seat-9d" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAiAkM">9d</a></td></tr><tr><td><a id="seat-10a" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAiAsM">10a</a></td><td><a id="seat-10b" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAyAgM">10b</a></td><td><span> </span></td><td><a id="seat-10c" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAyAoM">10c</a></td><td><a id="seat-10d" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAyAkM">10d</a></td></tr><tr><td><a id="seat-11a" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAyAsM">11a</a></td><td><a id="seat-11b" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAqAgM">11b</a></td><td><span> </span></td><td><a id="seat-11c" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAqAoM">11c</a></td><td><a id="seat-11d" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAqAkM">11d</a></td></tr><tr><td><a id="seat-12a" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAqAsM">12a</a></td><td><a id="seat-12b" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA6AgM">12b</a></td><td><span> </span></td><td><a id="seat-12c" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA6AoM">12c</a></td><td><a id="seat-12d" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA6AkM">12d</a></td></tr><tr><td><a id="seat-13a" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICA6AsM">13a</a></td><td><a id="seat-13b" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAmAgM">13b</a></td><td><span> </span></td><td><a id="seat-13c" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAmAoM">13c</a></td><td><a id="seat-13d" class="" href="#" seatid="ahFzfm91ci1saXR0bGUtYmFieXIhCxIDQnVzGICAgICA5JEKDAsSBFNlYXQYgICAgICAmAkM">13d</a></td></tr></tbody></table></div>
+                </div>
+                <div id="ticket-detailed-info" class="col-md-6">
+                    <div class="container-fluid input-groups">
+                        <div><h3>Пасажир</h3></div>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon1">@</span>
+                            <input type="text" class="form-control" placeholder="Імя" aria-describedby="basic-addon1">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon2"><span class="glyphicon glyphicon-phone-alt" aria-hidden="true"></span></span>
+                            <input type="text" class="form-control" placeholder="Телефон" aria-describedby="basic-addon2">
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="discount-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="dropdown-value">Без знижки</span>
+                                <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="discount-menu">
+                                <li><a href="#">Студент</a></li>
+                                <li><a href="#">Пенсіонер</a></li>
+                                <li><a href="#">Дитина до 12-ти років</a></li>
+                                <li><a href="#">Дитина до 4-х років</a></li>
+                            </ul>
+                        </div>
+                        <div class="textarea-group">
+                            <textarea class="form-control" rows="3" placeholder="Примітка"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="../js/jquery-ui.min.js"></script>
+<script src="../js/tablesaw.js" type="text/javascript"></script>
+<script src="../admin/js/adminpage.common.js" type="text/javascript"></script>
+<script src="../admin/js/adminpage.tickets.js" type="text/javascript"></script>
+<!--<script src="adminpage.js"></script>-->
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script>
+    (function () {
+        'use strict';
+
+        if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+            var msViewportStyle = document.createElement('style');
+            msViewportStyle.appendChild(
+                    document.createTextNode(
+                            '@-ms-viewport{width:auto!important}'
+                    )
+            );
+            document.querySelector('head').appendChild(msViewportStyle)
+        }
+
+    })();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.4/hammer.min.js"></script>
+</body>
+</html>

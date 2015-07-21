@@ -29,6 +29,7 @@ public class AppEngineFactory implements DAOFactory {
         map.put(Ticket.class, new TicketDAO());
         map.put(Discount.class, new DiscountDAO());
         map.put(Order.class, new OrderDAO());
+        map.put(Feedback.class, new FeedbackDAO());
     }
 
     @Override

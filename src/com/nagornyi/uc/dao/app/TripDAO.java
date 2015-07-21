@@ -3,7 +3,7 @@ package com.nagornyi.uc.dao.app;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Query;
-import com.nagornyi.uc.common.DateFormatter;
+import com.nagornyi.uc.common.date.DateFormatter;
 import com.nagornyi.uc.dao.*;
 import com.nagornyi.uc.entity.*;
 import com.nagornyi.uc.util.DateUtil;
@@ -29,10 +29,10 @@ public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
     }
 
     @Override
-    public List<Trip> getOtherTrips (Trip trip) {
-        return get(trip.getParentKey(), new Query.FilterPredicate("isForth",
+    public List<Trip> getOtherTrips(Trip trip) {
+        return get(trip.getParentKey(), new Query.FilterPredicate("forth",
                 Query.FilterOperator.EQUAL,
-                trip.isForth()), null, null);
+                trip.isRouteForth()), null, null);
     }
 
     @Override
@@ -88,40 +88,44 @@ public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
     @Override
     public List<Trip> getTripsByDateRange(Route route, Date startDate, Date endDate) {
 
-        List<Trip> trips = new ArrayList<Trip>();
-        Calendar start = Calendar.getInstance();
-        start.setTime(startDate);
-        Calendar end = Calendar.getInstance();
-        end.setTime(endDate);
-
-        int days = DateUtil.getDaysDelta(start, end);
-        int weeks = days/7;
-        Calendar iterEndDate = (Calendar)start.clone();
-        iterEndDate.add(Calendar.DAY_OF_MONTH, 7);
-        while (weeks != 0) {
             Query.Filter startDateMinFilter =
                     new Query.FilterPredicate("startDate",
                             Query.FilterOperator.GREATER_THAN_OR_EQUAL,
-                            start.getTime());
+                            startDate);
 
             Query.Filter startDateMaxFilter =
                     new Query.FilterPredicate("startDate",
                             Query.FilterOperator.LESS_THAN_OR_EQUAL,
-                            iterEndDate.getTime());
+                            endDate);
 
             Query.Filter startDateRangeFilter =
                     Query.CompositeFilterOperator.and(startDateMinFilter, startDateMaxFilter);
 
+            return get(route.getKey(), startDateRangeFilter, "startDate", Query.SortDirection.ASCENDING);
+    }
 
-            List<Trip> weekTrips = get(route.getKey(), startDateRangeFilter, "startDate", Query.SortDirection.ASCENDING);
+    @Override
+    public List<Trip> getTripsByDateRange(Route route, Date startDate, Date endDate, boolean isForth) {
 
-            trips.addAll(weekTrips);
+        Query.Filter startDateMinFilter =
+                new Query.FilterPredicate("startDate",
+                        Query.FilterOperator.GREATER_THAN_OR_EQUAL,
+                        startDate);
 
-            start.add(Calendar.DAY_OF_MONTH, 7);
-            iterEndDate.add(Calendar.DAY_OF_MONTH, 7);
-            weeks--;
-        }
-        return trips;
+        Query.Filter startDateMaxFilter =
+                new Query.FilterPredicate("startDate",
+                        Query.FilterOperator.LESS_THAN_OR_EQUAL,
+                        endDate);
+
+        Query.Filter forthFilter =
+                new Query.FilterPredicate("forth",
+                        Query.FilterOperator.EQUAL,
+                        isForth);
+
+        Query.Filter startDateRangeFilter =
+                Query.CompositeFilterOperator.and(forthFilter, startDateMinFilter, startDateMaxFilter);
+
+        return get(route.getKey(), startDateRangeFilter, "startDate", Query.SortDirection.ASCENDING);
     }
 
     public synchronized Trip getTripByDate(Date startDate, Date endDate) {
@@ -143,22 +147,25 @@ public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
 
     @Override
     public Key createTrip(Route route, Date tripStartDate, Date tripEndDate, boolean isForth) {
-        log.info("Creating " + (isForth? "forth" : "back") +" trip for route " + route.getRouteName() +
-                ", date range: "+DateFormatter.defaultFormat(tripStartDate) + " - " + DateFormatter.defaultFormat(tripEndDate));
+        log.info("Creating " + (isForth ? "forth" : "back") + " trip for route " + route.getRouteName() +
+                ", date range: " + DateFormatter.defaultFormat(tripStartDate) + " - " + DateFormatter.defaultFormat(tripEndDate));
         Trip trip = new Trip(route, tripStartDate, tripEndDate, route.getBus().getSeatsNum(), isForth);
         Key saved = save(trip);
         reserveBlocked(route.getBus(), trip);
         return saved;
     }
 
+    /**
+     * reserving first two rows of seats for administrator
+     * @param bus bus
+     * @param trip trip
+     */
     private void reserveBlocked(Bus bus, Trip trip) {
         log.info("Reserving initially blocked seats");
         List<Seat> seats = ((ISeatDAO) DAOFacade.getDAO(Seat.class)).getSeats(bus);
         User admin = ((IUserDAO)DAOFacade.getDAO(User.class)).getUserByEmail("info@ukraina-centr.com");
-        City routeStartCity = trip.getRoute().getFirstCity();
-        City routeEndCity = trip.getRoute().getLastCity();
-        String startCityId = trip.isForth()? routeStartCity.getStringKey() : routeEndCity.getStringKey();
-        String endCityId = trip.isForth()? routeEndCity.getStringKey() : routeStartCity.getStringKey();
+        String startCityId = trip.getStartCity().getStringKey();
+        String endCityId = trip.getEndCity().getStringKey();
 
         for (Seat seat: seats) {
             if (seat.isInitiallyBlocked()) {

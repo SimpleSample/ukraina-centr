@@ -1,7 +1,7 @@
 package com.nagornyi.uc.cache;
 
 import com.google.appengine.api.datastore.Key;
-import com.nagornyi.uc.common.DateFormatter;
+import com.nagornyi.uc.common.date.DateFormatter;
 import com.nagornyi.uc.common.RouteSearchResult;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.entity.Route;

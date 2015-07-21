@@ -2,7 +2,7 @@ package com.nagornyi.uc.dao.app;
 
 import com.google.appengine.api.datastore.*;
 import com.nagornyi.uc.cache.TicketCache;
-import com.nagornyi.uc.common.DateFormatter;
+import com.nagornyi.uc.common.date.DateFormatter;
 import com.nagornyi.uc.common.DiscountCalculator;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.IPriceDAO;
@@ -61,8 +61,15 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
     }
 
     @Override
+    public int countReservedTicketsForTrip(Trip trip) {
+        return countForQuery(getValidTicketsForTripQuery(trip)) + TicketCache.getLockedCount(trip.getStringKey());
+    }
+
+    @Override
     public List<Ticket> getTicketsForTrip(Trip trip) {
-       return getValidTicketsForTrip(trip);
+        List<Ticket> tickets = getValidTicketsForTrip(trip);
+        tickets.addAll(TicketCache.getLockedTickets(trip.getStringKey()));
+       return tickets;
     }
 
     @Override
@@ -78,10 +85,13 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
     }
     
     private List<Ticket> getValidTicketsForTrip(Trip trip) {
-        return get(trip.getKey(),
-                new Query.FilterPredicate("status",
-                        Query.FilterOperator.NOT_EQUAL,
-                        Ticket.Status.INVALID.idx), null, null);
+        return getByQuery(getValidTicketsForTripQuery(trip));
+    }
+
+    private Query getValidTicketsForTripQuery(Trip trip) {
+        return new Query(getKind())
+                .setFilter(new Query.FilterPredicate("status", Query.FilterOperator.NOT_EQUAL, Ticket.Status.INVALID.idx))
+                .setAncestor(trip.getKey());
     }
 
     @Override
@@ -171,6 +181,23 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
         return deleteForQuery(query);
     }
 
+    @Override
+    public Ticket getById(Key id) {
+        Ticket lockedTicket = TicketCache.getLockedTicket(KeyFactory.keyToString(id.getParent()),
+                KeyFactory.keyToString(id));
+
+        return lockedTicket == null? super.getById(id) : lockedTicket;
+    }
+
+    @Override
+    public void delete(Ticket entity) {
+        Ticket revealingTicket = TicketCache.revealLockedTicket(entity.getStringParentKey(),
+                KeyFactory.keyToString(entity.getKey()));
+        //if not from cache
+        if (revealingTicket == null) {
+            super.delete(entity);
+        }
+    }
 
     // queries
 

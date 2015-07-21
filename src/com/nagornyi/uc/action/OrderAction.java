@@ -4,10 +4,11 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
-import com.nagornyi.uc.common.ReservationResult;
+import com.nagornyi.uc.common.PurchaseResult;
 import com.nagornyi.uc.common.UserFriendlyException;
 import com.nagornyi.uc.common.liqpay.LiqPay;
 import com.nagornyi.uc.common.mail.MailFacade;
+import com.nagornyi.uc.context.RequestContext;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.ITicketDAO;
 import com.nagornyi.uc.entity.*;
@@ -42,9 +43,9 @@ public class OrderAction implements Action {
             Order order = new Order(user);
             DAOFacade.save(order);
             log.info("Processing order for user " + user.getUsername());
-            ReservationResult result = reserve(orderObj, user, order);
+            PurchaseResult result = reserve(orderObj, user, order);
             if (result.hasAnyFailed()) {
-                throw new UserFriendlyException(processFailed(result, req.getLocale()));
+                throw new UserFriendlyException(processFailed(result, RequestContext.getLocale()));
             } else {
                 DAOFacade.bulkSave(result.getAllTickets());
                 if (user.isPartner() || user.isAdmin()) {
@@ -67,14 +68,14 @@ public class OrderAction implements Action {
         }
     }
 
-    public ReservationResult reserve(JSONObject orderObj, User currentUser, Order order) throws JSONException {
-        String forthTripKey = orderObj.getString("forthTripId");
-        Trip forthTrip = DAOFacade.findByKey(Trip.class, KeyFactory.stringToKey(forthTripKey));
+    public PurchaseResult reserve(JSONObject orderObj, User currentUser, Order order) throws JSONException {
+        String userForthTripKey = orderObj.getString("tripId");
+        Trip userForthTrip = DAOFacade.findByKey(Trip.class, KeyFactory.stringToKey(userForthTripKey));
 
-        String backTripKey = orderObj.has("backTripId")? orderObj.getString("backTripId") : null;
-        Trip backTrip = backTripKey == null? null : DAOFacade.findByKey(Trip.class, KeyFactory.stringToKey(backTripKey));
+        String userBackTripKey = orderObj.has("backTripId")? orderObj.getString("backTripId") : null;
+        Trip userBackTrip = userBackTripKey == null? null : DAOFacade.findByKey(Trip.class, KeyFactory.stringToKey(userBackTripKey));
 
-        ReservationResult result = new ReservationResult(forthTrip, backTrip);
+        PurchaseResult result = new PurchaseResult(userForthTrip, userBackTrip);
         ITicketDAO dao = DAOFacade.getDAO(Ticket.class);
 
         JSONObject tickets = orderObj.getJSONObject("tickets");
@@ -89,28 +90,52 @@ public class OrderAction implements Action {
             String endCityId = ticketObj.getString("endCity");
             Date startDate = new Date(ticketObj.getLong("rawStartDate"));
             DiscountCategory category = DiscountCategory.valueOf(ticketObj.getString("discountId"));
-            String forthTicketId = ticketObj.has("forthTicketId")? (String)ticketObj.get("forthTicketId") : null;
-            String forthSeatId = (String)ticketObj.get("forthSeatId");
-            Seat forthSeat = DAOFacade.findById(Seat.class, KeyFactory.stringToKey(forthSeatId));
+            String userForthTicketId = ticketObj.has("ticketId")? (String)ticketObj.get("ticketId") : null;
+            String userForthSeatId = (String)ticketObj.get("seatId");
+            Seat userForthSeat = DAOFacade.findById(Seat.class, KeyFactory.stringToKey(userForthSeatId));
             String note = ticketObj.has("note") && ticketObj.get("note") instanceof String?
                     (String) ticketObj.get("note") : null;
 
-            Ticket ticket = dao.createReservedTicket(forthTicketId, forthTrip, forthSeat, passenger, phone1, phone2, currentUser,
-                    startCityId, endCityId, startDate, backTrip != null, category, order, note);
+            Ticket ticket = dao.createReservedTicket(userForthTicketId,
+                                                    userForthTrip,
+                                                    userForthSeat,
+                                                    passenger,
+                                                    phone1,
+                                                    phone2,
+                                                    currentUser,
+                                                    startCityId,
+                                                    endCityId,
+                                                    startDate,
+                                                    userBackTrip != null,
+                                                    category,
+                                                    order,
+                                                    note);
 
             if (ticket != null) {
                 result.addTicket(ticket);
             } else {
-                result.addForthFailed(ticketObj.getString("forthSeatNum"));
+                result.addForthFailed(ticketObj.getString("seatNum"));
             }
-            if (backTrip != null) {
-                Date backStartDate = new Date(ticketObj.getLong("rawBackStartDate"));
-                String backTicketId = ticketObj.has("backTicketId")? (String)ticketObj.get("backTicketId") : null;
-                String backSeatId = (String)ticketObj.get("backSeatId");
-                Seat backSeat = DAOFacade.findById(Seat.class, KeyFactory.stringToKey(backSeatId));
+            if (userBackTrip != null) {
+                Date userBackStartDate = new Date(ticketObj.getLong("rawBackStartDate"));
+                String userBackTicketId = ticketObj.has("backTicketId")? (String)ticketObj.get("backTicketId") : null;
+                String userBackSeatId = (String)ticketObj.get("backSeatId");
+                Seat userBackSeat = DAOFacade.findById(Seat.class, KeyFactory.stringToKey(userBackSeatId));
 
-                Ticket backTicket = dao.createReservedTicket(backTicketId, backTrip, backSeat, passenger, phone1, phone2, currentUser,
-                        endCityId, startCityId, backStartDate, true, category, order, note);
+                Ticket backTicket = dao.createReservedTicket(userBackTicketId,
+                                                            userBackTrip,
+                                                            userBackSeat,
+                                                            passenger,
+                                                            phone1,
+                                                            phone2,
+                                                            currentUser,
+                                                            endCityId,
+                                                            startCityId,
+                                                            userBackStartDate,
+                                                            true,
+                                                            category,
+                                                            order,
+                                                            note);
 
                 if(backTicket != null) {
                     result.addTicket(backTicket);
@@ -122,7 +147,7 @@ public class OrderAction implements Action {
         return result;
     }
 
-    private String processFailed(ReservationResult result, Locale locale) throws JSONException {
+    private String processFailed(PurchaseResult result, Locale locale) throws JSONException {
         Trip forthTrip = result.getForthTrip();
         Trip backTrip = result.getBackTrip();
         String resultString = "На жаль, місця ";

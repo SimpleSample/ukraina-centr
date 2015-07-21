@@ -5,7 +5,8 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
-import com.nagornyi.uc.common.DateFormatter;
+import com.nagornyi.uc.common.date.DateFormatter;
+import com.nagornyi.uc.common.date.DateUtils;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.IUserDAO;
 
@@ -49,7 +50,7 @@ public class Ticket extends EntityWrapper {
     }
 
     public User getUser() {
-        return ((IUserDAO)DAOFacade.getDAO(User.class)).getUserByEmail((String)getProperty("user"));
+        return ((IUserDAO)DAOFacade.getDAO(User.class)).getUserByEmail((String) getProperty("user"));
     }
 
     public void setUser(User user) {
@@ -98,12 +99,22 @@ public class Ticket extends EntityWrapper {
     public String getPhones() {
         String phones = "";
         if (getPhone1() != null) phones += getPhone1();
-        if (getPhone2() != null) phones += ", "+getPhone2();
+        if (getPhone2() != null && !getPhone2().equals(getPhone1())) phones += ", "+getPhone2();
         return phones;
     }
 
     public void setStatus(Status status) {
+        setStatusChangedDate(DateUtils.getUkraineDateNow());
         setProperty("status", status.idx);
+    }
+
+    public Date getStatusChangedDate() {
+        Date date = getProperty("statusChangedDate");
+        return date == null? DateUtils.getUkraineDateNow() : date; //TODO temp, not all tickets have it
+    }
+
+    public void setStatusChangedDate(Date statusChangedDate) {
+        setProperty("statusChangedDate", statusChangedDate);
     }
 
     public City getStartCity() {
@@ -168,18 +179,41 @@ public class Ticket extends EntityWrapper {
         setProperty("orderId", order.getKey());
     }
 
-    public JSONObject toJSON(Locale locale) throws JSONException {
+    public JSONObject toJson(Locale locale) throws JSONException {
+        User user = getUser();
         JSONObject obj = new JSONObject();
         obj.put("id", getStringKey());
+        obj.put("agent", user.isPartner()? user.getPartnerName() : getUser().getUsername());
         obj.put("passenger", getPassenger());
         obj.put("phones", getPhones());
         obj.put("trip", getStartCity().getLocalizedName(locale) + " - " + getEndCity().getLocalizedName(locale));
         obj.put("startDate", DateFormatter.format(getStartDate(), locale));
         obj.put("seat", getSeat().getSeatNum());
         obj.put("status", getStatus().name());
+        obj.put("statusChangedDate", DateFormatter.defaultFormat(getStatusChangedDate()));
         obj.put("price", getCalculatedPrice());
         obj.put("note", getNote());
         return obj;
+    }
+
+    public void initFromJson(JSONObject json) throws JSONException {
+        setPassenger(json.getString("passenger"));
+        if (json.has("phone1")) setPhone1(json.getString("phone1"));
+        if (json.has("phone2")) setPhone2(json.getString("phone2"));
+        setStartCity(DAOFacade.findByKey(City.class, KeyFactory.stringToKey(json.getString("startCity"))));
+        setEndCity(DAOFacade.findByKey(City.class, KeyFactory.stringToKey(json.getString("endCity"))));
+        Date startDate = new Date(json.getLong("rawStartDate"));
+        setStartDate(startDate);
+//        ticket.setPartial(isPartial);
+
+//        DiscountCategory category = DiscountCategory.valueOf(json.getString("discountId"));
+//        String forthTicketId = json.has("ticketId")? (String)json.get("ticketId") : null;
+        String forthSeatId = (String)json.get("seatId");
+        Seat forthSeat = DAOFacade.findById(Seat.class, KeyFactory.stringToKey(forthSeatId));
+        setSeat(forthSeat);
+        String note = json.has("note") && json.get("note") instanceof String?
+                (String) json.get("note") : null;
+        setNote(note);
     }
 
 

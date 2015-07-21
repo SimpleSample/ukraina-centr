@@ -14,20 +14,25 @@ import java.util.List;
  * @author Nagornyi
  * Date: 21.06.14
  */
+@Authorized
 public class RemoveTicketAction implements Action {
 
     @Override
     public void perform(ActionRequest req, ActionResponse resp) throws JSONException {
-        String ticketId = req.getParam("ticketId");
+        String ticketId = req.getParam("entityId");
         Ticket ticket = DAOFacade.findById(Ticket.class, KeyFactory.stringToKey(ticketId));
+
+        if (ticket == null) return;
 
         Order order = ticket.getOrder();
         if (order == null) {
             DAOFacade.getDAO(Ticket.class).delete(ticket);
-            return;
+        } else {
+            List<Ticket> tickets = order.getTickets();
+            DAOFacade.getDAO(Ticket.class).delete(ticket);
+            if (tickets.size() == 1) {
+                DAOFacade.getDAO(Order.class).delete(order);
+            }
         }
-        List<Ticket> tickets = order.getTickets();
-        DAOFacade.getDAO(Ticket.class).delete(ticket);
-        if (tickets.size() == 1) DAOFacade.getDAO(Order.class).delete(order);
     }
 }

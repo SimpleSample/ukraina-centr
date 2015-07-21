@@ -18,6 +18,7 @@ import java.util.Locale;
  * @author Nagornyi
  *         Date: 12.06.14
  */
+@Authorized
 public class TicketsForTripAction implements Action {
 
     @Override
@@ -33,7 +34,7 @@ public class TicketsForTripAction implements Action {
         JSONObject respObj = new JSONObject();
         JSONArray ticketObjs = new JSONArray();
         for (Ticket ticket: tickets) {
-            JSONObject obj = ticket.toJSON(Locale.forLanguageTag("uk"));
+            JSONObject obj = ticket.toJson(Locale.forLanguageTag("uk"));
             String transactionId = ticket.getOrder() == null? "" : ticket.getOrder().getTransactionId();
             if (transactionId == null) transactionId = "";
             obj.put("transactionId", transactionId);

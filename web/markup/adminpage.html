@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../favicon.png">
+    <link href='http://fonts.googleapis.com/css?family=Roboto:300,400&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
+
+    <title>Admin Dashboard</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- Custom styles for this template -->
+    <link href="../admin/css/dashboard.css" rel="stylesheet">
+    <link href="../css/tablesaw.css" rel="stylesheet"/>
+    <link href="../css/ng/tablesaw.custom.css" rel="stylesheet"/>
+    <link href="../css/ng/tickets.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Україна-Центр</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Settings</a></li>
+                <li><a href="#">Profile</a></li>
+                <li><a href="#">Help</a></li>
+            </ul>
+            <form class="navbar-form navbar-right">
+                <input type="text" class="form-control" placeholder="Search...">
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar sidebar-swiped">
+            <div class="sidebar-inner">
+                <ul class="nav nav-sidebar">
+                    <li class="active"><a href="#">Огляд</a></li>
+                    <li><a href="#">Пасажири</a></li>
+                    <li><a href="#">Користувачі</a></li>
+                    <li><a href="#">Партнери</a></li>
+                    <li><a href="#">Місця</a></li>
+                    <li><a href="#">Репорти</a></li>
+                    <li><a id="scan-barcode" href="zxing://scan/?ret=http%3A%2F%2Four-little-baby.appspot.com%2Fmarkup%2Fadminpage.html%3Fsome%3D%7BRAWCODE%7D">Scan barcode</a></li>
+                </ul>
+                <div class="swipe-area">
+                    <div class="toggle-sidebar-inner">
+                    <a id="toggle-sidebar-link" href="#"><span class="glyphicon"></span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <h1 class="page-header">Найближчий рейс - Кіровоград-Рим, 28 серпня 2015 року</h1>
+
+            <div class="row placeholders">
+                <div id="column-chart-container" class="col-md-6">
+
+                </div>
+                <div id="pie-chart-container" class="col-md-6">
+
+                </div>
+            </div>
+
+            <h2 class="sub-header">Пасажири</h2>
+            <div class="history-table">
+                <table class="tablesaw tablesaw-swipe tablesaw-sortable" data-tablesaw-mode-exclude="columntoggle" data-tablesaw-mode="swipe" data-tablesaw-sortable="" data-tablesaw-sortable-switch="" data-tablesaw-minimap="" data-tablesaw-mode-switch="">
+                    <thead>
+                    <tr>
+                        <th data-tablesaw-sortable-col data-tablesaw-sortable-switch data-tablesaw-priority="persist">Пасажир</th>
+                        <th data-tablesaw-priority="6">Телефони</th>
+                        <th data-tablesaw-sortable-col data-tablesaw-sortable-switch data-tablesaw-priority="4">Маршрут</th>
+                        <th data-tablesaw-sortable-col data-tablesaw-sortable-switch data-tablesaw-priority="4">Дата відправлення</th>
+                        <th data-tablesaw-priority="2">Місце</th>
+                        <th data-tablesaw-sortable-col data-tablesaw-sortable-switch data-tablesaw-priority="6">Статус</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDurIQJDA"><td>Odmin Admin</td><td></td><td>Чезене - Кіровоград</td><td>24 жовтня, 2015 11:15</td><td>2b</td><td>RESERVED</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDuwYwJDA">                    <td>Мdmin Admin</td><td></td><td>Вінниця - Кіровоград</td><td>25 квітня, 2015 11:15</td><td>2a</td><td>PROCESSING</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDu2pUJDA">                    <td>зdmin Admin</td><td class="ticket-trip"></td><td>КРим - Кіровоград</td><td>5 вересня, 2015 11:15</td><td>1a</td><td>RESERVED</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDurIQKDA">                    <td>trdmin Admin</td><td class="ticket-trip"></td><td>Рим - Кіровоград</td><td>25 жовтня, 2015 11:15</td><td>2d</td><td>PROCESSING</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDuwYwKDA">                    <td>раdmin Admin</td><td class="ticket-trip"></td><td>СРим - Кіровоград</td><td>25 жовтня, 2015 11:15</td><td>1b</td><td>RESERVED</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDu2pUKDA">                    <td>Admin Admin</td><td></td><td>Рим - Кіровоград</td><td>25 жовтня, 2015 11:15</td><td>1d</td><td>PROCESSING</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDurIQLDA">                    <td>Admin Admin</td><td></td><td>Рим - Кіровоград</td><td>25 жовтня, 2015 11:15</td><td>1c</td><td>RESERVED</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgO6wmQoMCxIGVGlja2V0GICAgIDu2pULDA">                    <td>Admin Admin</td><td></td><td>Рим - Кіровоград</td><td>25 жовтня, 2015 11:15</td><td>2c</td><td>PROCESSING</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgK6OngoMCxIGVGlja2V0GICAgICumYAJDA">                    <td>Admin Admin</td><td></td><td>Рим - Кіровоград</td><td>18 жовтня, 2015 11:15</td><td>2b</td><td>RESERVED</td></tr><tr id="ag9zfnVrcmFpbmEtY2VudHJyNgsSBVJvdXRlGICAgICEypsKDAsSBFRyaXAYgICAgK6OngoMCxIGVGlja2V0GICAgICu54gJDA">                    <td>Admin Admin</td><td></td><td>Рим - Кіровоград</td><td>18 жовтня, 2015 11:15</td><td>2a</td><td>PROCESSING</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="../js/jquery-ui.min.js"></script>
+<script src="../js/tablesaw.js" type="text/javascript"></script>
+<script src="adminpage.js"></script>
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script>
+    (function () {
+        'use strict';
+
+        if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+            var msViewportStyle = document.createElement('style');
+            msViewportStyle.appendChild(
+                    document.createTextNode(
+                            '@-ms-viewport{width:auto!important}'
+                    )
+            );
+            document.querySelector('head').appendChild(msViewportStyle)
+        }
+
+    })();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.4/hammer.min.js"></script>
+</body>
+</html>

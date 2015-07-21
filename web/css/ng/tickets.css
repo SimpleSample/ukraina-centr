@@ -16,6 +16,7 @@
     padding: 20px 10px 10px 10px;
     border-radius: 20px;
     margin-bottom: 10px;
+    display: inline-block;
 }
 
 .bus-scheme table {
@@ -301,7 +302,7 @@ span.price-self {
     padding: 9px 10px;
 }
 
-.forth-info, .back-info {
+.ticket__trip-info {
     width: 49%;
     display: inline-block;
     text-align: center;
@@ -309,7 +310,7 @@ span.price-self {
     padding-top: 10px;
 }
 
-.forth-info .btn, .back-info .btn {
+.ticket__trip-info .btn {
     font-size: 18px;
     padding: 5px 10px;
 }

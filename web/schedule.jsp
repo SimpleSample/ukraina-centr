@@ -4,6 +4,7 @@
 <%
     ResourceBundle bundle = ResourceBundle.getBundle("i18n.schedule", Locale.forLanguageTag("uk")); //TODO localization issue
 %>
+<!DOCTYPE html>
 <html>
 <head>
     <title><%=bundle.getString("schedule.schedule")%></title>

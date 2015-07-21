@@ -2,7 +2,7 @@ package com.nagornyi.uc.common.template;
 
 import com.google.template.soy.data.SoyListData;
 import com.google.template.soy.data.SoyMapData;
-import com.nagornyi.uc.common.DateFormatter;
+import com.nagornyi.uc.common.date.DateFormatter;
 import com.nagornyi.uc.entity.Ticket;
 import com.nagornyi.uc.entity.User;
 import com.nagornyi.uc.templates.TemplatesManager;

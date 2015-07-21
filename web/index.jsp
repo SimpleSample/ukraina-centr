@@ -4,9 +4,11 @@
 <%
     ResourceBundle bundle = ResourceBundle.getBundle("i18n.tickets", Locale.forLanguageTag("uk")); //TODO localization issue
 %>
+<!DOCTYPE html>
 <html>
 <head>
     <title>Україна-Центр</title>
+    <meta property="og:image" content="http://www.ukraina-centr.com/images/photos/DSC_2679_ph.jpg"/>
     <script defer src="js/pikaday.js" type="text/javascript"></script>
     <jsp:include page="/WEB-INF/jsp/imports.jsp" flush="true"/>
     <link rel="stylesheet" href="css/ng/tickets.css" type="text/css" media="screen">
@@ -14,7 +16,7 @@
     <jsp:include page="/WEB-INF/jsp/i18n.jsp" flush="true">
         <jsp:param name="bundleName" value="client_tickets"/>
     </jsp:include>
-    <script src="js/ng/new.ng.tickets.js" type="text/javascript"></script>
+    <script src="js/ng/ng.tickets.js" type="text/javascript"></script>
 </head>
 <body class="index-page">
     <jsp:include page="/WEB-INF/jsp/header.jsp" flush="true">
@@ -197,7 +199,7 @@
             </div>
             <div class="c-banner-stats">
                 <div><h3><span>Пошук здійснюється за сполученням Україна - Італія</span></h3></div>
-                <div><a href="/about"><h3 class="c-highlight-link">Дізнатись більше »</h3></a></div>
+                <div><a href="/conditions"><h3 class="c-highlight-link">Дізнатись більше »</h3></a></div>
             </div>
         </div>
     </div>
@@ -290,16 +292,24 @@
                 </div>
             </div>
             <div class="col-md-4 right-block">
+                <div class="news-block">
+                    <h3>Відгуки:</h3>
+                    <div class="rss-news">Завантажується...</div>
+                </div>
                 <div class="wrapper margin-bot">
                     <div class="extra-wrap">
                         <strong class="title-1" style="max-width: 340px; margin: 0 auto;">Не забудь поділитись
                             <em style="padding-left: 80px; padding-top: 6px;">з друзями!</em></strong>
                     </div>
-                    <div class="social-block"><a href="#"><img src="img/share_dest.png"></a></div>
-                </div>
-                <div class="news-block">
-                    <h3>Останні новини:</h3>
-                    <div class="rss-news">Завантажується...</div>
+                    <div class="social-block">
+                        <script type="text/javascript" src="//yastatic.net/share/share.js" charset="utf-8"></script>
+                        <div class="yashare-auto-init"
+                             data-yashareL10n="uk"
+                             data-yashareType="large"
+                             data-yashareQuickServices="vkontakte,facebook,twitter,odnoklassniki,moimir,gplus,pinterest"
+                             data-yashareTheme="counter"
+                             data-yashareImage="http://www.ukraina-centr.com/img/logo.png"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -323,23 +333,34 @@
         }
         $(document).ready(function() {
             setTimeout(function() {
-                google.load("feeds", "1", {callback: function(){
-                    new google.feeds.Feed("http://dt.ua/rss/")
-                            .load(function (result) {
-                                if (result.error) {
-                                    console.log('Couldn\'t load rss feed');
-                                    return;
-                                }
-                                var container = $('.rss-news');
-                                container.html('');
-                                for (var i = 0; i < result.feed.entries.length; i++) {
-                                    var entry = result.feed.entries[i];
-                                    var feedDate = ya_format_date(new Date(entry.publishedDate));
-                                    var feedHtml = feedTemplate(feedDate, entry.link, entry.title, entry.contentSnippet);
-                                    container.append($(feedHtml));
-                                }
-                            });
-                }});
+                new Request("getFeedbacks", {count: 5}).send(function(data) {
+                    var feedbacks = data.feedbacks;
+                    var container = $('.rss-news');
+                    container.html('');
+                    for (var i = 0; i < feedbacks.length; i++) {
+                        var feedback = feedbacks[i];
+                        var feedDate = new Date(feedback.date).toLocaleString();
+                        var feedHtml = feedTemplate(feedDate, "#", feedback.username, feedback.feedbackText);
+                        container.append($(feedHtml));
+                    }
+                });
+//                google.load("feeds", "1", {callback: function(){
+//                    new google.feeds.Feed("http://dt.ua/rss/")
+//                            .load(function (result) {
+//                                if (result.error) {
+//                                    console.log('Couldn\'t load rss feed');
+//                                    return;
+//                                }
+//                                var container = $('.rss-news');
+//                                container.html('');
+//                                for (var i = 0; i < result.feed.entries.length; i++) {
+//                                    var entry = result.feed.entries[i];
+//                                    var feedDate = ya_format_date(new Date(entry.publishedDate));
+//                                    var feedHtml = feedTemplate(feedDate, entry.link, entry.title, entry.contentSnippet);
+//                                    container.append($(feedHtml));
+//                                }
+//                            });
+//                }});
             }, 0);
         });
     </script>

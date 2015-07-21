@@ -168,6 +168,16 @@
         this.processData(this.data);
     };
 
+    Pager.prototype.onObjectIdChanged = function(oldId, newId) {
+        for (var i = 0, size = this.pagedObjectIds.length; i < size; i++) {
+            var idx = $.inArray(oldId, this.pagedObjectIds[i]);
+            if (idx != -1) {
+                var current = this.pagedObjectIds[i];
+                current[idx] = newId;
+            }
+        }
+    };
+
     Pager.prototype.clear = function() {
         clearPagerElements(this.$pagerEl, this.allPossibleCount.length);
         this.allPossibleCount = 0;
@@ -180,28 +190,4 @@
 
         this.onAfterResponse([]);
     };
-
-    //http://stackoverflow.com/questions/17126453/html-table-to-excel-javascript
-    //<a id="dlink"  style="display:none;"></a>
-
-    //<input type="button" onclick="tableToExcel('tablename', 'name', 'myfile.xls')" value="Export to Excel">
-    var tableToExcel = (function () {
-        var uri = 'data:application/vnd.ms-excel;base64,';
-        var template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
-        var base64 = function (s) {
-            return window.btoa(unescape(encodeURIComponent(s)));
-        };
-        var format = function (s, c) {
-            return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; }) ;
-        };
-
-        return function (table, name, filename) {
-            if (!table.nodeType) table = document.getElementById(table);
-            var ctx = { worksheet: name || 'Worksheet', table: table.innerHTML };
-
-            document.getElementById("dlink").href = uri + base64(format(template, ctx));
-            document.getElementById("dlink").download = filename;
-            document.getElementById("dlink").click();
-        }
-    })()
 })();

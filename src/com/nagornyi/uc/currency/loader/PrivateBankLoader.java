@@ -1,60 +1,56 @@
 package com.nagornyi.uc.currency.loader;
 
+import com.google.appengine.labs.repackaged.org.json.JSONArray;
+import com.google.appengine.labs.repackaged.org.json.JSONException;
+import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import com.nagornyi.uc.appinfo.AppInfoLoadException;
 import com.nagornyi.uc.appinfo.AppInfoLoader;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author Nagornyi
  * Date: 29.06.14
  */
 public class PrivateBankLoader implements AppInfoLoader {
-
-    private static String LOAD_URI = "https://api.privatbank.ua/p24api/pubinfo?exchange&coursid=3";
-    private XPath xpath = XPathFactory.newInstance().newXPath();
+    private static final Logger LOG = Logger.getLogger(PrivateBankLoader.class.getName());
+    private static final String JSON_LOAD_URI = "https://api.privatbank.ua/p24api/pubinfo?exchange&json&coursid=11";
 
     @Override
     public void load(Map<String, Object> map) throws AppInfoLoadException {
         try {
-            URL url = new URL(LOAD_URI);
-            DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
-            domFactory.setNamespaceAware(true);
-            DocumentBuilder builder = domFactory.newDocumentBuilder();
-            Document doc = builder.parse(url.openStream());
+            URL url = new URL(JSON_LOAD_URI);
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod("GET");
+            con.setDoInput(true);
+            BufferedReader br =
+                    new BufferedReader(
+                            new InputStreamReader(con.getInputStream()));
+            StringBuilder result = new StringBuilder();
+            String input;
+            while ((input = br.readLine()) != null){
+                result.append(input);
+            }
+            br.close();
 
-            XPathExpression rateExpr = this.xpath.compile("/exchangerates/row/exchangerate[@ccy='EUR']/@buy");
-            NodeList nodes = (NodeList) rateExpr.evaluate(doc, XPathConstants.NODESET);
-            double rate = 0.0;
-            if (nodes.getLength() > 0) {
-                rate = new Double(nodes.item(0).getNodeValue());
+            JSONArray currenciesList = new JSONArray(result.toString());
+            for (int i = 0, size = currenciesList.length(); i < size; i++) {
+                JSONObject currencyRecord = currenciesList.getJSONObject(i);
+                if ("EUR".equals(currencyRecord.getString("ccy")) && "UAH".equals(currencyRecord.getString("base_ccy"))) {
+                    String saleRateStr = currencyRecord.getString("sale");
+                    double saleRate = Double.parseDouble(saleRateStr);
+                    map.put("currencyRate", saleRate);
+                    LOG.info("Successfully loaded privat-bank currency rate " + saleRateStr);
+                    break;
+                }
             }
 
-            if (rate != 0.0) {
-                map.put("currencyRate", rate);
-            } else {
-                throw new AppInfoLoadException();
-            }
-
-        } catch (MalformedURLException e) {
-            throw new AppInfoLoadException(e);
-        } catch (ParserConfigurationException e) {
-            throw new AppInfoLoadException(e);
-        } catch (IOException e) {
-            throw new AppInfoLoadException(e);
-        } catch (SAXException e) {
-            throw new AppInfoLoadException(e);
-        } catch (XPathExpressionException e) {
+        } catch (JSONException | IOException e) {
             throw new AppInfoLoadException(e);
         }
     }

@@ -1,57 +1,165 @@
-.ui-accordion .ui-accordion-header {
-    font-size: 1.3em;
+.page-content-wrapper {
+    height: 100%;
+    position: relative;
 }
 
-.table-tickets>tbody>tr>td {
-    font-size:13px;
+.user-board {
+    height: 100%;
+    background-color: #fff;
+    padding: 20px 10px 20px 55px;
+    overflow-y: auto;
 }
 
-.ui-accordion .ui-accordion-header.ui-state-default {
-    border: 1px solid #F7B72F;
-    background: #F3E1BA;
-    border-radius: 0;
+.user-board h2 {
+    margin-bottom: 0;
+    padding-bottom: 10px;
 }
 
-.ui-accordion .ui-accordion-header.ui-state-hover {
-    border: 1px solid #F7B72F;
-    background: #F7B72F;
-    border-radius: 0;
+.profile-menu {
+    position: absolute;
+    z-index: 1;
+    padding: 20px;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #f5f5f5;
+    border-right: 1px solid #eee;
+    box-shadow: 0px 0px 5px #9B9696;
 }
 
-.ui-accordion .ui-accordion-content {
-    border-radius: 0;
+.profile-workplace {
+    background-color: #fff;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.16);
 }
 
-.ui-accordion .forms-inline-list input {
-    height: 2.8em;
-    min-width: 320px;
-    background: #F3F1E9;
-    box-shadow: inset -1px 1px 3px 0 rgba(0,0,0,0.1);
-    -webkit-box-shadow: inset -1px 1px 3px 0px rgba(0,0,0,0.1);
-    -moz-box-shadow: inset -1px 1px 3px 0px rgba(0,0,0,0.1);
+.profile-menu-list {
+    margin-left: -20px;
+    margin-right: -20px;
 }
 
-.ui-accordion .ui-accordion-header.ui-accordion-icons {
-    padding: .2em .5em .2em 2.2em;
+.profile-menu-list__item {
+    background-color: #f5f5f5;
+    padding: 10px 20px;
+    color: #747474;
+    font-size: 18px;
+    cursor: pointer;
+    font-weight: 100;
+    position: relative;
+    min-height: 45px;
+    transition: all 0.3s ease;
 }
 
-a.change-ticket-date {
-    background-image: url(../../img/crossed-arrows-dis.png);
-    width: 32px;
-    height: 32px;
-    display: block;
+.profile-menu-list__item:before {
+    content: ' ';
+    top: 10px;
+    left: 10px;
+    position: absolute;
+    width: 24px;
+    height: 24px;
 }
 
-a.change-ticket-date:hover {
-    background-image: url(../../img/crossed-arrows.png);
+li.profile-menu-list__item:hover {
+    border: 1px solid #D0D0D0;
+    background-color: #EDEDED;
+    color: #282828;
 }
 
-#avail-trips {
-    display: inline-block;
-    float: left;
+.profile-menu-list__item a {
+    color: #747474;
 }
 
-#avail-seats {
-    display: inline-block;
-    margin-left: 10px;
+.profile-menu-list__item.green {
+    border-left: 4px solid #9EF10F;
+}
+
+.profile-menu-list__item.green:before {
+    background: url(../../img/history_icon.png) no-repeat;
+}
+
+.profile-menu-list__item.green:hover:before {
+    background: url(../../img/history_icon_green.png) no-repeat;
+}
+
+.profile-menu-list__item.yellow {
+    border-left: 4px solid #FFE800;
+}
+
+.profile-menu-list__item.yellow:before {
+    background: url(../../img/change_icon.png) no-repeat;
+}
+
+.profile-menu-list__item.yellow:hover:before {
+    background: url(../../img/change_icon_yellow.png) no-repeat;
+}
+
+.profile-menu-list__item.red {
+    border-left: 4px solid #F10F76;
+}
+
+.profile-menu-list__item.red:before {
+    background: url(../../img/personal_icon.png) no-repeat;
+}
+
+.profile-menu-list__item.red:hover:before {
+    background: url(../../img/personal_icon_red.png) no-repeat;
+}
+
+.profile-menu-list__item.blue {
+    border-left: 4px solid #74B2F9;
+}
+
+.profile-menu-list__item.blue:before {
+    background: url(../../img/logout_icon.png) no-repeat;
+}
+
+.profile-menu-list__item.blue:hover:before {
+    background: url(../../img/logout_icon_blue.png) no-repeat;
+}
+
+.feedback-circle {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #FF8686;
+    border-radius: 999em;
+    text-align: center;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+    cursor: pointer;
+}
+
+.feedback-circle .glyphicon {
+    padding-top: 10px;
+    color: white;
+    font-size: 28px;
+}
+
+.profile-menu-list__item_text {
+    padding-left: 20px;
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .user-board {
+        padding-right: 40px;
+        padding-left: 40px;
+    }
+
+    .user-board h2 {
+        padding-top: 20px;
+    }
+
+    .profile-menu {
+        box-shadow: none;
+    }
+
+    .profile-menu-list__item_text {
+        display: block;
+    }
+
+    .feedback-circle {
+        top: 30px;
+        right: 40px;
+    }
 }

@@ -1,37 +1,24 @@
 <project name="Loc-build" default="convert-loc-files" basedir=".">
 <description>
 </description>
-    <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
-
     <target name="convert-loc-files">
         <property environment="env"/>
 
-        <if>
-            <available file="${artifact.output.path}\WEB-INF\classes\i18n" type="dir" />
-            <then>
-                <delete>
-                    <fileset dir="${artifact.output.path}\WEB-INF\classes\i18n" includes="*.properties" defaultexcludes="false"/>
-                </delete>
-            </then>
-            <else>
-                <mkdir dir="${artifact.output.path}\WEB-INF\classes\i18n"/>
-            </else>
-        </if>
-
+        <delete failonerror="false">
+            <fileset dir="${artifact.output.path}\WEB-INF\classes\i18n" includes="*.properties" defaultexcludes="false"/>
+        </delete>
+        <mkdir dir="${artifact.output.path}\WEB-INF\classes\i18n"/>
 
         <property name="executable-full-path"
-                  location="${env.JAVA_HOME}\bin\native2ascii.exe"/>
+                  location="${env.JAVA_HOME}\bin\native2ascii"/>
         <apply executable="${executable-full-path}" parallel="false" verbose="true" dest="${artifact.output.path}\WEB-INF\classes\i18n">
-            <arg line="-encoding CP1251"/>
+            <!--Uncomment for Windows-->
+            <!--<arg line="-encoding CP1251"/>-->
             <srcfile/>
             <targetfile/>
             <mapper type="glob" from="*.properties" to="*.properties"/>
             <fileset dir="${basedir}\i18n" includes="*_uk.properties"/>
         </apply>
-        <!--<exec executable="${executable-full-path}">-->
-            <!--<arg line="-encoding CP1251 D:\work\github-repo\ukraina-centr\i18n\header\header_uk.properties-->
-            <!--D:\work\github-repo\ukraina-centr\out\artifacts\ukraina_centr_war_exploded\WEB-INF\classes\header\header_uk.properties" />-->
-        <!--</exec>-->
     </target>
 
 </project>

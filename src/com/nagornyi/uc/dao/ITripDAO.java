@@ -24,5 +24,7 @@ public interface ITripDAO extends DAO<Trip> {
 
     List<Trip> getTripsByDateRange(Route route, Date startDate, Date endDate);
 
+    List<Trip> getTripsByDateRange(Route route, Date startDate, Date endDate, boolean isForth);
+
     Key createTrip(Route route, Date tripStartDate, Date tripEndDate, boolean isForth);
 }

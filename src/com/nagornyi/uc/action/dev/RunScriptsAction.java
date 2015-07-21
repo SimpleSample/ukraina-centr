@@ -5,7 +5,7 @@ import com.nagornyi.uc.Role;
 import com.nagornyi.uc.action.Action;
 import com.nagornyi.uc.action.Authorized;
 import com.nagornyi.uc.action.MD5Salt;
-import com.nagornyi.uc.common.DateFormatter;
+import com.nagornyi.uc.common.date.DateFormatter;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.app.UserDAO;
 import com.nagornyi.uc.entity.*;
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  * @author Nagorny
  * Date: 14.05.14
  */
-@Authorized
+@Authorized(role = Role.ADMIN)
 public class RunScriptsAction implements Action {
     private static String SETRA_HTML = "<div class=\"bus bus-setra\"><table><tbody><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\" class=\"active\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\" class=\"blocked\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><span>1c</span></td><td><span>1c</span></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr><tr><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td><td><span>1c</span></td><td><a href=\"#\">1c</a></td><td><a href=\"#\">1c</a></td></tr></tbody></table></div>";
     private static final Logger log = Logger.getLogger(RunScriptsAction.class.getName());

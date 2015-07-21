@@ -1,5 +1,6 @@
 package com.nagornyi.uc;
 
+import com.nagornyi.env.EnvVariablesStorage;
 import com.nagornyi.uc.cache.CacheManager;
 import com.nagornyi.uc.templates.TemplatesManager;
 
@@ -19,5 +20,6 @@ public class InitServlet extends HttpServlet {
 
         CacheManager.initCache();
         TemplatesManager.INSTANCE.init();
+        EnvVariablesStorage.loadEnvVariables();
     }
 }

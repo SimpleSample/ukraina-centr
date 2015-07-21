@@ -4,6 +4,7 @@ import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import com.nagornyi.uc.Role;
+import com.nagornyi.uc.context.RequestContext;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.ITicketDAO;
 import com.nagornyi.uc.dao.PaginationBatch;
@@ -24,12 +25,13 @@ public class GetAllTicketsAction implements Action {
 
     @Override
     public void perform(ActionRequest req, ActionResponse resp) throws JSONException {
-        Locale locale = req.getLocale();
+        Locale locale = RequestContext.getLocale();
         User user = req.getUser();
 
         String cursor = req.getParam("cursor");
         Integer count = Integer.parseInt((String)req.getParam("count"));
         boolean first = false;
+        //TODO could check cursor == null
         if (req.getParam("isInitialLoad") != null && Boolean.parseBoolean((String)(req.getParam("isInitialLoad")))) {
             first = true;
         }
@@ -40,7 +42,7 @@ public class GetAllTicketsAction implements Action {
         JSONObject respObj = new JSONObject();
         JSONArray ticketObjs = new JSONArray();
         for (Ticket ticket: tickets) {
-            ticketObjs.put(ticket.toJSON(locale));
+            ticketObjs.put(ticket.toJson(locale));
         }
 
         respObj.put("objects", ticketObjs);

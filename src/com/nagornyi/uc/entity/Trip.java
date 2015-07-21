@@ -1,10 +1,8 @@
 package com.nagornyi.uc.entity;
 
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.Key;
 import com.nagornyi.uc.dao.DAOFacade;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -37,10 +35,22 @@ public class Trip extends EntityWrapper {
         String startCity = getRoute().getFirstCity().getName();
         String endCity = getRoute().getLastCity().getName();
 
-        return isForth()? startCity + " - " + endCity : endCity + " - " + startCity;
+        return isRouteForth()? startCity + " - " + endCity : endCity + " - " + startCity;
     }
 
-    public boolean isForth() {
+    public City getStartCity() {
+        City startCity = getRoute().getFirstCity();
+        City endCity = getRoute().getLastCity();
+        return isRouteForth()? startCity : endCity;
+    }
+
+    public City getEndCity() {
+        City startCity = getRoute().getFirstCity();
+        City endCity = getRoute().getLastCity();
+        return isRouteForth()? endCity : startCity;
+    }
+
+    public boolean isRouteForth() {
         return getProperty("forth");
     }
 

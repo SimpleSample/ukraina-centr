@@ -3,7 +3,13 @@ package com.nagornyi.uc.cache;
 import com.nagornyi.uc.entity.Seat;
 import com.nagornyi.uc.entity.Ticket;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -37,6 +43,28 @@ public class TicketCache extends EntityCache {
 
         Map ticketsForTrip = lockedTickets.get(tripKey);
         return ticketsForTrip == null || ticketsForTrip.isEmpty()? 0 : ticketsForTrip.size();
+    }
+
+    public static synchronized List<Ticket> getLockedTickets(String tripKey) {
+        Map<String, TicketRecord> ticketsForTrip = lockedTickets.get(tripKey);
+        if (ticketsForTrip == null) return new ArrayList<Ticket>();
+
+        tryRevealLockedForTrip(tripKey);
+
+        List<Ticket> lockedTickets = new ArrayList<Ticket>();
+        for (String key: ticketsForTrip.keySet()) {
+            lockedTickets.add(ticketsForTrip.get(key).ticket);
+        }
+        return lockedTickets;
+    }
+
+    public static synchronized Ticket getLockedTicket(String tripKey, String ticketId) {
+        Map<String, TicketRecord> ticketsForTrip = lockedTickets.get(tripKey);
+        if (ticketsForTrip == null) return null;
+
+        tryRevealLockedForTrip(tripKey);
+        TicketRecord record = ticketsForTrip.get(ticketId);
+        return record == null? null : record.ticket;
     }
 
     public static synchronized List<Seat> getLockedSeats(String tripKey) {

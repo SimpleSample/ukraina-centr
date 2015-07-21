@@ -4,6 +4,7 @@
 <%
     ResourceBundle bundle = ResourceBundle.getBundle("i18n.about", Locale.forLanguageTag("uk")); //TODO localization issue
 %>
+<!DOCTYPE html>
 <html>
 <head>
     <title><%=bundle.getString("about.about_us")%></title>
@@ -20,6 +21,7 @@
             <h2><%=bundle.getString("about.lets_travel")%></h2>
             <p class="p2"><%=bundle.getString("about.first_paragraph1")%> <a class="link italic" href="${pageContext.request.contextPath}/leasing"><%=bundle.getString("about.first_paragraph2")%></a>. <%=bundle.getString("about.first_paragraph3")%></p>
             <p class="p3"><%=bundle.getString("about.second_paragraph")%></p>
+            <p><a href="/conditions"><%=bundle.getString("about.read_more_about_passengers_transportation_policy")%> »</a></p>
             <div class="article-photo"><img src="images/photos/DSC_2686_ph.jpg"></div>
         </article>
     </div>

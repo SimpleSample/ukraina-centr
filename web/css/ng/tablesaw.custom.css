@@ -1,0 +1,175 @@
+/*tablesaw customization*/
+.history-table {
+    overflow-x: auto;
+    padding: 10px 0;
+}
+
+.history-table .tablesaw thead {
+    border: none;
+    background: none;
+    border-bottom: 3px solid #C8C8C8;
+    border-top: 1px solid #C8C8C8;
+}
+
+@media (min-width: 40em) {
+    .history-table .tablesaw td {
+        line-height: 1.6em;
+    }
+}
+
+.tablesaw a.action-glyph-link {
+    margin-left: 16px;
+    font-size: 20px;
+    outline: none;
+}
+
+.tablesaw a.action-glyph-link:focus {
+    color: #8CC314;
+}
+
+.tablesaw a.action-glyph-link:hover {
+    color: #6F6F6F;
+}
+
+.history-table .tablesaw .tablesaw-cell-content, .history-table .tablesaw td {
+    color: #747474;
+    font-weight: 100;
+}
+
+.history-table .tablesaw .tablesaw-cell-label {
+    font-family: 'Roboto', sans-serif;
+    text-transform: none;
+    font-weight: normal;
+    font-size: 16px;
+}
+
+.history-table .tablesaw thead tr:first-child th {
+    font-family: 'Roboto', sans-serif;
+    border-right: none;
+}
+
+.history-table .tablesaw tbody tr {
+    transition: all 0.3s ease;
+}
+
+.history-table .tablesaw tbody tr:hover, .history-table .tablesaw tbody tr.active {
+    background-color: rgba(158, 241, 15, 0.47);
+}
+
+.history-table .tablesaw-bar .btn.btn-select {
+    margin-top: -2px;
+}
+
+.history-table .tablesaw-bar .tablesaw-advance a.tablesaw-nav-btn.down:before {
+    left: .35em;
+}
+
+.history-table .tablesaw-sortable .tablesaw-sortable-head button,
+.history-table .tablesaw-sortable thead tr th {
+    text-transform: none;
+    color: #747474;
+    font-size: 18px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.history-table .tablesaw-advance-dots li i {
+    vertical-align: super;
+}
+
+.history-table .tablesaw-bar .tablesaw-toolbar .btn-select:after {
+    padding-top: 1.2em;
+    padding-right: 1.6em;
+}
+
+.history-table .tablesaw-sortable-switch, .history-table .tablesaw-modeswitch {
+    padding-left: 10px;
+}
+
+.history-table .tablesaw-advance {
+    padding-right: 10px;
+}
+
+.history-table .tablesaw-toolbar label {
+    margin-right: 0;
+}
+
+.history-table .tablesaw-bar .btn.btn-select {
+    border: 1px solid #C8C8C8;
+}
+
+@media (max-width: 39.9375em) {
+    .history-table .tablesaw .tablesaw-cell-content {
+        float: right;
+    }
+}
+
+.tablesaw-toolbar-container {
+    float: left;
+    padding: 10px;
+}
+
+/*pager*/
+.tablesaw-pager {
+    font-size: 18px;
+}
+
+.tablesaw-pager-container .pager-element {
+    border: 1px solid #DFDFDF;
+    padding: 5px 10px;
+    transition: all 0.3s ease;
+}
+.tablesaw-pager-container {
+    float: right;
+    padding: 10px;
+}
+
+.pager-element.disabled a {
+    color: #DFDFDF;
+    cursor: not-allowed;
+}
+
+.pager-element.disabled:hover {
+    background-color: #FFF;
+}
+
+.pager-element.pager-prev {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.pager-element.pager-next {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.tablesaw-pager-container .pager-element:hover {
+    background-color: rgba(158, 241, 15, 0.47);
+}
+
+.pager-element.active a {
+    color: #fff;
+}
+
+.pager-element.active {
+    background-color: #9DCC37;
+    border: 1px solid #9DCC37;
+}
+
+.ticket-status {
+    padding: 4px;
+    border-radius: 15px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.ticket-status.status-RESERVED {
+    background: rgba(92, 184, 92, 0.73);
+}
+
+.ticket-status.status-PROCESSING {
+    background: rgb(240, 173, 78);
+}
+
+.ticket-status.status-LOCKED {
+    background: #9d9d9d;
+}

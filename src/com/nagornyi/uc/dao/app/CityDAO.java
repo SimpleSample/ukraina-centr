@@ -2,10 +2,10 @@ package com.nagornyi.uc.dao.app;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.repackaged.org.apache.commons.collections.CollectionUtils;
 import com.nagornyi.uc.cache.CityCache;
 import com.nagornyi.uc.dao.ICityDAO;
 import com.nagornyi.uc.entity.City;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 

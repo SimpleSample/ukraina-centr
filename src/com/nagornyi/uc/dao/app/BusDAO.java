@@ -6,7 +6,7 @@ import com.nagornyi.uc.entity.Bus;
 
 /**
  * @author Nagorny
- *         Date: 12.05.14
+ * Date: 12.05.14
  */
 public class BusDAO extends EntityDAO<Bus> implements IBusDAO {
 

@@ -1,6 +1,6 @@
 package com.nagornyi.uc.util;
 
-import com.nagornyi.uc.common.DateFormatter;
+import com.nagornyi.uc.common.date.DateFormatter;
 
 import java.util.Calendar;
 import java.util.Date;

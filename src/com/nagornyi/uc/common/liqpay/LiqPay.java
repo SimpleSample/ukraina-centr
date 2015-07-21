@@ -2,7 +2,8 @@ package com.nagornyi.uc.common.liqpay;
 
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
-import com.nagornyi.uc.common.DateFormatter;
+import com.nagornyi.env.EnvVariablesStorage;
+import com.nagornyi.uc.common.date.DateFormatter;
 import com.nagornyi.uc.entity.Order;
 import com.nagornyi.uc.entity.Ticket;
 import com.nagornyi.uc.entity.User;
@@ -18,15 +19,9 @@ public class LiqPay {
 //    private Proxy __PROXY = null;
 //    private String __PROXY_AUTH = null;
 
+    private static final String ENV_PARAMETER_GROUP = LiqPay.class.getSimpleName();
     private static String host = "https://www.liqpay.com/api/";
-    private static String pub_key = "i30587714188";
-    private static String priv_key = "fc1iwzi5oHaOhSqME8H849tqSuNi8At1x3g2RdqY";
-//    private static String result_url = "http://our-little-baby.appspot.com/tickets.html?orderId=";
-    private static String result_url = "http://www.ukraina-centr.com/tickets?orderId=";//TODO
-    private static String server_url = "http://www.ukraina-centr.com/lpCallback"; //TODO
-//    private static String server_url = "http://our-little-baby.appspot.com/lpCallback";
     private static String language = "ru";
-    private static String sandbox = "0"; // TODO make it config
     private static String type = "buy";
     private static String currency = "EUR"; // USD, EUR, RUB, UAH
     private static String description = "Оплата квитків на сайті www.ukraina-centr.com";
@@ -35,8 +30,6 @@ public class LiqPay {
     public LiqPay() {}
 
     public LiqPay(String public_key, String private_key, String url) {
-        pub_key = public_key;
-        priv_key = private_key;
         host = url;
     }
 
@@ -55,7 +48,7 @@ public class LiqPay {
         Ticket ticket = null;
         Ticket backTicket = null;
         for (Ticket ticket1: tickets) {
-            if (ticket1.getTrip().isForth()) {
+            if (ticket1.getTrip().isRouteForth()) {
                 ticket = ticket1;
             } else {
                 backTicket = ticket1;
@@ -96,13 +89,15 @@ public class LiqPay {
 
         JSONObject json = new JSONObject();
 
-        json.put("public_key", pub_key);
+        String publicKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "publicKey");
+        json.put("public_key", publicKey);
 
         for (Map.Entry<String, String> entry: list.entrySet())
             json.put(entry.getKey(), entry.getValue());
 
         String dataJson = json.toString();
-        String signature = LiqPayUtil.base64_encode( LiqPayUtil.sha1( priv_key + dataJson + priv_key) );
+        String privateKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "privateKey");
+        String signature = LiqPayUtil.base64_encode( LiqPayUtil.sha1( privateKey + dataJson + privateKey) );
 
         HashMap<String, String> data = new HashMap<String, String>();
         data.put("data", dataJson);
@@ -124,8 +119,8 @@ public class LiqPay {
             language = list.get("language");
 
         String signature = cnb_signature(list);
-
-        list.put("public_key", pub_key);
+        String publicKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "publicKey");
+        list.put("public_key", publicKey);
         list.put("signature", signature);
 
         String form = "";
@@ -148,10 +143,13 @@ public class LiqPay {
         params.put("description", description);
         params.put("order_id", orderDesc);
         params.put("type", type);
-        params.put("result_url", result_url+orderId);
-        params.put("server_url", server_url);
-        params.put("public_key", pub_key);
+        String serverUrl = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "serverUrl");
+        params.put("result_url", serverUrl + "?orderId=" + orderId);
+        params.put("server_url", serverUrl + "lpCallback");
+        String publicKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "publicKey");
+        params.put("public_key", publicKey);
         params.put("language", language);
+        String sandbox = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "sandbox");
         params.put("sandbox", sandbox);
         params.put("signature", cnb_signature(params));
         return params;
@@ -194,7 +192,9 @@ public class LiqPay {
         if(description == null)
             throw new NullPointerException("description can't be null");
 
-        String sign_str = priv_key + amount + currency + pub_key;
+        String publicKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "publicKey");
+        String privateKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "privateKey");
+        String sign_str = privateKey + amount + currency + publicKey;
 
         if(order_id != null)sign_str += order_id;
         if(type != null)sign_str += type;
@@ -219,8 +219,12 @@ public class LiqPay {
         String signature = params.get("signature");
         if (signature == null) return false;
 
-        String calcSignature = cnb_signature(params);
-        return signature.equals(calcSignature);
+        if (LiqPay_v3.isVersion3(params)) {
+            return LiqPay_v3.isValid(params);
+        } else {
+            String calcSignature = cnb_signature(params);
+            return signature.equals(calcSignature);
+        }
     }
 
 //    public void setProxy(String host, Integer port){

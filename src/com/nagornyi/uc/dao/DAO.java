@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  * @author Nagorny
- *         Date: 12.05.14
+ * Date: 12.05.14
  */
 public interface DAO<Entity extends BaseEntity> {
 
@@ -20,6 +20,8 @@ public interface DAO<Entity extends BaseEntity> {
     List<Entity> getByProperty(String prop, Object propValue);
 
     List<Entity> getAll();
+
+    Query getQueryByParent(Key parentKey);
 
     List<Entity> getByParent(Key parentKey);
 

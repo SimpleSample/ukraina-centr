@@ -9,16 +9,16 @@ import java.util.List;
 /**
  * Created by Yanko on 25.05.14.
  */
-public class ReservationResult {
+public class PurchaseResult {
     private List<String> forthFailedTickets = new ArrayList<String>();
     private List<String> backFailedTickets = new ArrayList<String>();
     private Trip forthTrip;
     private Trip backTrip;
     private List<Ticket> allTickets = new ArrayList<Ticket>();
 
-    public ReservationResult(Trip forthTrip, Trip backTrip) {
-        this.forthTrip = forthTrip;
-        this.backTrip = backTrip;
+    public PurchaseResult(Trip userForthTrip, Trip userBackTrip) {
+        this.forthTrip = userForthTrip;
+        this.backTrip = userBackTrip;
     }
 
     public void addTicket(Ticket ticket) {

@@ -1,7 +1,9 @@
 package com.nagornyi.uc.transport;
 
+import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import org.omg.CORBA.OBJ_ADAPTER;
 
 import java.util.logging.Logger;
 
@@ -29,6 +31,18 @@ public class ActionResponse {
     }
 
     public void setResponseParam(String key, String value) {
+        setValue(key, value);
+    }
+
+    public void setResponseParam(String key, JSONObject value) {
+        setValue(key, value);
+    }
+
+    public void setResponseParam(String key, JSONArray value) {
+        setValue(key, value);
+    }
+
+    private void setValue(String key, Object value) {
         if (dataObj == null) {
             dataObj = new JSONObject();
         }

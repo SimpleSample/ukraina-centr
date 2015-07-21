@@ -92,8 +92,13 @@ public class EntityDAO<E extends EntityWrapper> implements DAO<E> {
     }
 
     @Override
+    public Query getQueryByParent(Key parentKey) {
+        return new Query(getKind()).setAncestor(parentKey);
+    }
+
+    @Override
     public List<E> getByParent(Key parentKey) {
-        Query query = new Query(getKind()).setAncestor(parentKey);
+        Query query = getQueryByParent(parentKey);
 
         return getByQuery(query);
     }

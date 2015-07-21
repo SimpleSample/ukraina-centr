@@ -1,6 +1,6 @@
 package com.nagornyi.uc.context;
 
-import com.nagornyi.uc.common.DateFormatter;
+import com.nagornyi.uc.common.date.DateFormatter;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.IUserDAO;
 import com.nagornyi.uc.entity.User;
@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Currency;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 /**
  * Additional info:
@@ -22,6 +23,7 @@ import java.util.Locale;
  * Date: 29.06.14
  */
 public class RequestContext {
+    private static final Logger log = Logger.getLogger(RequestContext.class.getName());
 
     private static ThreadLocal<Locale> locale = new ThreadLocal<Locale>() {
         @Override
@@ -87,6 +89,7 @@ public class RequestContext {
     }
 
     public static void setLocale(Locale locale) {
+        log.info("setting locale " + locale.getLanguage().toUpperCase() + " for user " + (getUser() == null? "null" : getUser().getEmail()));
         RequestContext.locale.set(locale);
     }
 

@@ -6,8 +6,9 @@ import com.nagornyi.uc.transport.ActionResponse;
 
 /**
  * @author Nagorny
- *         Date: 25.04.14
+ * Date: 25.04.14
  */
 public interface Action {
+
     void perform(ActionRequest req, ActionResponse resp) throws JSONException;
 }

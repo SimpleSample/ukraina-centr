@@ -12,7 +12,7 @@ import java.util.Locale;
 
 /**
  * @author Nagornyi
- *         Date: 20.06.14
+ * Date: 20.06.14
  */
 @Authorized(role = Role.ADMIN)
 public class AddUserAction implements Action {
