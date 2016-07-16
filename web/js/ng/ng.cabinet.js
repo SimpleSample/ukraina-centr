@@ -73,7 +73,27 @@ var clientBundle = window.clientBundle || {};
         popup.show();
     }
 
+    function showCabinetSection(sectionSelectorToShow) {
+        var sectionToShow = $(sectionSelectorToShow);
+        if (sectionToShow.hasClass('block-hidden')) {
+            var notHidden = $('.profile-workplace').not('.block-hidden');
+            notHidden.animate({
+                opacity: 'toggle'
+            }, 200, function() {
+                notHidden.addClass('block-hidden');
+                sectionToShow.removeClass('block-hidden');
+                sectionToShow.animate({
+                    opacity: 'toggle'
+                }, 300);
+            });
+        }
+
+    }
+
     $(document).on('ready', function() {
+        var $content = $('.user-board');
+        var minHeight = $( window ).height() - $('footer').outerHeight() - $('header').outerHeight();
+        $content.css('min-height', minHeight + 'px');
         if (!isAuthorized()) {
             var popup = new Popup(clientBundle.error, uc.suggestRegistration(), '', function(popupId){
                 var $popupEl = $(popupId);
@@ -122,7 +142,10 @@ var clientBundle = window.clientBundle || {};
             } else if ($actionElement.hasClass('glyphicon-trash')) {
                 removeTicket($targetTr, ticketId, function() {
                     $targetTr.remove();
-                    reinitTablesaw($tablesaw);
+                    pager.clear();
+                    pager.load(1, function() {
+                        reinitTablesaw($tablesaw);
+                    });
                 });
             }
             return false;
@@ -138,57 +161,76 @@ var clientBundle = window.clientBundle || {};
             pager.init();
         });
 
-        $('#order-history').on('click tap', function(eve){
+        var $menu = $('.profile-menu-list');
+        var $orderHistory = $('#order-history');
+        var $personalData = $('#personal-data');
+        var $cabinetLogout = $('#cabinet-logout')
+        $orderHistory.on('click tap', function(eve){
             eve.preventDefault();
+            showCabinetSection('#order-history-block');
+            $menu.find('.active').removeClass('active');
+            $orderHistory.addClass('active');
 
             return false;
         });
-        $('#password-change').on('click tap', function(eve){
+
+        $personalData.on('click tap', function(eve){
             eve.preventDefault();
-            var popup = new Popup(clientBundle.password_change, window.uc.changePassTemplate, '', function(popupId) {
-                $(popupId + ' #btn-change-pass').click(function(event){
-                    event.preventDefault();
-                    var popupEl = $(popupId);
-                    var $old = popupEl.find('#user-password-old');
-                    var oldVal = $old.val();
-                    var newVal = popupEl.find('#user-password').val();
-                    var isOldPassValid = /^[0-9a-zA-Z]{8,}$/.test(oldVal);
-                    var isNewPassValid = /^[0-9a-zA-Z]{8,}$/.test(newVal);
-                    if (!isOldPassValid || !isNewPassValid) {
-                        new Message(clientBundle.password_should_be_at_least_8_symbols_long, 5000);
-                        return;
-                    }
-
-                    new Request("changePass", {oldPass: oldVal, newPass: newVal}).send(function(data) {
-                        if (data && data['newPass']) {
-                            popup.destroy();
-                            if ($old.hasClass('input-error')) $old.removeClass('input-error');
-                            new Popup(clientBundle.password_change, '<div>'+clientBundle.password_was_changed_successfully+'</div>','').show();
-                        } else {
-                            $old.addClass('input-error');
-                            new Message(clientBundle.old_password_is_not_correct, 5000);
-                        }
-                    });
-                    return false;
-                });
-
-            });
-            popup.show();
+            showCabinetSection('#personal-info-block');
+            $menu.find('.active').removeClass('active');
+            $personalData.addClass('active');
             return false;
         });
-        $('#personal-data').on('click tap', function(eve){
-            eve.preventDefault();
 
-            return false;
-        });
-        $('#cabinet-logout').on('click tap', function(eve){
+        $cabinetLogout.on('click tap', function(eve){
             eve.preventDefault();
+            $menu.find('.active').removeClass('active');
+            $cabinetLogout.addClass('active');
             window.logout(function(){
                 window.location.href = '/';
             });
 
             return false;
         });
+        var $passChangeBlock = $('.password-change-block');
+        //$('#password-change').on('click tap', function(eve){
+        //    eve.preventDefault();
+            //var popup = new Popup(clientBundle.password_change, window.uc.changePassTemplate, '', function(popupId) {
+        $passChangeBlock.find('#password-change').click(function(event) {
+            event.preventDefault();
+            //var popupEl = $(popupId);
+            var $old = $passChangeBlock.find('#user-password-old');
+            var oldVal = $old.val();
+            var $new = $passChangeBlock.find('#user-password');
+            var newVal = $new.val();
+            var isOldPassValid = /^[0-9a-zA-Z]{8,}$/.test(oldVal);
+            var isNewPassValid = /^[0-9a-zA-Z]{8,}$/.test(newVal);
+            if (!isOldPassValid || !isNewPassValid) {
+                new Message(clientBundle.password_should_be_at_least_8_symbols_long, 5000);
+                return;
+            }
+
+            new Request("changePass", {oldPass: oldVal, newPass: newVal}).send(function(data) {
+                if (data && data['newPass']) {
+                    //popup.destroy();
+                    if ($old.hasClass('input-error')) $old.removeClass('input-error');
+                    $old.val('');
+                    $new.val('');
+                    new Popup(clientBundle.password_change, '<div>'+clientBundle.password_was_changed_successfully+'</div>','').show();
+                } else {
+                    $old.addClass('input-error');
+                    new Message(clientBundle.old_password_is_not_correct, 5000);
+                }
+            });
+            return false;
+        });
+
+            //});
+            //popup.show();
+            //return false;
+        //});
+
+        $('#buy-ticket').click(function() {window.location.assign = '/';});
 
         $('.feedback-circle').on('click tap', function() {
             new Popup(clientBundle.feedback, window.uc.feedbackForm, '', function(popupId) {

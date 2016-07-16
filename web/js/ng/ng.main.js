@@ -145,7 +145,14 @@
 
     window.login = function(callback) {
         var content = window.uc.loginTemplate;
-        var popup = new Popup(clientBundle.login, content, '', function(popupId) { //TODO localize
+        var popup = new Popup(clientBundle.login, content, '', function(popupId) {
+            gapi.signin2.render('my-signin2', {
+                'scope': 'https://www.googleapis.com/auth/plus.login',
+                'theme': 'dark',
+                'width': 'auto',
+                'onsuccess': function(user) {window.onGoogleSignIn(user, popup);},
+                'onfailure': function() {console.log('login failed');}
+            });
             $(popupId + ' #btn-login').on('click', function(event){
                 event.preventDefault();
                 var data = {};
@@ -213,12 +220,38 @@
         EventBus.dispatch('user_authorized');
     }
 
+    window.updateCookie = function(name, surname, phone) {
+        document.cookie = "user=" + name;
+        document.cookie = "name=" + name + ' ' + surname;
+        document.cookie = "phone=" + phone;
+    };
+
     window.logout = function(callback) {
         var req = new Request('logout');
-        req.send(function(data){
+        req.send(function() {
             EventBus.dispatch('user_loggedout');
-            if (callback) callback();
+            if (callback) {
+                callback();
+            }
         });
+    };
+
+    window.onGoogleSignIn = function onSignIn(googleUser, $popup) {
+        // Useful data for your client-side scripts:
+        var profile = googleUser.getBasicProfile();
+        var req = {
+            email:profile.getEmail(),
+            idToken: googleUser.getAuthResponse().id_token,
+            name: profile.getName(),
+            imageUrl: profile.getImageUrl()
+        };
+        new Request('validateGoogleUser',req)
+            .send(function(){
+                document.cookie = "name=" + profile.getName();
+                document.cookie = "email=" + profile.getEmail();
+                EventBus.dispatch('user_authorized');
+                $popup.destroy();
+            })
     };
 })();
 
@@ -237,6 +270,7 @@
         '</div>';
 
     window.uc.loginTemplate =
+        '<div id="my-signin2" class="g-signin2"></div>'+
         '<div class="forms">' +
         '<label><input type="email" name="email" placeholder="Email"></label>' +
         '<label><input type="password" name="password" placeholder="'+clientBundle.password+'"></label>' +

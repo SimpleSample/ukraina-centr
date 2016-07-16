@@ -2,7 +2,9 @@ package com.nagornyi.uc.action;
 
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.nagornyi.uc.Constants;
 import com.nagornyi.uc.common.UserFriendlyException;
+import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.app.UserDAO;
 import com.nagornyi.uc.entity.User;
 import com.nagornyi.uc.transport.ActionRequest;
@@ -20,29 +22,31 @@ public class LoginAction implements Action {
 
     @Override
     public void perform(ActionRequest req, ActionResponse resp) throws JSONException {
-        if (req.getSession().getAttribute("email") != null) {
-            String email = (String)req.getSession().getAttribute("email");
+        String email = (String) req.getSession().getAttribute(Constants.EMAIL);
+        if (email != null) {
             log.log(Level.INFO, "User logged in with email:" + email);
+
             new WelcomeAction().perform(req, resp);
-            if (req.getParam("auto") != null) return;
+            if (req.getParam(Constants.AUTO) != null) {
+                return;
+            }
             throw new UserFriendlyException("Ви вже авторизовані в системі");
         }
 
-        String email = req.getParam("email");
-        String password = req.getParam("password");
-        String errorMessage = null;
-        UserDAO dao = new UserDAO();
+        email = req.getParam(Constants.EMAIL);
+        String password = req.getParam(Constants.PASSWORD);
+
+        UserDAO dao = DAOFacade.getDAO(User.class);
         User user = dao.getUserByEmail(email);
         if (user == null) {
-            errorMessage = "Користувач з поштою " + email + " відсутній в системі"; //TODO localize
+            throw new UserFriendlyException("Користувач з поштою " + email + " відсутній в системі"); //TODO localize
         } else {
             String encPass = MD5Salt.encrypt(password, email);
             log.log(Level.INFO, "User email:" + email + ", pass:"+password+", encrypted new:" + encPass + ", enc old:"+user.getPassword() + ", user role: " + user.getRole());
             if (!encPass.equals(user.getPassword())) {
-                errorMessage = "Пароль введений невірно"; //TODO localize
+                throw new UserFriendlyException("Пароль введений невірно"); //TODO localize
             }
         }
-        if (errorMessage != null) throw new UserFriendlyException(errorMessage);
 
         JSONObject obj = new JSONObject();
         obj.put("name", user.getName());
@@ -52,7 +56,7 @@ public class LoginAction implements Action {
         obj.put("phone", user.getPhone());
         resp.setDataObject(obj);
 
-        req.getSession().setAttribute("email", email);
-        req.getSession().setAttribute("role", user.getRole().level);
+        req.getSession().setAttribute(Constants.EMAIL, email);
+        req.getSession().setAttribute(Constants.ROLE, user.getRole().level);
     }
 }

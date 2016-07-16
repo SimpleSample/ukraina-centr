@@ -1,0 +1,32 @@
+{namespace templates}
+/**
+ * Says hello to the world.
+ * @param username user name
+ * @param transactionId liqpay transaction ID
+ */
+{template .liqpayPurchaseFailed}
+  <table align="center" border="0" cellpadding="0" cellspacing="0" width="640">
+      <tbody>
+      <tr>
+          <td align="left" style="line-height:23px;font-size:1px" valign="top">&nbsp;</td>
+      </tr>
+      <tr>
+          <td align="left" style="font-size:20px;line-height:28px;font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546" valign="top">
+              <h1 style="font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;font-size:30px;line-height:38px;color:#454546;font-weight:normal;padding:0px,50px,0px,0px">
+              Вітаємо Вас, {$username}!</h1>
+              На жаль, спроба придбати квитки на сайті <a href="http://www.ukraina-centr.com" style="color:#8bd61a;text-decoration:none" target="_blank">www.ukraina-centr.com</a> закінчилась невдало.
+              Платіжний сервіс Liqpay відхилив вашу оплату. Щоб дізнатись більше - зателефонуйте за номером 3700 (в межах України) та вкажіть наступний номер транзакції: <b>{$transactionId}</b>
+          </td>
+      </tr>
+
+      <tr>
+          <td align="left" style="line-height:23px;font-size:1px" valign="top">&nbsp;</td>
+      </tr>
+      <tr>
+          <td align="left" style="font-size:24px;line-height:28px;font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546" valign="top">
+              Дякуємо Вам за довіру та приємних подорожей з <a href="http://www.ukraina-centr.com" style="color:#8bd61a;text-decoration:none" target="_blank">www.ukraina-centr.com</a>
+          </td>
+      </tr>
+      </tbody>
+  </table>
+{/template}

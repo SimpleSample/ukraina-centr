@@ -155,6 +155,18 @@
     border: 1px solid #9DCC37;
 }
 
+.page-counter {
+    font-size: 16px;
+    color: #9d9d9d;
+    font-weight: 100;
+    padding-left: 10px;
+}
+
+.page-counter .pager-from, .page-counter .pager-to, .page-counter .pager-all-count {
+    font-weight: 900;
+    color: #8CC314;
+}
+
 .ticket-status {
     padding: 4px;
     border-radius: 15px;

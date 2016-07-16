@@ -1,3 +1,4 @@
+<%@ page import="com.nagornyi.env.EnvVariablesStorage" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/favicon.png">
 <link href='https://fonts.googleapis.com/css?family=Roboto:300,400&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
@@ -25,3 +26,6 @@
 <script src="${pageContext.request.contextPath}/js/EventBus.js" type="text/javascript"></script>
 <script src="${pageContext.request.contextPath}/js/ng/ng.main.js" type="text/javascript"></script>
 <script src="${pageContext.request.contextPath}/js/ng/ng.common.js" type="text/javascript"></script>
+<meta name="google-signin-scope" content="profile email">
+<meta name="google-signin-client_id" content="<%=EnvVariablesStorage.getValue("Oauth", "clientId")%>">
+<script src="https://apis.google.com/js/platform.js" async defer></script>

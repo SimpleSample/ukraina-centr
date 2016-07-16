@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * Date: 18.05.14
  */
 public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
-    private static Logger log = Logger.getLogger(TripDAO.class.getName());
+    private static final Logger log = Logger.getLogger(TripDAO.class.getName());
 
     @Override
     protected Trip createDAOEntity(Entity entity) {

@@ -19,6 +19,7 @@ public class User extends NamedEntity implements Serializable {
     private String name;
     private String surname;
     private String email;
+    private String imageUrl;
     private String phone;
     private String password;
     private String role;
@@ -37,6 +38,10 @@ public class User extends NamedEntity implements Serializable {
 
     public User(Key parentKey) {
         super(parentKey);
+    }
+
+    public User(String name) {
+        super(name);
     }
 
     public String getUsername() {
@@ -91,6 +96,14 @@ public class User extends NamedEntity implements Serializable {
         setProperty("phone", phone);
     }
 
+    public String getImageUrl() {
+        return getProperty("imageUrl");
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.setProperty("imageUrl", imageUrl);
+    }
+
     public Address getLocation() {
         return location;
     }
@@ -131,7 +144,11 @@ public class User extends NamedEntity implements Serializable {
     }
 
     public Locale getUserLocale() {
-        return Locale.forLanguageTag((String)getProperty("locale"));
+        return Locale.forLanguageTag(getLanguageTag());
+    }
+
+    public String getLanguageTag() {
+        return getProperty("locale");
     }
 
     public void setUserLocale(Locale userLocale) {

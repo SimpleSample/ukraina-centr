@@ -428,7 +428,7 @@ dl span {float:left; width:80px;}
 /****************************footer************************/
 .uc-page-footer {
     width: 100%;
-    padding: 20px 0;
+    padding: 5px 0;
     background: url(../../img/active_item.png) repeat;
     color: white;
     font-weight: 100;
@@ -843,6 +843,11 @@ button, select {
     padding: 10px;
 }
 
+.g-signin2 {
+    padding: 10px 0;
+    border-bottom: 1px solid #ccc;
+}
+
 @media (min-width: 768px) {
     h2 {
         font-size:46px;
@@ -873,6 +878,10 @@ button, select {
 
     .spacer-1 {
         background:url(../../img/spacer-1.gif) right top repeat-y !important;
+    }
+
+    .uc-page-footer {
+        padding: 20px 0;
     }
 
     .page-content .pad-container {

@@ -7,13 +7,22 @@ import com.nagornyi.uc.action.Authorized;
 import com.nagornyi.uc.action.MD5Salt;
 import com.nagornyi.uc.common.date.DateFormatter;
 import com.nagornyi.uc.dao.DAOFacade;
-import com.nagornyi.uc.dao.app.UserDAO;
-import com.nagornyi.uc.entity.*;
+import com.nagornyi.uc.entity.Bus;
+import com.nagornyi.uc.entity.City;
+import com.nagornyi.uc.entity.Country;
+import com.nagornyi.uc.entity.Price;
+import com.nagornyi.uc.entity.Route;
+import com.nagornyi.uc.entity.RouteLink;
+import com.nagornyi.uc.entity.User;
 import com.nagornyi.uc.helper.BusHelper;
 import com.nagornyi.uc.transport.ActionRequest;
 import com.nagornyi.uc.transport.ActionResponse;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -30,11 +39,9 @@ public class RunScriptsAction implements Action {
 
     @Override
     public void perform(ActionRequest req, ActionResponse resp) throws JSONException {
-        UserDAO dao = DAOFacade.getDAO(User.class);
-        User u =  dao.getUserByEmail("forartforces@gmail.com");
-//        u.setRole(Role.USER);
-        u.setPassword(MD5Salt.encrypt("Fhntv1234", "forartforces@gmail.com"));
-        dao.save(u);
+//        UserDAO dao = DAOFacade.getDAO(User.class);
+//        User u =  dao.getUserByEmail("forartforces@gmail.com");
+//        MailFacade.sendFailedTicketsPurchaseFromLiqPay(u, "45390584095834059");
 
         if (true) return;
 

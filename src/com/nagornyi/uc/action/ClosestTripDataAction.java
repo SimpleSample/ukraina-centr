@@ -32,8 +32,8 @@ public class ClosestTripDataAction implements Action {
         Trip back = dao.getOrCreateTrip(route, date, false);
 
         JSONObject respObject = new JSONObject();
-        respObject.put(FORTH_TRIP_KEY, TripConverter.convertTripWithTicketsExcludeAdmin(forth));
-        respObject.put(BACK_TRIP_KEY, TripConverter.convertTripWithTicketsExcludeAdmin(back));
+        respObject.put(FORTH_TRIP_KEY, TripConverter.convertTripWithTickets(forth));
+        respObject.put(BACK_TRIP_KEY, TripConverter.convertTripWithTickets(back));
         resp.setDataObject(respObject);
     }
 

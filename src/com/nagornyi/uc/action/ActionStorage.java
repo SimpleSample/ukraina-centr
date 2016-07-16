@@ -10,8 +10,7 @@ import java.util.Map;
  * @author Nagorny
  * Date: 25.04.14
  */
-public class
-        ActionStorage {
+public class ActionStorage {
     private static final Map<String, Class<? extends Action>> ACTIONS = new HashMap<String, Class<? extends Action>>();
 
     static {
@@ -63,6 +62,11 @@ public class
         /*Admin rights*/
         //POST /users
         ACTIONS.put("addUser", AddUserAction.class);
+        //GET /users/:userId
+        ACTIONS.put("getUser", GetUserAction.class);
+        //PUT /users/:userId
+        ACTIONS.put("updateUser", UpdateUserAction.class);
+        ACTIONS.put("validateGoogleUser", ValidateGoogleUserAction.class);
         //GET /users/{username}/contacts
         ACTIONS.put("allContacts", GetContactsAction.class);
         // GET /routes/{routeId}/trips/{type}/all/tickets/size/{fromDate}/{toDate}

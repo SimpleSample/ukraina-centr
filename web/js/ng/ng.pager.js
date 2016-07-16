@@ -5,32 +5,37 @@
 
     function createPagerLayout($pagerEl) {
         if (!$pagerEl.hasClass('tablesaw-pager')) $pagerEl.addClass('tablesaw-pager');
-        $pagerEl.append($('<div class="tablesaw-pager-container">'+
-            '<table>'+
-            '<tbody>' +
-            '<tr>'+
-            createPagerElement('pager-prev disabled', 'Prev') +
-            createPagerElement('pager-page active', '1') +
-            createPagerElement('pager-next disabled', 'Next') +
-            '</tr>'+
-            '</tbody>' +
-            '</table>'+
+        $pagerEl.append($('' +
+            '<span class="page-counter">' +
+                '<span class="pager-from">0</span> - <span class="pager-to">10</span> з ' +
+                '<span class="pager-all-count">10</span> елементів' +
+            '</span>'+
+            '<div class="tablesaw-pager-container">'+
+                '<table>'+
+                    '<tbody>' +
+                        '<tr>'+
+                            createPagerElement('pager-prev disabled', 'Prev') +
+                            createPagerElement('pager-page active', '1') +
+                            createPagerElement('pager-next disabled', 'Next') +
+                        '</tr>'+
+                    '</tbody>' +
+                '</table>'+
             '</div>'));
     }
 
-    function createPagerElements($pagerEl, pageCount) {
-        var $elemContainer = $pagerEl.find('tr');
-        for (var i = 1; i < pageCount; i++) {
-            $(createPagerElement('pager-page', i + 1)).insertAfter($($elemContainer.find('.pager-element')[i]).parent());
-        }
-    }
+    //function createPagerElements($pagerEl, pageCount) {
+    //    var $elemContainer = $pagerEl.find('tr');
+    //    for (var i = 1; i < pageCount; i++) {
+    //        $(createPagerElement('pager-page', i + 1)).insertAfter($($elemContainer.find('.pager-element')[i]).parent());
+    //    }
+    //}
 
-    function clearPagerElements($pagerEl, pageCount) {
-        var $elemContainer = $pagerEl.find('tr');
-        for (var i = 1; i < pageCount; i++) {
-            $($elemContainer.find('.pager-element')[i+1]).remove();
-        }
-    }
+    //function clearPagerElements($pagerEl, pageCount) {
+    //    var $elemContainer = $pagerEl.find('tr');
+    //    for (var i = 1; i < pageCount; i++) {
+    //        $($elemContainer.find('.pager-element')[i+1]).remove();
+    //    }
+    //}
 
     function disableNext($pagerEl) {
         $pagerEl.find('.pager-next').addClass('disabled');
@@ -51,6 +56,12 @@
     function setPage($pagerEl, pageNum) {
         $pagerEl.find('.pager-element.active').removeClass('active');
         $($pagerEl.find('.pager-element')[pageNum]).addClass('active');
+    }
+
+    function setCounts($pagerEl, from, to, allCount) {
+        $pagerEl.find('.pager-from').text(from);
+        $pagerEl.find('.pager-to').text(to);
+        $pagerEl.find('.pager-all-count').text(allCount);
     }
 
     function createPagedObjectsArray(allPossibleCount, loadSize) {
@@ -105,7 +116,8 @@
         this.load(1);
     };
 
-    Pager.prototype.load = function(pageIdx) {
+    Pager.prototype.load = function(pageIdx, loadCallback) {
+        this.$pagerEl.find('.pager-page a').text(pageIdx);
         this.currentPage = pageIdx;
         this.from = (pageIdx-1) * this.loadSize;
         var objForCurrentPage = this.pagedObjectIds[pageIdx-1];
@@ -118,6 +130,9 @@
                 objects[objects.length] = dataStore.get(objId);
             }
             this.onAfterResponse(objects);
+            if (loadCallback) {
+                loadCallback();
+            }
         } else {
             this.requestParams.from = this.from;
             this.requestParams.count = this.loadSize;
@@ -129,7 +144,7 @@
                 if (data.allPossibleCount) {
                     that.allPossibleCount = data.allPossibleCount;
                     that.pagedObjectIds = createPagedObjectsArray(that.allPossibleCount, that.loadSize);
-                    createPagerElements(that.$pagerEl, that.pagedObjectIds.length);
+                    //createPagerElements(that.$pagerEl, that.pagedObjectIds.length);
                     that.$pagerEl.find('.pager-page a').click(function(e){
                         e.preventDefault();
                         var $this = $(this);
@@ -147,6 +162,9 @@
                 that.cursor = data['cursor'];
                 delete data['cursor'];
                 that.onAfterResponse(objects);
+                if (loadCallback) {
+                    loadCallback();
+                }
             });
         }
     };
@@ -154,6 +172,11 @@
     Pager.prototype.onAfterResponse = function(objects) {
         enableNext(this.$pagerEl);
         enablePrev(this.$pagerEl);
+
+        var to = this.from + this.loadSize > this.allPossibleCount
+            ? this.allPossibleCount
+            :this.from + this.loadSize;
+        setCounts(this.$pagerEl, this.from, to, this.allPossibleCount);
 
         if (this.isInitialLoad || this.currentPage * this.loadSize > this.allPossibleCount) {
             disableNext(this.$pagerEl);
@@ -179,7 +202,7 @@
     };
 
     Pager.prototype.clear = function() {
-        clearPagerElements(this.$pagerEl, this.allPossibleCount.length);
+        //clearPagerElements(this.$pagerEl, this.allPossibleCount.length);
         this.allPossibleCount = 0;
         this.isInitialLoad = true;
         this.pagedObjectIds = [];

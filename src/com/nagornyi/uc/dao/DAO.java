@@ -35,6 +35,8 @@ public interface DAO<Entity extends BaseEntity> {
 
     void delete(Entity entity);
 
+    void delete(List<Entity> entities);
+
     Set<Key> deleteAll();
 
     Set<Key> deleteForQuery(Query query);

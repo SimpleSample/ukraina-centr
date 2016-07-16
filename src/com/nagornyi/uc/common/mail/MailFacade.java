@@ -1,6 +1,5 @@
 package com.nagornyi.uc.common.mail;
 
-import com.nagornyi.uc.common.template.FailedOrderTemplate;
 import com.nagornyi.uc.common.template.HTMLTemplates;
 import com.nagornyi.uc.currency.CurrencyConverter;
 import com.nagornyi.uc.entity.Ticket;
@@ -25,8 +24,8 @@ public class MailFacade {
         new MailSender(user, template).send();
     }
 
-    public static void sendFailedReservation(User user) {
-        String template = FailedOrderTemplate.getFailedReservation(user);
+    public static void sendFailedTicketsPurchaseFromLiqPay(User user, String transactionId) {
+        String template = HTMLTemplates.getFailedTicketsPurchaseFromLiqPayTemplate(user, transactionId);
         new MailSender(user, template).send();
     }
 

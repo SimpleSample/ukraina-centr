@@ -23,6 +23,7 @@ public class TemplatesManager {
         SoyFileSet sfs = new SoyFileSet.Builder()
                 .add(new File("WEB-INF/templates/renewPass.soy"))
                 .add(new File("WEB-INF/templates/reserveFail.soy"))
+                .add(new File("WEB-INF/templates/liqpayPurchaseFailed.soy"))
                 .add(new File("WEB-INF/templates/reserve.soy")).build();
 
         // Compile the template into a SoyTofu object.

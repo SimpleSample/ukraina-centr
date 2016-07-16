@@ -51,7 +51,7 @@ public class GetTripsForPeriodAction implements Action {
         // first trip with all tickets
         Trip firstTrip = trips.remove(0);
 
-        JSONObject firstTripJson = TripConverter.convertTripWithTicketsExcludeAdmin(firstTrip);
+        JSONObject firstTripJson = TripConverter.convertTripWithTickets(firstTrip);
         ISeatDAO dao = DAOFacade.getDAO(Seat.class);
         List<Seat> seats = dao.getSeats(route.getBus());
         JSONArray allSeats = new JSONArray();

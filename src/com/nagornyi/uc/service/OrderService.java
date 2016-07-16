@@ -110,7 +110,7 @@ public class OrderService implements UCService {
         }
         ticket.setStartDate(new Date(rawStartDate));
 
-        DiscountCategory category = DiscountCategory.valueOf(ticketJson.getString("discountId"));
+        DiscountCategory category = ticketJson.has("discountId")? DiscountCategory.valueOf(ticketJson.getString("discountId")) : DiscountCategory.NONE;
         PriceService priceService = ServiceLocator.getInstance().getService(PriceService.class.getSimpleName());
         double price = priceService.getPrice(ticket.getStartCity().getStringKey(),
                 ticket.getEndCity().getStringKey(),

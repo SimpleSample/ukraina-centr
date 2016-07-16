@@ -8,13 +8,26 @@ import java.util.Date;
 /**
  * Created by Artem on 26.04.2015.
  */
-public class DateUtil {
+public final class DateUtil {
+//    private static Logger log = Logger.getLogger(DateUtil.class.getName());
 
-    public static int getDaysDelta(Calendar start, Calendar end) {
-        return (end.get(Calendar.MONTH) - start.get(Calendar.MONTH))*30 + (end.get(Calendar.DAY_OF_MONTH) - start.get(Calendar.DAY_OF_MONTH));
+    private DateUtil() {
+
     }
 
-    public static DatePeriod getActualDatePeriodForRoute (Date closestStartDate, DatePeriod routeDatePeriod) {
+    public static int getDaysDelta(Calendar start, Calendar end) {
+        Long endMilliseconds = end.getTimeInMillis();
+        Long startMilliseconds = start.getTimeInMillis();
+        if (endMilliseconds < startMilliseconds) {
+            return 0;
+        }
+
+        double result = (endMilliseconds - startMilliseconds) / (1000 * 60 * 60 * 24);
+
+        return (int)result;
+    }
+
+    public static DatePeriod getActualDatePeriodForRoute(Date closestStartDate, DatePeriod routeDatePeriod) {
         Calendar cTargetDate = Calendar.getInstance();
         cTargetDate.setTime(closestStartDate);
         cTargetDate.set(Calendar.MILLISECOND, 0);

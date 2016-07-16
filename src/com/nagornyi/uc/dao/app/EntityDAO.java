@@ -135,6 +135,15 @@ public class EntityDAO<E extends EntityWrapper> implements DAO<E> {
     }
 
     @Override
+    public void delete(List<E> es) {
+        List<Key> keys = new ArrayList<>(es.size());
+        for (E entity: es) {
+            keys.add(entity.getKey());
+        }
+        datastore.delete(keys);
+    }
+
+    @Override
     public Set<Key> deleteAll() {
         Query q = new Query(getKind());
 

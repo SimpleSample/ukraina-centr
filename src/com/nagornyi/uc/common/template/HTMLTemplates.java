@@ -51,4 +51,20 @@ public class HTMLTemplates {
         data.put("newPass", newPass);
         return TemplatesManager.INSTANCE.renderTemplate("templates.renewPass", data);
     }
+
+
+    public static String getFailedTicketsPurchaseTemplate(User user) {
+        SoyMapData data = new SoyMapData();
+        String username = user.isPartner()? user.getPartnerName() : user.getUsername();
+        data.put("username", username);
+        return TemplatesManager.INSTANCE.renderTemplate("templates.reserveFail", data);
+    }
+
+    public static String getFailedTicketsPurchaseFromLiqPayTemplate(User user, String transactionId) {
+        SoyMapData data = new SoyMapData();
+        String username = user.isPartner()? user.getPartnerName() : user.getUsername();
+        data.put("username", username);
+        data.put("transactionId", transactionId);
+        return TemplatesManager.INSTANCE.renderTemplate("templates.liqpayPurchaseFailed", data);
+    }
 }

@@ -44,18 +44,19 @@ public class LiqPayCallbackProcessor extends HttpServlet {
             }
             String status = liqPayParams.get("status");
             String order_id_desc = liqPayParams.get("order_id");
+            String transactionId = liqPayParams.get("transaction_id");
             String orderExternalId = order_id_desc.substring(0, order_id_desc.indexOf(LiqPay.UC_KEY));
             log.info("order_id: " + orderExternalId);
             IOrderDAO dao = DAOFacade.getDAO(Order.class);
             Order order = dao.findByExternalId(Long.valueOf(orderExternalId));
             List<Ticket> tickets = order.getTickets();
             User user = order.getUser();
-            order.setTransactionId(liqPayParams.get("transaction_id"));
+            order.setTransactionId(transactionId);
 
-            if ("failure".equals(status)) {
+            if ("failure".equals(status) || "reversed".equals(status)) {
                 order.failed();
-                MailFacade.sendFailedReservation(user);
-            } else if ("cash_wait".equals(status) || "processing".equals(status)) {
+                MailFacade.sendFailedTicketsPurchaseFromLiqPay(user, transactionId);
+            } else if ("cash_wait".equals(status) || "processing".equals(status) || "wait_secure".equals(status)) {
                 order.processing();
             } else {
                 order.succeeded();

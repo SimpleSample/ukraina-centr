@@ -6,10 +6,6 @@
   <threadsafe>true</threadsafe>
   <sessions-enabled>true</sessions-enabled>
 
-    <admin-console>
-        <page name="Passengers" url="/admin/passengers.jsp" />
-        <page name="Users" url="/admin/users.jsp" />
-    </admin-console>
     <resource-files>
         <include path="/WEB-INF/templates/**.soy" />
     </resource-files>
