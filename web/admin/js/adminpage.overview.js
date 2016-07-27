@@ -89,7 +89,7 @@ $(function () {
             startDate : startDate,
             endDate : endDate
         };
-        new Request('countPassengers', reqData).send(function(data){
+        new Request('countPassengers', reqData).send(function(data) {
             var dataArray = data[DATA_ARRAY];
             var milissDataArray = data[MILISS_DATA_ARRAY];
             var typedPassengersData = passengersData[tripType];
@@ -211,10 +211,10 @@ $(function () {
         printableTitle = chosenTrip.startDate + " " + chosenTrip.stringData;
     }
 
-    $(document).ready(function(){
+    $(document).ready(function() {
         TablesawUtils.bindCommonHandlers($('.history-table>table'), 'Ticket');
 
-        new Request('closestTripData').send(function(data){
+        new Request('closestTripData').send(function(data) {
             var forthTrip = data.forthTrip;
             forthTrip.type = 'forth';
             dataStore.set(forthTrip, 'Trip');
@@ -230,16 +230,20 @@ $(function () {
                 ev.preventDefault();
                 headerDropdown.removeClass('open');
                 var choice = $(this).attr('id');
-                if (chosenTripId == choice) return false;
+                if (chosenTripId === choice) {
+                    return false;
+                }
 
                 chosenTripId = choice;
                 onTripChanged(chosenTripId);
                 return false;
             });
+            headerDropdown.find('.dropdown-toggle-hidden').removeClass('dropdown-toggle-hidden');
+
             onTripChanged(currentTrip.id);
         });
 
-        $('#print-table').on('click', function(event){
+        $('#print-table').on('click', function() {
             printTablesaw($('.history-table>table'), printableTitle);
         });
     });
@@ -250,7 +254,9 @@ if ($.urlParam('barcode')) {
     new Popup('Результат сканування', '<div>'+barcode+'</div>').show();
 }
 
-if (!uc) var uc = {};
+if (!uc) {
+    var uc = {};
+}
 window.uc.adminTicketRecordTemplate = function(ticket) {
     var note = ticket['note'] || '';
     return '<tr id="'+ticket['id']+'">' +

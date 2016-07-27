@@ -41,9 +41,11 @@ public class RunScriptsAction implements Action {
     public void perform(ActionRequest req, ActionResponse resp) throws JSONException {
 //        UserDAO dao = DAOFacade.getDAO(User.class);
 //        User u =  dao.getUserByEmail("forartforces@gmail.com");
-//        MailFacade.sendFailedTicketsPurchaseFromLiqPay(u, "45390584095834059");
+//        User u2 =  dao.getUserByEmail("info@ukraina-centr.com");
 
-        if (true) return;
+//        MailFacade.sendSuccessfulReservation(u, ticketPaginationBatch.getEntitiesBatch());
+
+//        if (true) return;
 
         // adding one user
         User user = new User();

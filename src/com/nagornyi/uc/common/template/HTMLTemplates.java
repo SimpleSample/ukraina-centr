@@ -3,6 +3,7 @@ package com.nagornyi.uc.common.template;
 import com.google.template.soy.data.SoyListData;
 import com.google.template.soy.data.SoyMapData;
 import com.nagornyi.uc.common.date.DateFormatter;
+import com.nagornyi.uc.entity.Order;
 import com.nagornyi.uc.entity.Ticket;
 import com.nagornyi.uc.entity.User;
 import com.nagornyi.uc.templates.TemplatesManager;
@@ -17,7 +18,8 @@ public class HTMLTemplates {
 
     //todo restore <span style="font-weight:100">або</span> {$realPrice}₴ in template when uah prices will be appropriate
     public static String getUserReservationTemplate(double eurSummaryPrice, double summaryPrice, List<Ticket> tickets, User user) {
-        Long orderExternalId = tickets.iterator().next().getOrder().getExternalId();
+        Order order = tickets.iterator().next().getOrder();
+        String orderExternalId = order == null? "[no order ID]" : order.getExternalId().toString();
         System.out.println("summary price " + summaryPrice);
         Locale locale = user.getUserLocale();
         SoyListData ticketsSoy = new SoyListData();
@@ -40,7 +42,7 @@ public class HTMLTemplates {
         data.put("tickets", ticketsSoy);
         data.put("price", eurSummaryPrice);
         data.put("realPrice", summaryPrice);
-        data.put("orderId", orderExternalId.toString());
+        data.put("orderId", orderExternalId);
         return TemplatesManager.INSTANCE.renderTemplate("templates.reserve", data);
     }
 

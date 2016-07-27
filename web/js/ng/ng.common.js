@@ -169,10 +169,13 @@ var clientBundle = clientBundle || {};
     window.Message = function(message, seconds) {
         this.element = $('<div class="message" style="display: none;">'+message+'</div>');
         var that = this;
-        this.timerId = setTimeout(function(){
+        this.timerId = setTimeout(function() {
             that.element.removeClass('shown');
             clearTimeout(that.timerId);
-            var oneMoreTimer = setTimeout(function(){that.element.remove(); clearTimeout(oneMoreTimer)}, 400);
+            var oneMoreTimer = setTimeout(function() {
+                that.element.remove();
+                clearTimeout(oneMoreTimer)
+            }, 400);
         }, seconds? seconds : 3000);
         var popup = $('.popup-self');
         if (popup[0]) {
@@ -182,9 +185,13 @@ var clientBundle = clientBundle || {};
         }
         this.element.addClass('shown');
         this.element.show();
+    };
+    
+    Message.show = function (message, seconds) {
+        new Message(message, seconds);
     }
-
 })();
+
 /*Ajax*/
 (function(){
     window.Request = function(action, params) {

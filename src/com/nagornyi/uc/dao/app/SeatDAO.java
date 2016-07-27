@@ -32,6 +32,11 @@ public class SeatDAO extends EntityDAO<Seat> implements ISeatDAO {
 
     @Override
     public List<Seat> getSeats(Bus bus) {
-        return BusCache.getSeats(bus);
+        return BusCache.getSeats(bus.getStringKey());
+    }
+
+    @Override
+    public List<Seat> getSeatsForSetra() {
+        return BusCache.getSeats();
     }
 }

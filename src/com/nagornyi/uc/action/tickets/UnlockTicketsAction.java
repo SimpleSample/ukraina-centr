@@ -1,8 +1,10 @@
-package com.nagornyi.uc.action;
+package com.nagornyi.uc.action.tickets;
 
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.nagornyi.uc.action.Action;
+import com.nagornyi.uc.action.Authorized;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.ITicketDAO;
 import com.nagornyi.uc.entity.Ticket;

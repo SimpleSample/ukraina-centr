@@ -1,17 +1,20 @@
 (function(){
 
     var printableTitle = '';
-    $(document).ready(function(){
+    $(document).ready(function() {
         TablesawUtils.bindCommonHandlers($('.history-table>table'), 'Ticket');
 
-        $('#print-table').on('click', function(event){
+        $('#print-table').on('click', function() {
             printTablesaw($('.history-table>table'), printableTitle);
         });
 
         EventBus.addEventListener(TRIP_CHANGED_EVENT, function(ev, trip) {
-            TablesawUtils.renderTable($('.history-table>table>tbody'),
-                trip.tickets,
-                uc.adminTicketRecordTemplate);
+            new Request('ticketsForTrip', {tripId: trip.id, excludeBlockedTickets: true}).send(function(data) {
+                trip.tickets = data.tickets;
+
+                TablesawUtils.renderTable($('.history-table>table>tbody'), trip.tickets, uc.adminTicketRecordTemplate);
+            });
+
             printableTitle = trip.startDate + " " + trip.stringData;
         });
     });

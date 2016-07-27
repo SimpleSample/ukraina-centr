@@ -7,7 +7,13 @@ import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import com.nagornyi.uc.common.PurchaseResultNew;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.ITicketDAO;
-import com.nagornyi.uc.entity.*;
+import com.nagornyi.uc.entity.City;
+import com.nagornyi.uc.entity.DiscountCategory;
+import com.nagornyi.uc.entity.Order;
+import com.nagornyi.uc.entity.Seat;
+import com.nagornyi.uc.entity.Ticket;
+import com.nagornyi.uc.entity.Trip;
+import com.nagornyi.uc.entity.User;
 import com.nagornyi.uc.helper.TripConverter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -111,7 +117,7 @@ public class OrderService implements UCService {
         ticket.setStartDate(new Date(rawStartDate));
 
         DiscountCategory category = ticketJson.has("discountId")? DiscountCategory.valueOf(ticketJson.getString("discountId")) : DiscountCategory.NONE;
-        PriceService priceService = ServiceLocator.getInstance().getService(PriceService.class.getSimpleName());
+        PriceService priceService = ServiceLocator.getInstance().getPriceService();
         double price = priceService.getPrice(ticket.getStartCity().getStringKey(),
                 ticket.getEndCity().getStringKey(),
                 user,

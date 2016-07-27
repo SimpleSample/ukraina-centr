@@ -11,7 +11,7 @@
             <jsp:include page="/WEB-INF/jsp/admin/sidebar.jsp" flush="true"/>
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                 <div class="dropdown header-dropdown">
-                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <button class="btn btn-default dropdown-toggle dropdown-toggle-hidden" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                         <span>Найближчий рейс - </span><span class="dropdown-value"></span>
                         <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
                     </button>

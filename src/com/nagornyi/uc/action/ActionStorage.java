@@ -2,6 +2,13 @@ package com.nagornyi.uc.action;
 
 import com.nagornyi.uc.action.dev.ClearDBAction;
 import com.nagornyi.uc.action.dev.RunScriptsAction;
+import com.nagornyi.uc.action.seats.GetSeatsAction;
+import com.nagornyi.uc.action.tickets.GetAllTicketsAction;
+import com.nagornyi.uc.action.tickets.LockTicketAction;
+import com.nagornyi.uc.action.tickets.RemoveTicketAction;
+import com.nagornyi.uc.action.tickets.SaveTicketsAction;
+import com.nagornyi.uc.action.tickets.TicketsForTripAction;
+import com.nagornyi.uc.action.tickets.UnlockTicketsAction;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,6 +60,8 @@ public class ActionStorage {
         ACTIONS.put("getTrip", GetTripAction.class);
         //PATCH /routes/{routeId}/trips/all/tickets
         ACTIONS.put("saveTickets", SaveTicketsAction.class);
+
+        ACTIONS.put("getSeats", GetSeatsAction.class);
 
         ACTIONS.put("postFeedback", PostFeedback.class);
 

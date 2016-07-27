@@ -1,9 +1,17 @@
 (function(){
     window.TRIP_CHANGED_EVENT = 'TRIP_CHANGED_EVENT';
-    var inMemoryAllSeats = [];
+    
+    function renderTripOption($dropdownOptions, trip, quiteFull) {
+        var template =
+            '<li><a id="'+trip.id+'" href="#">' +
+                    '<span class="drop-value">'+trip.stringData+'</span>, ' +
+                    '<span class="pass-counter'+(quiteFull? ' red' : '')+'">'+trip.passCount +'/'+trip.allCount+'</span>' +
+            '</a></li>';
+        $dropdownOptions.append(template);
+    }
 
-    var dropdownPromise = new Promise(function(resolve, reject){
-        $(document).ready(function(){
+    var dropdownPromise = new Promise(function(resolve, reject) {
+        $(document).ready(function() {
             var $headerDropdown = $('.header-dropdown');
             if ($headerDropdown.length) {
                 resolve($headerDropdown);
@@ -13,52 +21,42 @@
         });
     });
 
-    dropdownPromise.then(function($headerDropdown){
+    dropdownPromise.then(function($headerDropdown) {
         var $dropdownText = $headerDropdown.find(' .dropdown-value');
-        $headerDropdown.find('.dropdown-menu').on('click', 'a', function(ev) {
+        $headerDropdown.find('.dropdown-menu').on('click', 'a', function() {
             var $thisAnchor = $(this);
             $dropdownText.text($thisAnchor.find('.drop-value').text());
             var tripId = $thisAnchor.attr('id');
-            if (!dataStore.has(tripId)) {
-                new Request('getTrip', {tripId: tripId}).send(function(data){
-                    dataStore.set(data.trip, 'Trip');
-                    data.trip.allSeats = inMemoryAllSeats;
-                    EventBus.dispatch(TRIP_CHANGED_EVENT, null, data.trip);
-                });
-            } else {
-                var activeTrip = dataStore.get(tripId);
-                activeTrip.allSeats = inMemoryAllSeats;
-                EventBus.dispatch(TRIP_CHANGED_EVENT, null, activeTrip);
-            }
+            var activeTrip = dataStore.get(tripId);
+            
+            EventBus.dispatch(TRIP_CHANGED_EVENT, null, activeTrip);
         });
     });
 
-    new Request('tripsForPeriod').send(function(data){
-        var trips = data['trips'];
+    new Request('tripsForPeriod').send(function(data) {
+        var trips = data;
         if (!trips) {
             new Popup('Помилка', '<div>Не знайдено жодної поїздки</div>').show();
             return;
         }
 
-        dropdownPromise.then(function($headerDropdown){
-            dataStore.set(trips[0], 'Trip');
-            var $dropdownText = $headerDropdown.find(' .dropdown-value');
-            $dropdownText.text(trips[0].stringData);
+        dataStore.setAll(trips, 'Trip');
 
-            inMemoryAllSeats = trips[0].allSeats;
-            EventBus.dispatch(TRIP_CHANGED_EVENT, null, trips[0]);
+        dropdownPromise.then(function($headerDropdown) {
+            var firstTrip = trips[0];
+            var $dropdownText = $headerDropdown.find(' .dropdown-value');
+            $dropdownText.text(firstTrip.stringData);
+
             var $dropdownOptions = $headerDropdown.find('.dropdown-menu');
             for (var i = 0, size = trips.length; i < size; i++) {
                 var trip = trips[i];
-                var almostFull = trip.passCount/trip.allCount > 0.8;
-                var counterClass = 'pass-counter' + almostFull? ' red' : '';
-                $dropdownOptions.append(
-                    '<li>' +
-                    '<a id="'+trip.id+'" href="#">' +
-                    '<span class="drop-value">'+trip.stringData+'</span>, ' +
-                    '<span class="'+counterClass+'">'+trip.passCount +'/'+trip.allCount+'</span></a>' +
-                    '</li>');
+                var quiteFull = trip.passCount/trip.allCount > 0.8;
+
+                renderTripOption($dropdownOptions, trip, quiteFull);
             }
+
+            $headerDropdown.find('.dropdown-toggle-hidden').removeClass('dropdown-toggle-hidden');
+            EventBus.dispatch(TRIP_CHANGED_EVENT, null, firstTrip)
         });
     });
 })();

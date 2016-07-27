@@ -1,8 +1,10 @@
-package com.nagornyi.uc.action;
+package com.nagornyi.uc.action.tickets;
 
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.nagornyi.uc.action.Action;
+import com.nagornyi.uc.action.Authorized;
 import com.nagornyi.uc.common.UserFriendlyException;
 import com.nagornyi.uc.converter.TicketConverter;
 import com.nagornyi.uc.dao.DAOFacade;

@@ -62,19 +62,19 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
 
     @Override
     public int countReservedTicketsForTrip(Trip trip) {
-        return countForQuery(getValidTicketsForTripQuery(trip)) + TicketCache.getLockedCount(trip.getStringKey());
+        return countForQuery(getValidTicketsForTripQuery(trip.getKey())) + TicketCache.getLockedCount(trip.getStringKey());
     }
 
     @Override
-    public List<Ticket> getTicketsForTrip(Trip trip) {
-        List<Ticket> tickets = getValidTicketsForTrip(trip);
-        tickets.addAll(TicketCache.getLockedTickets(trip.getStringKey()));
-       return tickets;
+    public List<Ticket> getTicketsForTrip(String tripKey) {
+        List<Ticket> tickets = getValidTicketsForTrip(KeyFactory.stringToKey(tripKey));
+        tickets.addAll(TicketCache.getLockedTickets(tripKey));
+        return tickets;
     }
 
     @Override
     public List<Seat> getUnavailableSeatsForTrip(Trip trip) {
-        List<Ticket> tickets = getValidTicketsForTrip(trip);
+        List<Ticket> tickets = getValidTicketsForTrip(trip.getKey());
         List<Seat> seats = new ArrayList<Seat>();
         for(Ticket t: tickets) {
             seats.add(t.getSeat());
@@ -84,14 +84,14 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
         return seats;
     }
     
-    private List<Ticket> getValidTicketsForTrip(Trip trip) {
-        return getByQuery(getValidTicketsForTripQuery(trip));
+    private List<Ticket> getValidTicketsForTrip(Key tripKey) {
+        return getByQuery(getValidTicketsForTripQuery(tripKey));
     }
 
-    private Query getValidTicketsForTripQuery(Trip trip) {
+    private Query getValidTicketsForTripQuery(Key tripKey) {
         return new Query(getKind())
                 .setFilter(new Query.FilterPredicate("status", Query.FilterOperator.NOT_EQUAL, Ticket.Status.INVALID.idx))
-                .setAncestor(trip.getKey());
+                .setAncestor(tripKey);
     }
 
     @Override

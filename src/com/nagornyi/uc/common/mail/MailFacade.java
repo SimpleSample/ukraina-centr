@@ -21,19 +21,29 @@ public class MailFacade {
         }
         double convertedPrice = CurrencyConverter.fromBase(price);
         String template = HTMLTemplates.getUserReservationTemplate(price, CurrencyUtil.round(convertedPrice, -1), tickets, user);
-        new MailSender(user, template).send();
+
+        createMailSender().setUser(user).setMessage(template).send();
     }
 
     public static void sendFailedTicketsPurchaseFromLiqPay(User user, String transactionId) {
         String template = HTMLTemplates.getFailedTicketsPurchaseFromLiqPayTemplate(user, transactionId);
-        new MailSender(user, template).send();
+
+        createMailSender().setUser(user).setMessage(template).send();
     }
 
     public static void sendRenewPass(User user, String newPass) {
         String template = HTMLTemplates.getRenewPassTemplate(user, newPass);
-        new MailSender(user, template)
+
+        createMailSender()
+                .setUser(user)
+                .setMessage(template)
                 .includeAdmin(false)
-                .setSubject(MailSender.UC_SUBJECT +"Відновлення паролю")
+                .setSubject(AppEngineMailSender.UC_SUBJECT +"Відновлення паролю")
                 .send();
+    }
+
+    private static MailSender createMailSender() {
+        return new SendgridMailSender();
+//        return new AppEngineMailSender(); for app engine
     }
 }

@@ -2,7 +2,6 @@ package com.nagornyi.uc.dao;
 
 import com.nagornyi.uc.entity.Bus;
 import com.nagornyi.uc.entity.Seat;
-import com.nagornyi.uc.entity.Trip;
 
 import java.util.List;
 
@@ -15,4 +14,6 @@ public interface ISeatDAO extends DAO<Seat> {
     void fillSeatsForBus(Bus bus);
 
     List<Seat> getSeats(Bus bus);
+
+    List<Seat> getSeatsForSetra();
 }

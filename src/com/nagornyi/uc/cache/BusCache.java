@@ -1,7 +1,6 @@
 package com.nagornyi.uc.cache;
 
 import com.nagornyi.uc.dao.DAOFacade;
-import com.nagornyi.uc.dao.IBusDAO;
 import com.nagornyi.uc.entity.Bus;
 import com.nagornyi.uc.entity.Seat;
 
@@ -9,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 /**
  * @author Nagorny
@@ -27,8 +25,12 @@ public class BusCache extends EntityCache {
         }
     }
 
-    public static List<Seat> getSeats(Bus bus) {
-        return buses.get(bus.getStringKey()).getSeats();
+    public static List<Seat> getSeats(String busId) {
+        return buses.get(busId).getSeats();
+    }
+
+    public static List<Seat> getSeats() {
+        return buses.values().iterator().next().getSeats();
     }
 
     public static List<Seat> getFreeSeats(String busId, List<Seat> unavailableSeats) {

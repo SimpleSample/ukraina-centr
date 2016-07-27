@@ -11,7 +11,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="${pageContext.request.contextPath}/js/EventBus.js" type="text/javascript"></script>
     <script src="${pageContext.request.contextPath}/js/ng/ng.common.js" type="text/javascript"></script>
-    <script src="${pageContext.request.contextPath}/admin/js/ng.admin.js" type="text/javascript"></script>
+    <script src="${pageContext.request.contextPath}/admin/js/ng.admin.users.js" type="text/javascript"></script>
 </head>
 <body>
 <%

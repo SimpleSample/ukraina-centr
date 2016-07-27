@@ -8,6 +8,7 @@ import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.IPriceDAO;
 import com.nagornyi.uc.dao.ITicketDAO;
 import com.nagornyi.uc.dao.app.TicketDAO;
+import com.nagornyi.uc.dto.trip.PricedTrip;
 import com.nagornyi.uc.entity.Price;
 import com.nagornyi.uc.entity.Ticket;
 import com.nagornyi.uc.entity.Trip;
@@ -31,17 +32,39 @@ public final class TripConverter {
 
     }
 
+    public static PricedTrip convertToPricedTrip(Trip trip) {
+        PricedTrip result = new PricedTrip();
+        result.setId(trip.getStringKey());
+        result.setAllCount(trip.getSeatsNum());
+        result.setStringData(getTripData(trip));
+        result.setStartDate(trip.getStartDate().getTime());
+        result.setRouteForth(trip.isRouteForth());
+
+        TicketDAO ticketDAO = DAOFacade.getDAO(Ticket.class);
+        int notAvailableTicketCount = ticketDAO.countReservedTicketsForTrip(trip);
+
+        result.setPassCount(notAvailableTicketCount);
+
+        IPriceDAO prices = DAOFacade.getDAO(Price.class);
+        Price price = prices.getPriceByCities(trip.getStartCity().getStringKey(), trip.getEndCity().getStringKey());
+
+        if (price != null) {
+            result.setPrice(price.getPrice());
+        }
+        return result;
+    }
+
     public static JSONObject convertTripWithTicketsExcludeAdmin(Trip trip) throws JSONException {
         JSONObject tripObj = convertTrip(trip, false);
 
         ITicketDAO ticketDAO = DAOFacade.getDAO(Ticket.class);
 
-        List<Ticket> tickets = ticketDAO.getTicketsForTrip(trip);
+        List<Ticket> tickets = ticketDAO.getTicketsForTrip(trip.getStringKey());
         tripObj.put(PASS_COUNT_KEY, tickets.size());
         Iterator<Ticket> iterator = tickets.iterator();
         while (iterator.hasNext()) {
             Ticket nextTicket = iterator.next();
-            if ("info@ukraina-centr.com".equals(nextTicket.getUser().getEmail())) {
+            if (nextTicket.getSeat().isInitiallyBlocked()) {
                 iterator.remove();
             }
         }
@@ -54,7 +77,7 @@ public final class TripConverter {
 
         ITicketDAO ticketDAO = DAOFacade.getDAO(Ticket.class);
 
-        List<Ticket> tickets = ticketDAO.getTicketsForTrip(trip);
+        List<Ticket> tickets = ticketDAO.getTicketsForTrip(trip.getStringKey());
         tripObj.put(PASS_COUNT_KEY, tickets.size());
         addTicketsToTripJson(tripObj, tickets);
         return tripObj;

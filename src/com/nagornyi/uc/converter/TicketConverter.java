@@ -77,7 +77,7 @@ public final class TicketConverter {
 
     public static void populatePrice(Ticket ticket, User user, JSONObject ticketJson) throws JSONException {
         DiscountCategory category = DiscountCategory.valueOf(ticketJson.getString("discountId"));
-        PriceService priceService = ServiceLocator.getInstance().getService(PriceService.class.getSimpleName());
+        PriceService priceService = ServiceLocator.getInstance().getPriceService();
         double price = priceService.getPrice(ticket.getStartCity().getStringKey(),
                 ticket.getEndCity().getStringKey(),
                 user,

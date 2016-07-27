@@ -21,7 +21,7 @@ public interface ITicketDAO extends DAO<Ticket> {
 
     List<Seat> getUnavailableSeatsForTrip(Trip trip);
 
-    List<Ticket> getTicketsForTrip(Trip trip);
+    List<Ticket> getTicketsForTrip(String tripKey);
 
     boolean sameTicketExists(Ticket newTicket);
 

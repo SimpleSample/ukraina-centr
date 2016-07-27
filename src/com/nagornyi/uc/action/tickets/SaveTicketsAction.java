@@ -1,8 +1,9 @@
-package com.nagornyi.uc.action;
+package com.nagornyi.uc.action.tickets;
 
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.nagornyi.uc.action.Action;
 import com.nagornyi.uc.common.PurchaseResultNew;
 import com.nagornyi.uc.common.UserFriendlyException;
 import com.nagornyi.uc.dao.DAOFacade;
@@ -34,7 +35,7 @@ public class SaveTicketsAction implements Action {
         order.setStatus(Order.Status.SUCCESS);
         DAOFacade.save(order);
 
-        OrderService orderService = ServiceLocator.getInstance().getService(OrderService.class.getSimpleName());
+        OrderService orderService = ServiceLocator.getInstance().getOrderService();
 
         Iterator tripKeys = changedTickets.keys();
         PurchaseResultNew result = new PurchaseResultNew();

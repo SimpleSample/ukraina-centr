@@ -24,7 +24,7 @@ public class GetTripAction implements Action {
         String tripId = req.getParam(ActionKeys.TRIP_ID_KEY);
 
         Trip trip = DAOFacade.findById(Trip.class, KeyFactory.stringToKey(tripId));
-        JSONObject tripObj = TripConverter.convertTripWithTickets(trip);
+        JSONObject tripObj = TripConverter.convertTripWithTicketsExcludeAdmin(trip);
         resp.setResponseParam(ActionKeys.TRIP_KEY, tripObj);
     }
 }

@@ -36,16 +36,16 @@
     };
 
 
-    $(document).ready(function(){
+    $(document).ready(function() {
         var sidebar = $('.sidebar');
         var swipeOptions = { dragLockToAxis: true, dragBlockHorizontal: true };
         var touchControl = new Hammer($('body')[0], swipeOptions);
         touchControl.on("swipeleft swiperight", function(ev) {
-            if (ev.type == 'swipeleft') {
+            if (ev.type === 'swipeleft') {
                 if (!sidebar.hasClass('sidebar-swiped')) {
                     sidebar.addClass('sidebar-swiped');
                 }
-            } else if (ev.type == 'swiperight') {
+            } else if (ev.type === 'swiperight') {
                 if (sidebar.hasClass('sidebar-swiped')) {
                     sidebar.removeClass('sidebar-swiped');
                 }

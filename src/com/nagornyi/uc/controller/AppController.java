@@ -10,6 +10,8 @@ import com.nagornyi.uc.common.UserFriendlyException;
 import com.nagornyi.uc.context.RequestContext;
 import com.nagornyi.uc.transport.ActionRequest;
 import com.nagornyi.uc.transport.ActionResponse;
+import com.nagornyi.uc.transport.ResponseDto;
+import com.nagornyi.uc.util.ActionUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -36,8 +38,8 @@ public class AppController extends HttpServlet {
         resp.setHeader("Content-Type", "application/json");
 
         ActionRequest request = new ActionRequest(req);
-        JSONObject responseObj = new JSONObject();
-        ActionResponse response = new ActionResponse(responseObj);
+        ResponseDto responseObj = new ResponseDto();
+        ActionResponse response = new ActionResponse();
         RequestContext.init(req);
 
         boolean isAuthorized = checkAuthorization(req, action, responseObj);
@@ -46,16 +48,30 @@ public class AppController extends HttpServlet {
             performAction(action, request, response, responseObj, actionAlias);
         }
 
-        if (response.getDataObj() != null) {
-            try {
-                responseObj.put("data", response.getDataObj());
-            } catch (JSONException e) {}
-        }
-        resp.getWriter().print(responseObj.toString());
+        writeResponse(responseObj, response, resp);
+
         RequestContext.destroy();
     }
 
-    private boolean checkAuthorization(HttpServletRequest req, Action action, JSONObject responseObject) {
+    private void writeResponse(ResponseDto responseDto, ActionResponse response, HttpServletResponse resp) throws IOException {
+        //new
+        if (responseDto.getErrorMessage() != null || response.getData() != null) {
+            responseDto.setData(response.getData());
+            resp.getWriter().print(ActionUtil.serializeObject(responseDto));
+        //old, will be removed
+        } else if (response.getDataObj() != null) {
+            JSONObject responseJson = new JSONObject();
+            try {
+                responseJson.put("data", response.getDataObj());
+            } catch (JSONException e) {}
+
+            resp.getWriter().print(responseJson.toString());
+        } else {
+            resp.getWriter().print("{}");
+        }
+    }
+
+    private boolean checkAuthorization(HttpServletRequest req, Action action, ResponseDto responseObject) {
         Authorized auth = action.getClass().getAnnotation(Authorized.class);
 
         if (auth == null) {
@@ -63,14 +79,14 @@ public class AppController extends HttpServlet {
         }
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("email") == null) {
-            setErrorMessage(responseObject, "Авторизуйтесь, будь ласка, в системі");
+            responseObject.setErrorMessage("Авторизуйтесь, будь ласка, в системі");
             log("No user in session");
             return false;
         } else {
             String email = (String) session.getAttribute("email");
             Integer role = (Integer) session.getAttribute("role");
             if (role == null || auth.role().level < role) {
-                setErrorMessage(responseObject, "Авторизуйтесь, будь ласка, в системі");
+                responseObject.setErrorMessage("Авторизуйтесь, будь ласка, в системі");
                 log("user " + email + " has inappropriate role: " + role);
                 return false;
             }
@@ -79,26 +95,20 @@ public class AppController extends HttpServlet {
     }
 
     private void performAction(Action action, ActionRequest request, ActionResponse response,
-                               JSONObject responseObject, String actionAlias) {
+                               ResponseDto responseObject, String actionAlias) {
         try {
             log("Performing Action " + action.getClass().getSimpleName() +". \n Params: " + request.serializeAllParams());
             action.perform(request, response);
         } catch (UserFriendlyException e) {
             log("Couldn't perform action "+actionAlias+" - business exception", e);
-            setErrorMessage(responseObject, e.getUserFriendlyMessage());
+            responseObject.setErrorMessage(e.getUserFriendlyMessage());
         } catch (ApiProxy.OverQuotaException e) {
             //TODO could try to send email about qouta
             log("Couldn't perform action "+actionAlias+" - quota limit exceeded ", e);
-            setErrorMessage(responseObject, "Сервіс тимчасово недоступний");
+            responseObject.setErrorMessage("Сервіс тимчасово недоступний");
         } catch (Exception e) {
             log("Couldn't perform action " + actionAlias, e);
-            setErrorMessage(responseObject, "Упс, щось пішло не так"); //TODO localize
+            responseObject.setErrorMessage("Упс, щось пішло не так"); //TODO localize
         }
-    }
-
-    private void setErrorMessage(JSONObject responseObj, String message) {
-        try {
-            responseObj.put("errorMessage", message);
-        } catch (JSONException e) {}
     }
 }

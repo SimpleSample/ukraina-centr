@@ -155,6 +155,10 @@ body {
     width: 100%;
 }
 
+.header-dropdown .dropdown-toggle-hidden span {
+    visibility: hidden;
+}
+
 .dropdown-menu .pass-counter {
     font-style: italic;
 }

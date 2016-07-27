@@ -13,17 +13,22 @@ import java.util.logging.Logger;
  */
 public class ActionResponse {
     private static final Logger log = Logger.getLogger(ActionResponse.class.getName());
-
-    private JSONObject responseObj = new JSONObject();
+    // old, to be removed
     private JSONObject dataObj;
+    // new
+    private Object data;
 
-
-    public ActionResponse(JSONObject responseObj) {
-        this.responseObj = responseObj;
-    }
 
     public void setDataObject(JSONObject obj) {
         dataObj = obj;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
+
+    public Object getData() {
+        return data;
     }
 
     public JSONObject getDataObj() {

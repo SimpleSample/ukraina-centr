@@ -115,7 +115,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>admin-passengers</servlet-name>
-        <jsp-file>/admin/new.passengers.jsp</jsp-file>
+        <jsp-file>/admin/passengers.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>admin-passengers</servlet-name>
@@ -128,6 +128,14 @@
     <servlet-mapping>
         <servlet-name>admin-tickets</servlet-name>
         <url-pattern>/admin/tickets</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>admin-users</servlet-name>
+        <jsp-file>/admin/users.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>admin-users</servlet-name>
+        <url-pattern>/admin/users</url-pattern>
     </servlet-mapping>
 
     <servlet>
