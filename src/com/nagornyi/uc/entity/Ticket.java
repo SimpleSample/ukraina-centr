@@ -53,8 +53,8 @@ public class Ticket extends EntityWrapper {
         return ((IUserDAO)DAOFacade.getDAO(User.class)).getUserByEmail((String) getProperty("user"));
     }
 
-    public void setUser(User user) {
-        setProperty("user", user.getEmail());
+    public void setUserEmail(String userEmail) {
+        setProperty("user", userEmail);
     }
 
     public Seat getSeat() {
@@ -98,8 +98,12 @@ public class Ticket extends EntityWrapper {
 
     public String getPhones() {
         String phones = "";
-        if (getPhone1() != null) phones += getPhone1();
-        if (getPhone2() != null && !getPhone2().equals(getPhone1())) phones += ", "+getPhone2();
+        if (getPhone1() != null) {
+            phones += getPhone1();
+        }
+        if (getPhone2() != null && !getPhone2().equals(getPhone1())) {
+            phones += ", "+getPhone2();
+        }
         return phones;
     }
 
@@ -109,8 +113,8 @@ public class Ticket extends EntityWrapper {
     }
 
     public Date getStatusChangedDate() {
-        Date date = getProperty("statusChangedDate");
-        return date == null? DateUtils.getUkraineDateNow() : date; //TODO temp, not all tickets have it
+        return getProperty("statusChangedDate");
+//        return date == null? DateUtils.getUkraineDateNow() : date; //TODO temp, not all tickets have it
     }
 
     public void setStatusChangedDate(Date statusChangedDate) {
@@ -159,6 +163,10 @@ public class Ticket extends EntityWrapper {
 
     public String getNote() {
         return getProperty("note");
+    }
+
+    public Key getOrderId() {
+        return getProperty("orderId");
     }
 
     public void setNote(String note) {

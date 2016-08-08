@@ -55,6 +55,14 @@ public class ActionRequest {
         return ((IUserDAO)DAOFacade.getDAO(User.class)).getUserByEmail((String)getSession().getAttribute("email"));
     }
 
+    public String getUserEmail() {
+        return (String)getSession().getAttribute("email");
+    }
+
+    public Integer getUserRoleLevel() {
+        return (Integer) getSession().getAttribute("role");
+    }
+
     public boolean checkRequiredParams(String... keys) {
         for(String key: keys) if (getParam(key) == null) return false;
         return true;

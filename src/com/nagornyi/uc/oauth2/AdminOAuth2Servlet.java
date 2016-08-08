@@ -3,6 +3,7 @@ package com.nagornyi.uc.oauth2;
 import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.extensions.servlet.auth.oauth2.AbstractAuthorizationCodeServlet;
 import com.google.api.client.http.GenericUrl;
+import com.nagornyi.uc.service.ServiceLocator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +43,6 @@ public class AdminOAuth2Servlet extends AbstractAuthorizationCodeServlet {
 
     @Override
     protected String getUserId(HttpServletRequest req) throws ServletException, IOException {
-        return "info@ukraina-centr.com";
+        return ServiceLocator.getInstance().getUserService().getAdminEmail();
     }
 }

@@ -1,7 +1,12 @@
 package com.nagornyi.uc.dao;
 
 import com.google.appengine.api.datastore.Key;
-import com.nagornyi.uc.entity.*;
+import com.nagornyi.uc.entity.DiscountCategory;
+import com.nagornyi.uc.entity.Order;
+import com.nagornyi.uc.entity.Seat;
+import com.nagornyi.uc.entity.Ticket;
+import com.nagornyi.uc.entity.Trip;
+import com.nagornyi.uc.entity.User;
 
 import java.util.Date;
 import java.util.List;
@@ -13,9 +18,9 @@ import java.util.Set;
  */
 public interface ITicketDAO extends DAO<Ticket> {
 
-    PaginationBatch<Ticket> getNextBatch(User user, String startCursor, int limit);
+    PaginationBatch<Ticket> getNextBatch(String userEmail, String startCursor, int limit);
 
-    int countAllTicketsForUser(User user);
+    int countAllTicketsForUser(String userEmail);
 
     int countReservedTicketsForTrip(Trip trip);
 
@@ -23,16 +28,22 @@ public interface ITicketDAO extends DAO<Ticket> {
 
     List<Ticket> getTicketsForTrip(String tripKey);
 
+    List<Ticket> getAllNotPayedTicketsTillDate(Date tillDate);
+
     boolean sameTicketExists(Ticket newTicket);
 
     void lockTicket(Ticket ticket);
 
     Ticket revealLockedTicket(String tripId, String ticketId);
 
+    int revealAllLockedTickets();
+
     Ticket createReservedTicket(String ticketId, Trip trip, Seat seat, String passenger, String phone1, String phone2, User user,
                                 String startCityId, String endCityId, Date startDate, boolean isPartial, DiscountCategory category, Order order, String note);
 
-    List<Ticket> getTicketsForUserByPeriod(User user, Date endDate);
+    List<Ticket> getAllTicketsForUserTillDate(User user, Date endDate);
 
-    Set<Key> deleteTicketsForUserByPeriod(User user, Date endDate);
+    Set<Key> deleteAllTicketsForUserTillDate(User user, Date endDate);
+
+    Set<Key> deleteTicketsForTrip(String tripKey);
 }

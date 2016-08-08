@@ -31,6 +31,12 @@ public class MailFacade {
         createMailSender().setUser(user).setMessage(template).send();
     }
 
+    public static void sendTimedOutTicketsToBeRemoved(User user, List<Ticket> tickets) {
+        String template = HTMLTemplates.getTimedOutTicketsTemplate(user, tickets);
+
+        createMailSender().setUser(user).setMessage(template).includeAdmin(false).send();
+    }
+
     public static void sendRenewPass(User user, String newPass) {
         String template = HTMLTemplates.getRenewPassTemplate(user, newPass);
 

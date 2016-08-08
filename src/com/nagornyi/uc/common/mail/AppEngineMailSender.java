@@ -1,6 +1,7 @@
 package com.nagornyi.uc.common.mail;
 
 import com.nagornyi.uc.entity.User;
+import com.nagornyi.uc.service.ServiceLocator;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -55,14 +56,16 @@ public class AppEngineMailSender implements MailSender {
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
 
+        String adminEmail = ServiceLocator.getInstance().getUserService().getAdminEmail();
+
         MimeMessage msg = new MimeMessage(session);
         try {
-            msg.setFrom(new InternetAddress("info@ukraina-centr.com", "Україна-Центр", "utf-8"));
+            msg.setFrom(new InternetAddress(adminEmail, "Україна-Центр", "utf-8"));
             msg.addRecipient(Message.RecipientType.TO,
                     new InternetAddress(user.getEmail(), user.getName(), "utf-8"));
             if (includeAdmin) {
                 msg.addRecipient(Message.RecipientType.CC,
-                        new InternetAddress("info@ukraina-centr.com", "Admin", "utf-8"));
+                        new InternetAddress(adminEmail, "Admin", "utf-8"));
             }
             msg.setSubject(subject, "utf-8");
 

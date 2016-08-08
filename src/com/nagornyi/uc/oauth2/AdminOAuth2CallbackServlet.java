@@ -5,6 +5,7 @@ import com.google.api.client.auth.oauth2.AuthorizationCodeResponseUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.servlet.auth.oauth2.AbstractAuthorizationCodeCallbackServlet;
 import com.google.api.client.http.GenericUrl;
+import com.nagornyi.uc.service.ServiceLocator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +48,7 @@ public class AdminOAuth2CallbackServlet extends AbstractAuthorizationCodeCallbac
 
     @Override
     protected String getUserId(HttpServletRequest req) throws ServletException, IOException {
-        return "info@ukraina-centr.com";
+        return ServiceLocator.getInstance().getUserService().getAdminEmail();
     }
 
 

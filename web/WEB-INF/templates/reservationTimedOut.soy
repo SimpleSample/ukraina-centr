@@ -1,0 +1,32 @@
+{namespace templates}
+/**
+ * @param username user name
+ * @param tickets user ordered tickets
+ */
+{template .reservationTimedOut}
+
+<table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:1000px;">
+    <tbody>
+    {call .greetingsHeader}
+        {param username: $username /}
+    {/call}
+    <tr>
+        <td align="left" style="font-size:20px;line-height:28px;font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546" valign="top">
+            <div>Ваше замовлення на сайті <a href="http://www.ukraina-centr.com" style="color:#8bd61a;text-decoration:none" target="_blank">www.ukraina-centr.com</a> закінчилось невдало, оскільки не була проведена оплата наступних квитків:</div>
+        </td>
+    </tr>
+    {call .ticketsList}
+        {param tickets: $tickets /}
+    {/call}
+    <tr>
+        <td align="left" style="font-size:20px;line-height:28px;font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546" valign="top">
+            <div>Будь ласка, відвідайте наш сайт знову та спробуйте ще раз!</div>
+        </td>
+    </tr>
+    <tr>
+        <td align="left" style="line-height:23px;font-size:1px" valign="top">&nbsp;</td>
+    </tr>
+    {call .emailFooter /}
+    </tbody>
+</table>
+{/template}

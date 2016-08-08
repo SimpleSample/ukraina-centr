@@ -52,15 +52,6 @@
 
 
     <servlet>
-        <servlet-name>sessioncleanup</servlet-name>
-        <servlet-class>com.nagornyi.uc.CleanupServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>sessioncleanup</servlet-name>
-        <url-pattern>/jobs/sessioncleanup</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
         <servlet-name>schedule</servlet-name>
         <jsp-file>/schedule.jsp</jsp-file>
     </servlet>
@@ -138,6 +129,7 @@
         <url-pattern>/admin/users</url-pattern>
     </servlet-mapping>
 
+    <!-- Jobs -->
     <servlet>
         <servlet-name>updaterates</servlet-name>
         <servlet-class>com.nagornyi.uc.currency.UpdateCurrencyServlet</servlet-class>
@@ -150,6 +142,14 @@
     <servlet-mapping>
         <servlet-name>updaterates</servlet-name>
         <url-pattern>/jobs/updaterates</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>sessioncleanup</servlet-name>
+        <servlet-class>com.nagornyi.uc.CleanupServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>sessioncleanup</servlet-name>
+        <url-pattern>/jobs/sessioncleanup</url-pattern>
     </servlet-mapping>
 
     <security-role>

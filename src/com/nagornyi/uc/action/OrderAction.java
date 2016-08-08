@@ -38,33 +38,35 @@ public class OrderAction implements Action {
 
         JSONObject orderObj = new JSONObject((String)req.getParam(ORDER));
 
-        if (ORDER_TYPE_RESERVE.equals(orderObj.getString(ORDER_TYPE))) {
-            User user = req.getUser();
-            Order order = new Order(user);
-            DAOFacade.save(order);
-            log.info("Processing order for user " + user.getUsername());
-            PurchaseResult result = reserve(orderObj, user, order);
-            if (result.hasAnyFailed()) {
-                throw new UserFriendlyException(processFailed(result, RequestContext.getLocale()));
-            } else {
-                DAOFacade.bulkSave(result.getAllTickets());
-                if (user.isPartner() || user.isAdmin()) {
-                    order.succeeded();
-                    MailFacade.sendSuccessfulReservation(user, result.getAllTickets());
-                } else {
-                    double resultPrice = 0;
-                    for (Ticket ticket: result.getAllTickets()) {
-                        resultPrice += ticket.getCalculatedPrice();
-                    }
-                    log.info("Calculated price for order " + resultPrice);
+        if (!ORDER_TYPE_RESERVE.equals(orderObj.getString(ORDER_TYPE))) {
+            return;
+        }
 
-                    String order_desc = LiqPay.getPaymentDescription(order, user, result.getAllTickets());
-                    JSONObject liqPayParams = LiqPay.getLiqPayReservationJSON(resultPrice, order.getStringKey(), order_desc);
-                    log.info("Liq pay params: " + liqPayParams.toString());
-                    resp.setDataObject(liqPayParams);
+        User user = req.getUser();
+        Order order = new Order(user);
+        DAOFacade.save(order);
+        log.info("Processing order for user " + user.getUsername());
+        PurchaseResult result = reserve(orderObj, user, order);
+        if (result.hasAnyFailed()) {
+            throw new UserFriendlyException(processFailed(result, RequestContext.getLocale()));
+        } else {
+            DAOFacade.bulkSave(result.getAllTickets());
+            if (user.isPartner() || user.isAdmin()) {
+                order.succeeded();
+                MailFacade.sendSuccessfulReservation(user, result.getAllTickets());
+            } else {
+                double resultPrice = 0;
+                for (Ticket ticket: result.getAllTickets()) {
+                    resultPrice += ticket.getCalculatedPrice();
                 }
-                DAOFacade.save(order);
+                log.info("Calculated price for order " + resultPrice);
+
+                String order_desc = LiqPay.getPaymentDescription(order, user, result.getAllTickets());
+                JSONObject liqPayParams = LiqPay.getLiqPayReservationJSON(resultPrice, order.getStringKey(), order_desc);
+                log.info("Liq pay params: " + liqPayParams.toString());
+                resp.setDataObject(liqPayParams);
             }
+            DAOFacade.save(order);
         }
     }
 
@@ -84,8 +86,8 @@ public class OrderAction implements Action {
             JSONObject ticketObj = tickets.getJSONObject(ticketIds.getString(i));
 
             String passenger = ticketObj.getString("passenger");
-            String phone1 = ticketObj.has("phone1")? ticketObj.getString("phone1") : null;
-            String phone2 = ticketObj.has("phone2")? ticketObj.getString("phone2") : null;
+            String phone1 = hasNonNullValue(ticketObj, "phone1")? ticketObj.getString("phone1") : null;
+            String phone2 = hasNonNullValue(ticketObj, "phone2")? ticketObj.getString("phone2") : null;
             String startCityId = ticketObj.getString("startCity");
             String endCityId = ticketObj.getString("endCity");
             Date startDate = new Date(ticketObj.getLong("rawStartDate"));
@@ -93,8 +95,7 @@ public class OrderAction implements Action {
             String userForthTicketId = ticketObj.has("ticketId")? (String)ticketObj.get("ticketId") : null;
             String userForthSeatId = (String)ticketObj.get("seatId");
             Seat userForthSeat = DAOFacade.findById(Seat.class, KeyFactory.stringToKey(userForthSeatId));
-            String note = ticketObj.has("note") && ticketObj.get("note") instanceof String?
-                    (String) ticketObj.get("note") : null;
+            String note = hasNonNullValue(ticketObj, "note")? (String) ticketObj.get("note") : null;
 
             Ticket ticket = dao.createReservedTicket(userForthTicketId,
                                                     userForthTrip,
@@ -170,5 +171,14 @@ public class OrderAction implements Action {
         return StringUtils.join(failedTickets, ", ") +
                 " ("+trip.getRoute().getFirstCity().getLocalizedName(loc) + " - " +
                 trip.getRoute().getLastCity().getLocalizedName(loc) +")";
+    }
+
+    private boolean hasNonNullValue(JSONObject object, String key) {
+        try {
+            return object.has(key) && object.get(key) != JSONObject.NULL;
+        } catch (JSONException e) {
+            log.severe("Parsing failed");
+        }
+        return false;
     }
 }

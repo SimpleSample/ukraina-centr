@@ -541,12 +541,6 @@ public class Sendgrid {
     public void send(WarningListener w) throws JSONException {
         Map<String, String> data = prepareMessageData();
 
-        log.info("data map " + data.toString());
-
-        for(Map.Entry entry : data.entrySet()) {
-            log.info("Value: " + entry.getKey() + " = " + entry.getValue());
-        }
-
         StringBuffer requestParams = new StringBuffer();
         Iterator<String> paramIterator = data.keySet().iterator();
         while (paramIterator.hasNext()) {

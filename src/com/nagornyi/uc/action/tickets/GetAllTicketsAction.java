@@ -11,7 +11,6 @@ import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.ITicketDAO;
 import com.nagornyi.uc.dao.PaginationBatch;
 import com.nagornyi.uc.entity.Ticket;
-import com.nagornyi.uc.entity.User;
 import com.nagornyi.uc.transport.ActionRequest;
 import com.nagornyi.uc.transport.ActionResponse;
 
@@ -28,7 +27,7 @@ public class GetAllTicketsAction implements Action {
     @Override
     public void perform(ActionRequest req, ActionResponse resp) throws JSONException {
         Locale locale = RequestContext.getLocale();
-        User user = req.getUser();
+        String userEmail = req.getUserEmail();
 
         String cursor = req.getParam("cursor");
         Integer count = Integer.parseInt((String)req.getParam("count"));
@@ -39,7 +38,7 @@ public class GetAllTicketsAction implements Action {
         }
 
         ITicketDAO ticketDAO = DAOFacade.getDAO(Ticket.class);
-        PaginationBatch<Ticket> result = ticketDAO.getNextBatch(user, cursor, count);
+        PaginationBatch<Ticket> result = ticketDAO.getNextBatch(userEmail, cursor, count);
         List<Ticket> tickets = result.getEntitiesBatch();
         JSONObject respObj = new JSONObject();
         JSONArray ticketObjs = new JSONArray();
@@ -48,12 +47,12 @@ public class GetAllTicketsAction implements Action {
         }
 
         respObj.put("objects", ticketObjs);
-        boolean accepted = user.getRole().level <= Role.PARTNER.level;
+        boolean accepted = req.getUserRoleLevel() <= Role.PARTNER.level;
         respObj.put("isPartner", accepted);
         respObj.put("cursor", result.getStartCursor());
 
         if (first) {
-            respObj.put("allPossibleCount", ticketDAO.countAllTicketsForUser(user));
+            respObj.put("allPossibleCount", ticketDAO.countAllTicketsForUser(userEmail));
         }
 
         resp.setDataObject(respObj);

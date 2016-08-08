@@ -36,7 +36,11 @@ public abstract class EntityWrapper implements BaseEntity {
     }
 
     protected void setProperty(String propertyName, Object value) {
-        entity.setProperty(propertyName, value);
+        if (value != null) {
+            entity.setProperty(propertyName, value);
+        } else if (entity.hasProperty(propertyName)) {
+            entity.removeProperty(propertyName);
+        }
     }
 
     protected <T> T getProperty(String propertyName) {

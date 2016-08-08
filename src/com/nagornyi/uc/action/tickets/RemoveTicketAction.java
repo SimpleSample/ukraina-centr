@@ -11,6 +11,7 @@ import com.nagornyi.uc.transport.ActionRequest;
 import com.nagornyi.uc.transport.ActionResponse;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author Nagornyi
@@ -18,6 +19,7 @@ import java.util.List;
  */
 @Authorized
 public class RemoveTicketAction implements Action {
+    private static Logger log = Logger.getLogger(RemoveTicketAction.class.getName());
 
     @Override
     public void perform(ActionRequest req, ActionResponse resp) throws JSONException {
@@ -33,6 +35,7 @@ public class RemoveTicketAction implements Action {
             List<Ticket> tickets = order.getTickets();
             DAOFacade.getDAO(Ticket.class).delete(ticket);
             if (tickets.size() == 1) {
+                log.info("Removing order " + order.getExternalId() + " for user " + req.getUserEmail());
                 DAOFacade.getDAO(Order.class).delete(order);
             }
         }

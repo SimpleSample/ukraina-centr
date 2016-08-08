@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  */
 public class TicketCache extends EntityCache {
     private static Logger log = Logger.getLogger(TicketCache.class.getName());
-    private static Map<String, Map<String, TicketRecord>> lockedTickets = new ConcurrentHashMap<String, Map<String, TicketRecord>>();
+    private static Map<String, Map<String, TicketRecord>> lockedTickets = new ConcurrentHashMap<>();
 
     public static synchronized void lockTicket(Ticket ticket) {
         TicketRecord record = new TicketRecord();
@@ -30,7 +30,7 @@ public class TicketCache extends EntityCache {
 
         Map<String, TicketRecord> ticketsForTrip = lockedTickets.get(ticket.getStringParentKey());
         if (ticketsForTrip == null) {
-            ticketsForTrip = new HashMap<String, TicketRecord>();
+            ticketsForTrip = new HashMap<>();
             lockedTickets.put(ticket.getStringParentKey(), ticketsForTrip);
         }
 
@@ -47,7 +47,9 @@ public class TicketCache extends EntityCache {
 
     public static synchronized List<Ticket> getLockedTickets(String tripKey) {
         Map<String, TicketRecord> ticketsForTrip = lockedTickets.get(tripKey);
-        if (ticketsForTrip == null) return new ArrayList<Ticket>();
+        if (ticketsForTrip == null) {
+            return new ArrayList<>();
+        }
 
         tryRevealLockedForTrip(tripKey);
 
@@ -60,7 +62,9 @@ public class TicketCache extends EntityCache {
 
     public static synchronized Ticket getLockedTicket(String tripKey, String ticketId) {
         Map<String, TicketRecord> ticketsForTrip = lockedTickets.get(tripKey);
-        if (ticketsForTrip == null) return null;
+        if (ticketsForTrip == null) {
+            return null;
+        }
 
         tryRevealLockedForTrip(tripKey);
         TicketRecord record = ticketsForTrip.get(ticketId);
@@ -69,7 +73,9 @@ public class TicketCache extends EntityCache {
 
     public static synchronized List<Seat> getLockedSeats(String tripKey) {
         Map<String, TicketRecord> ticketsForTrip = lockedTickets.get(tripKey);
-        if (ticketsForTrip == null) return new ArrayList<Seat>();
+        if (ticketsForTrip == null) {
+            return new ArrayList<>();
+        }
 
         tryRevealLockedForTrip(tripKey);
 
@@ -80,9 +86,12 @@ public class TicketCache extends EntityCache {
         return lockedSeats;
     }
 
-    private static synchronized void tryRevealLockedForTrip(String tripKey) {
+    private static int tryRevealLockedForTrip(String tripKey) {
         Map<String, TicketRecord> ticketsForTrip = lockedTickets.get(tripKey);
-        if (ticketsForTrip == null) return;
+        int unlockedCount = 0;
+        if (ticketsForTrip == null) {
+            return unlockedCount;
+        }
 
         Long currentTime = new Date().getTime();
         Set<String> ticketsToUnlock = new HashSet<String>();
@@ -93,6 +102,7 @@ public class TicketCache extends EntityCache {
                 ticketsToUnlock.add(key);
             }
         }
+        unlockedCount = ticketsToUnlock.size();
 
         for (String key: ticketsToUnlock) {
             ticketsForTrip.remove(key);
@@ -101,11 +111,14 @@ public class TicketCache extends EntityCache {
         if (ticketsForTrip.isEmpty()) {
             lockedTickets.remove(tripKey);
         }
+        return unlockedCount;
     }
 
     public static boolean sameExists(Ticket ticket) {
         Map<String, TicketRecord> ticketsForTrip = lockedTickets.get(ticket.getStringParentKey());
-        if (ticketsForTrip == null) return false;
+        if (ticketsForTrip == null) {
+            return false;
+        }
 
         for (String ticketId: ticketsForTrip.keySet()) {
             Ticket t = ticketsForTrip.get(ticketId).ticket;
@@ -118,17 +131,30 @@ public class TicketCache extends EntityCache {
     }
 
     public static synchronized Ticket revealLockedTicket(String tripId, String ticketId) {
-        log.info("Revealing locked ticket for trip = " + tripId + ", ticketId = " + ticketId);
+        log.info("Trying to reveal locked ticket for trip = " + tripId + ", ticketId = " + ticketId);
         Map<String, TicketRecord> ticketsForTrip = lockedTickets.get(tripId);
-        if (ticketsForTrip == null) return null;
+        if (ticketsForTrip == null) {
+            return null;
+        }
         TicketRecord record = ticketsForTrip.remove(ticketId);
-        if (record == null) return null;
+        if (record == null) {
+            return null;
+        }
 
         if (ticketsForTrip.isEmpty()) {
             lockedTickets.remove(tripId);
         }
         log.info("revealed locked ticket, user: " + record.username + ", seat: " + record.seatName);
         return record.ticket;
+    }
+
+    public static synchronized int revealAllLockedTickets() {
+        log.info("Trying to reveal all locked tickets");
+        int revealedCount = 0;
+        for (String tripId : lockedTickets.keySet()) {
+            revealedCount += tryRevealLockedForTrip(tripId);
+        }
+        return revealedCount;
     }
 
     @Override

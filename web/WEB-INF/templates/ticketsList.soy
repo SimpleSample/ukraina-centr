@@ -1,0 +1,37 @@
+{namespace templates}
+/**
+ * @param tickets user ordered tickets
+ */
+{template .ticketsList}
+<tr>
+    <td style="padding-top: 20px;">
+        <table align="left" border="0" cellpadding="0" cellspacing="0" style="float:left;border:1px solid #ffffff; border-bottom: 1px solid #868686; font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546;" width="100%">
+            <tbody>
+            <tr>
+                <td align="center" style="font-size:20px;height:40px; padding: 0 10px;border-bottom: 3px solid #868686;" valign="middle"><b>Пасажир</b>
+                </td>
+                <td align="center" style="font-size:20px;height:40px; padding: 0 10px;border-bottom: 3px solid #868686;" valign="middle"><b>Телефон</b>
+                </td>
+                <td align="center" style="font-size:20px;height:40px; padding: 0 10px;border-bottom: 3px solid #868686;" valign="middle"><b>Маршрут</b>
+                </td>
+                <td align="center" style="font-size:20px;height:40px; padding: 0 10px;border-bottom: 3px solid #868686;" valign="middle"><b>Дата відправлення</b>
+                </td>
+                <td align="center" style="font-size:20px;height:40px; padding: 0 10px;border-bottom: 3px solid #868686;" valign="middle"><b>Місце</b>
+                </td>
+                <td align="center" style="font-size:20px;height:40px; padding: 0 10px;border-bottom: 3px solid #868686;" valign="middle"><b>Примітка</b>
+                </td>
+            </tr>
+            {foreach $ticket in $tickets}
+             <tr>
+                <td align="left" style="font-size:16px;min-height:38px;line-height: 22px;" valign="middle"><b>{$ticket.passenger}</b></td>
+                <td align="center" style="font-size:16px;min-height:38px;line-height: 22px;" valign="middle">{if $ticket.phone1 != null}<div>{$ticket.phone1}</div>{/if}{if $ticket.phone2}<div>{$ticket.phone2}</div>{/if}</td>
+                <td align="center" style="font-size:16px;min-height:38px;line-height: 22px;" valign="middle">{$ticket.route}</td>
+                <td align="center" style="font-size:16px;min-height:38px;line-height: 22px;" valign="middle">{$ticket.startDate}</td>
+                <td align="center" style="font-size:16px;min-height:38px;line-height: 22px;" valign="middle">{$ticket.seat}</td>
+                <td align="left" style="font-size:16px;min-height:38px;line-height: 22px;" valign="middle">{$ticket.note}</td>
+             </tr>
+            {/foreach}
+        </table>
+    </td>
+</tr>
+{/template}

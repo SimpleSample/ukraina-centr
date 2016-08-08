@@ -69,7 +69,7 @@ public class OrderService implements UCService {
 
         Ticket ticket = getTicket(trip, ticketId);
         if (ticket != null) {
-            ticket.setUser(currentUser);
+            ticket.setUserEmail(currentUser.getEmail());
             ticket.setOrder(order);
             ticket.setPartial(isPartial);
             fillTicketFromJson(currentUser, trip, ticketObj, ticket, isForth);

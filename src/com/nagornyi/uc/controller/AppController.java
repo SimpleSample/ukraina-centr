@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Nagorny
@@ -26,13 +28,19 @@ import java.io.IOException;
  */
 public class AppController extends HttpServlet {
 
+    private static final Logger log = Logger.getLogger(AppController.class.getName());
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String actionAlias = req.getParameter("a");
-        if (actionAlias == null) return;
+        if (actionAlias == null) {
+            return;
+        }
 
         Action action = ActionStorage.get(actionAlias);
-        if (action == null) return;
+        if (action == null) {
+            return;
+        }
 
         resp.setCharacterEncoding("UTF-8");
         resp.setHeader("Content-Type", "application/json");
@@ -97,17 +105,17 @@ public class AppController extends HttpServlet {
     private void performAction(Action action, ActionRequest request, ActionResponse response,
                                ResponseDto responseObject, String actionAlias) {
         try {
-            log("Performing Action " + action.getClass().getSimpleName() +". \n Params: " + request.serializeAllParams());
+            log.info("Performing Action " + action.getClass().getSimpleName() +". \n Params: " + request.serializeAllParams());
             action.perform(request, response);
         } catch (UserFriendlyException e) {
-            log("Couldn't perform action "+actionAlias+" - business exception", e);
+            log.log(Level.WARNING, "Couldn't perform action "+actionAlias+" - business exception", e);
             responseObject.setErrorMessage(e.getUserFriendlyMessage());
         } catch (ApiProxy.OverQuotaException e) {
             //TODO could try to send email about qouta
-            log("Couldn't perform action "+actionAlias+" - quota limit exceeded ", e);
+            log.log(Level.WARNING, "Couldn't perform action "+actionAlias+" - quota limit exceeded ", e);
             responseObject.setErrorMessage("Сервіс тимчасово недоступний");
         } catch (Exception e) {
-            log("Couldn't perform action " + actionAlias, e);
+            log.log(Level.SEVERE, "Couldn't perform action "+actionAlias+" - unexpected exception", e);
             responseObject.setErrorMessage("Упс, щось пішло не так"); //TODO localize
         }
     }

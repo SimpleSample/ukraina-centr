@@ -7,6 +7,8 @@ import com.nagornyi.uc.dao.ITicketDAO;
 import com.nagornyi.uc.dao.IUserDAO;
 import com.nagornyi.uc.entity.Ticket;
 import com.nagornyi.uc.entity.User;
+import com.nagornyi.uc.service.ServiceLocator;
+import com.nagornyi.uc.service.TicketService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,15 +31,22 @@ public class CleanupServlet extends SessionCleanupServlet {
         log.info("Start cleaning admin tickets");
         IUserDAO dao = DAOFacade.getDAO(User.class);
 
-        User admin = dao.getUserByEmail("info@ukraina-centr.com");
+        String adminEmail = ServiceLocator.getInstance().getUserService().getAdminEmail();
+        User admin = dao.getUserByEmail(adminEmail);
 
         ITicketDAO ticketDao = DAOFacade.getDAO(Ticket.class);
-        Set<Key> deletedKeys = ticketDao.deleteTicketsForUserByPeriod(admin, getDateThreeDaysAgo());
+        Set<Key> deletedKeys = ticketDao.deleteAllTicketsForUserTillDate(admin, getDateThreeDaysAgo());
 
         log.info("Deleted " + deletedKeys.size() + " tickets");
+
+        TicketService ticketService = ServiceLocator.getInstance().getTicketService();
+
+        int deletedTickets = ticketService.deleteUnpaidTicketsForLastDay();
+
+        log.info("Deleted unpaid tickets: " + deletedTickets);
     }
 
-    private Date getDateThreeDaysAgo () {
+    private Date getDateThreeDaysAgo() {
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
 

@@ -9,11 +9,16 @@
         <property name="forth" direction="asc"/>
         <property name="startDate" direction="asc"/>
     </datastore-index>
-    <datastore-index kind="Ticket" ancestor="true" source="manual">
+    <datastore-index kind="Ticket" ancestor="false" source="manual">
         <property name="status" direction="asc"/>
+        <property name="statusChangedDate" direction="asc"/>
     </datastore-index>
     <datastore-index kind="Ticket" ancestor="false" source="manual">
         <property name="user" direction="asc"/>
         <property name="startDate" direction="desc"/>
+    </datastore-index>
+    <datastore-index kind="Ticket" ancestor="true" source="manual">
+        <property name="seat" direction="asc"/>
+        <property name="status" direction="asc"/>
     </datastore-index>
 </datastore-indexes>

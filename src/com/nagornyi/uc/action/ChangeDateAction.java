@@ -49,7 +49,7 @@ public class ChangeDateAction implements Action {
             newTicket.setStartDate(trip.getStartDate());
             newTicket.setStartCity(ticket.getStartCity());
             newTicket.setEndCity(ticket.getEndCity());
-            newTicket.setUser(ticket.getUser());
+            newTicket.setUserEmail(ticket.getUser().getEmail());
 
             DAOFacade.delete(ticket);
             DAOFacade.save(newTicket);

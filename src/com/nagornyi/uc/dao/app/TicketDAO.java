@@ -33,14 +33,14 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
     }
 
     @Override
-    public PaginationBatch<Ticket> getNextBatch(User user, String startCursor, int limit) {
+    public PaginationBatch<Ticket> getNextBatch(String userEmail, String startCursor, int limit) {
         FetchOptions fetchOptions = FetchOptions.Builder.withLimit(limit);
         if (startCursor != null) {
             fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor));
         }
 
         Query query = new Query(getKind())
-                .setFilter(new Query.FilterPredicate("user", Query.FilterOperator.EQUAL, user.getEmail()))
+                .setFilter(new Query.FilterPredicate("user", Query.FilterOperator.EQUAL, userEmail))
                 .addSort("startDate", Query.SortDirection.DESCENDING);
 
         QueryResultList<Entity> results = datastore.prepare(query).asQueryResultList(fetchOptions);
@@ -53,9 +53,9 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
     }
 
     @Override
-    public int countAllTicketsForUser(User user) {
+    public int countAllTicketsForUser(String userEmail) {
         Query query = new Query(getKind())
-                .setFilter(new Query.FilterPredicate("user", Query.FilterOperator.EQUAL, user.getEmail()))
+                .setFilter(new Query.FilterPredicate("user", Query.FilterOperator.EQUAL, userEmail))
                 .addSort("startDate", Query.SortDirection.DESCENDING);
         return countForQuery(query);
     }
@@ -63,6 +63,14 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
     @Override
     public int countReservedTicketsForTrip(Trip trip) {
         return countForQuery(getValidTicketsForTripQuery(trip.getKey())) + TicketCache.getLockedCount(trip.getStringKey());
+    }
+
+    @Override
+    public List<Ticket> getAllNotPayedTicketsTillDate(Date tillDate) {
+        Query.Filter statusFilter = new Query.FilterPredicate("status", Query.FilterOperator.EQUAL, Ticket.Status.PROCESSING.idx);
+        Query.Filter tillDateFilter = new Query.FilterPredicate("statusChangedDate", Query.FilterOperator.LESS_THAN, tillDate);
+
+        return getByFilter(Query.CompositeFilterOperator.and(statusFilter, tillDateFilter));
     }
 
     @Override
@@ -90,16 +98,20 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
 
     private Query getValidTicketsForTripQuery(Key tripKey) {
         return new Query(getKind())
-                .setFilter(new Query.FilterPredicate("status", Query.FilterOperator.NOT_EQUAL, Ticket.Status.INVALID.idx))
+                .setFilter(filterByValidTicket())
                 .setAncestor(tripKey);
+    }
+
+    private Query.Filter filterByValidTicket() {
+        return new Query.FilterPredicate("status", Query.FilterOperator.NOT_EQUAL, Ticket.Status.INVALID.idx);
     }
 
     @Override
     public boolean sameTicketExists(Ticket newTicket) {
-        List<Ticket> tickets = get(newTicket.getParentKey(),
-                new Query.FilterPredicate("seat",
-                        Query.FilterOperator.EQUAL,
-                        newTicket.getSeat().getKey()), null, null);
+        Query.Filter seatFilter = new Query.FilterPredicate("seat", Query.FilterOperator.EQUAL, newTicket.getSeat().getKey());
+        Query.Filter fullFilter = Query.CompositeFilterOperator.and(seatFilter, filterByValidTicket());
+
+        List<Ticket> tickets = get(newTicket.getParentKey(), fullFilter, null, null);
 
         return !tickets.isEmpty() || TicketCache.sameExists(newTicket);
     }
@@ -115,17 +127,24 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
     }
 
     @Override
+    public int revealAllLockedTickets() {
+        return TicketCache.revealAllLockedTickets();
+    }
+
+    @Override
     public Ticket createReservedTicket(String ticketId, Trip trip, Seat seat, String passenger, String phone1, String phone2, User user,
                                String startCityId, String endCityId, Date startDate, boolean isPartial, DiscountCategory category, Order order, String note) {
 
-        if (category == null) category = DiscountCategory.NONE;
+        if (category == null) {
+            category = DiscountCategory.NONE;
+        }
         log.info("\tCreating ticket, trip: " + trip.getTripName()+ "("+ DateFormatter.defaultFormat(startDate)+"), seat: " +
                 seat.getSeatNum() + ", passenger: " + passenger + ", discount: " + category.getDiscount().getName());
         Ticket ticket;
         if (ticketId == null) {
             ticket = new Ticket(trip);
             ticket.setSeat(seat);
-            ticket.setUser(user);
+            ticket.setUserEmail(user.getEmail());
         } else {
             ITicketDAO dao = DAOFacade.getDAO(Ticket.class);
             ticket = dao.revealLockedTicket(trip.getStringKey(), ticketId);
@@ -168,17 +187,22 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
     }
 
     @Override
-    public List<Ticket> getTicketsForUserByPeriod(User user, Date endDate) {
+    public List<Ticket> getAllTicketsForUserTillDate(User user, Date endDate) {
         Query query = ticketQuery.getTicketsForUserByPeriodQuery(user, endDate);
 
         return getByQuery(query);
     }
 
     @Override
-    public Set<Key> deleteTicketsForUserByPeriod(User user, Date endDate) {
+    public Set<Key> deleteAllTicketsForUserTillDate(User user, Date endDate) {
         Query query = ticketQuery.getTicketsForUserByPeriodQuery(user, endDate);
 
         return deleteForQuery(query);
+    }
+
+    @Override
+    public Set<Key> deleteTicketsForTrip(String tripKey) {
+        return deleteForQuery(getQueryByParent(KeyFactory.stringToKey(tripKey)));
     }
 
     @Override
@@ -197,6 +221,11 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
         if (revealingTicket == null) {
             super.delete(entity);
         }
+    }
+
+    @PostDelete(kinds = "Trip")
+    public void postDeleteTrip(DeleteContext context) {
+        deleteTicketsForTrip(KeyFactory.keyToString(context.getCurrentElement()));
     }
 
     // queries

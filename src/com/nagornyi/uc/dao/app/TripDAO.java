@@ -6,6 +6,7 @@ import com.google.appengine.api.datastore.Query;
 import com.nagornyi.uc.common.date.DateFormatter;
 import com.nagornyi.uc.dao.*;
 import com.nagornyi.uc.entity.*;
+import com.nagornyi.uc.service.ServiceLocator;
 import com.nagornyi.uc.util.DateUtil;
 
 import java.util.*;
@@ -163,7 +164,8 @@ public class TripDAO extends EntityDAO<Trip> implements ITripDAO {
     private void reserveBlocked(Bus bus, Trip trip) {
         log.info("Reserving initially blocked seats");
         List<Seat> seats = ((ISeatDAO) DAOFacade.getDAO(Seat.class)).getSeats(bus);
-        User admin = ((IUserDAO)DAOFacade.getDAO(User.class)).getUserByEmail("info@ukraina-centr.com");
+        String adminEmail = ServiceLocator.getInstance().getUserService().getAdminEmail();
+        User admin = ((IUserDAO)DAOFacade.getDAO(User.class)).getUserByEmail(adminEmail);
         String startCityId = trip.getStartCity().getStringKey();
         String endCityId = trip.getEndCity().getStringKey();
 

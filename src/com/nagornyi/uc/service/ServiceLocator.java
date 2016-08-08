@@ -9,6 +9,8 @@ public class ServiceLocator {
 
     private OrderService orderService = new OrderService();
     private PriceService priceService = new PriceService();
+    private UserService userService = new UserService();
+    private TicketService ticketService = new TicketService();
 
     public static ServiceLocator getInstance() {
         return INSTANCE;
@@ -20,5 +22,13 @@ public class ServiceLocator {
 
     public PriceService getPriceService() {
         return priceService;
+    }
+
+    public UserService getUserService() {
+        return userService;
+    }
+
+    public TicketService getTicketService() {
+        return ticketService;
     }
 }

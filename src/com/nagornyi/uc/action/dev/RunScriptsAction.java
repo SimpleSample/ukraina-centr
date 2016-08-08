@@ -29,6 +29,8 @@ import java.util.logging.Logger;
  *
  * new Request('run', {}).send(function(){});
  *
+ * //TODO clean tickets: status = PROCESSING and statusChangedDate = null
+ *
  * @author Nagorny
  * Date: 14.05.14
  */
@@ -45,7 +47,7 @@ public class RunScriptsAction implements Action {
 
 //        MailFacade.sendSuccessfulReservation(u, ticketPaginationBatch.getEntitiesBatch());
 
-//        if (true) return;
+        if (true) return;
 
         // adding one user
         User user = new User();

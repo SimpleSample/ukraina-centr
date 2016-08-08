@@ -7,6 +7,7 @@ import com.nagornyi.uc.dao.ICityDAO;
 import com.nagornyi.uc.dao.ITripDAO;
 import com.nagornyi.uc.entity.City;
 import com.nagornyi.uc.entity.Route;
+import com.nagornyi.uc.entity.Ticket;
 import com.nagornyi.uc.entity.Trip;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -16,7 +17,6 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -69,5 +69,6 @@ public class TripTests {
         DAOFacade.getDAO(Trip.class).deleteAll();
 
         assertTrue(DAOFacade.getDAO(Trip.class).getAll().isEmpty());
+        assertTrue(DAOFacade.getDAO(Ticket.class).getAll().isEmpty());
     }
 }

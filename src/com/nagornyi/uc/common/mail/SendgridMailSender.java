@@ -2,6 +2,7 @@ package com.nagornyi.uc.common.mail;
 
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.nagornyi.uc.entity.User;
+import com.nagornyi.uc.service.ServiceLocator;
 
 import java.util.logging.Logger;
 
@@ -47,14 +48,16 @@ public class SendgridMailSender implements MailSender {
     public void send() {
         log.info("Sending mail to " + user.getEmail() + ", subject " + subject);
 
+        String adminEmail = ServiceLocator.getInstance().getUserService().getAdminEmail();
+
         Sendgrid sendgrid = new Sendgrid();
         sendgrid.setSubject(subject)
                 .setHtml(message)
-                .setFrom("info@ukraina-centr.com").setFromName("Україна-Центр")
+                .setFrom(adminEmail).setFromName("Україна-Центр")
                 .addTo(user.getEmail(), user.getName());
 
         if (includeAdmin) {
-            sendgrid.addTo("info@ukraina-centr.com", "Admin");
+            sendgrid.addTo(adminEmail, "Admin");
         }
 
         try {

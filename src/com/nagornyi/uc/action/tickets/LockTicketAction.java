@@ -41,7 +41,7 @@ public class LockTicketAction implements Action {
         Ticket ticket = new Ticket(id, tripId);
         TicketConverter.populateTicketFromJson(ticket, ticketObj, isUserForth);
         TicketConverter.populateEmptyFieldsFromTrip(ticket, trip);
-        ticket.setUser(req.getUser());
+        ticket.setUserEmail(req.getUserEmail());
         ticket.setStatus(Ticket.Status.LOCKED);
         ticket.setCalculatedPrice(0.0); // throws NPE when GETting it. wtf?
 

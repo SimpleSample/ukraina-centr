@@ -58,7 +58,7 @@ MiscUtils = {
 };
 
 (function() {
-    var UKRAINE = "ag9zfnVrcmFpbmEtY2VudHJyEAsSB0NvdW50cnkiA3Vrcgw";
+    var UKRAINE = "ahFzfm91ci1saXR0bGUtYmFieXIQCxIHQ291bnRyeSIDdWtyDA";
     var clientBundle = window.clientBundle;
     function getCleanState() {
         return {

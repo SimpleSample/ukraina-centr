@@ -155,12 +155,46 @@ public class EntityDAO<E extends EntityWrapper> implements DAO<E> {
         query.setKeysOnly();
         List<Entity> entities = datastore.prepare(query).asList(FetchOptions.Builder.withDefaults());
 
-        Set<Key> keys = new HashSet<Key>(entities.size());
+        Set<Key> keys = new HashSet<>(entities.size());
 
         for (Entity e : entities) {
             keys.add(e.getKey());
         }
-        if (!keys.isEmpty()) datastore.delete(keys);
+        if (!keys.isEmpty()) {
+            datastore.delete(keys);
+        }
         return keys;
+    }
+
+    @Override
+    public int countAll() {
+        return countForQuery(new Query(getKind()));
+    }
+
+    public int sanitizeStringProperty(String propertyName) {
+        Query.FilterPredicate stringNullFilter = new Query.FilterPredicate(propertyName,
+                Query.FilterOperator.EQUAL,
+                "null");
+        Query.FilterPredicate nullFilter = new Query.FilterPredicate(propertyName,
+                Query.FilterOperator.EQUAL,
+                null);
+        Query.FilterPredicate emptyStringFilter = new Query.FilterPredicate(propertyName,
+                Query.FilterOperator.EQUAL,
+                "");
+        Query.FilterPredicate jsUndefinedFilter = new Query.FilterPredicate(propertyName,
+                Query.FilterOperator.EQUAL,
+                "undefined");
+        Query.Filter resultFilter =
+                Query.CompositeFilterOperator.or(stringNullFilter, nullFilter, emptyStringFilter, jsUndefinedFilter);
+        List<E> entities = getByFilter(resultFilter);
+
+        int result = entities.size();
+
+        for(E entity: entities) {
+            entity.getEntity().removeProperty(propertyName);
+        }
+        save(entities);
+
+        return result;
     }
 }

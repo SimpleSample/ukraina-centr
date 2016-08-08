@@ -40,4 +40,8 @@ public interface DAO<Entity extends BaseEntity> {
     Set<Key> deleteAll();
 
     Set<Key> deleteForQuery(Query query);
+
+    int countAll();
+
+    int sanitizeStringProperty(String propertyName);
 }
