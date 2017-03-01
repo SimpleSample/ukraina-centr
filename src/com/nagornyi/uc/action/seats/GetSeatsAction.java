@@ -1,19 +1,18 @@
 package com.nagornyi.uc.action.seats;
 
-import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import com.nagornyi.uc.action.Action;
 import com.nagornyi.uc.action.Authorized;
+import com.nagornyi.uc.action.response.GetAllSeatsResponse;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.ISeatDAO;
+import com.nagornyi.uc.dto.SeatDto;
 import com.nagornyi.uc.entity.Seat;
 import com.nagornyi.uc.transport.ActionRequest;
 import com.nagornyi.uc.transport.ActionResponse;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import static com.nagornyi.uc.action.ActionKeys.ALL_SEATS_KEY;
 
 @Authorized
 public class GetSeatsAction implements Action {
@@ -22,12 +21,10 @@ public class GetSeatsAction implements Action {
     public void perform(ActionRequest req, ActionResponse resp) throws JSONException {
         ISeatDAO seatDAO = DAOFacade.getDAO(Seat.class);
         List<Seat> seats = seatDAO.getSeatsForSetra();
-        JSONArray allSeats = new JSONArray();
+        List<SeatDto> allSeats = new ArrayList<>(seats.size());
         for (Seat seat: seats) {
-            allSeats.put(seat.toJSON());
+            allSeats.add(new SeatDto(seat.getStringKey(), seat.getSeatNum()));
         }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(ALL_SEATS_KEY, allSeats);
-        resp.setDataObject(jsonObject);
+        resp.setData(new GetAllSeatsResponse(allSeats));
     }
 }

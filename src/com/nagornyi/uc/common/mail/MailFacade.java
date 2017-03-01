@@ -34,7 +34,12 @@ public class MailFacade {
     public static void sendTimedOutTicketsToBeRemoved(User user, List<Ticket> tickets) {
         String template = HTMLTemplates.getTimedOutTicketsTemplate(user, tickets);
 
-        createMailSender().setUser(user).setMessage(template).includeAdmin(false).send();
+        createMailSender()
+                .setUser(user)
+                .setMessage(template)
+                .includeAdmin(false)
+                .setSubject("Невдале замовлення квитків")
+                .send();
     }
 
     public static void sendRenewPass(User user, String newPass) {
@@ -44,7 +49,7 @@ public class MailFacade {
                 .setUser(user)
                 .setMessage(template)
                 .includeAdmin(false)
-                .setSubject(AppEngineMailSender.UC_SUBJECT +"Відновлення паролю")
+                .setSubject("Відновлення паролю")
                 .send();
     }
 

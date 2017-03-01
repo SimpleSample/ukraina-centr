@@ -12,7 +12,6 @@ import java.util.Map;
 
 public class LiqPay_v3 {
 
-    private static final String ENV_PARAMETER_GROUP = LiqPay.class.getSimpleName();
     public static boolean isVersion3(Map<String, String> params) {
         return params.containsKey("data");
     }
@@ -21,12 +20,15 @@ public class LiqPay_v3 {
         String data = params.get("data");
         String signature = params.get("signature");
 
-        if (StringUtils.isEmpty(signature) || StringUtils.isEmpty(data)) return false;
+        if (StringUtils.isEmpty(signature) || StringUtils.isEmpty(data)) {
+            return false;
+        }
 
-        String privateKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "privateKey");
-        return signature.equals(LiqPay.str_to_sign(privateKey + data + privateKey));
+        String privateKey = EnvVariablesStorage.getValue(LiqPay.ENV_PARAMETER_GROUP, "privateKey");
+        return signature.equals(LiqPay.sha1base64Encoding(privateKey + data + privateKey));
     }
 
+    @SuppressWarnings("unchecked")
     public static Map<String, String> parseParams(Map<String, String> requestData) {
         Map<String, String> result = new HashMap<>();
         String dataJson = requestData.get("data");

@@ -32,7 +32,7 @@ public class SendgridMailSender implements MailSender {
 
     @Override
     public MailSender setSubject(String subject) {
-        this.subject = subject;
+        this.subject = UC_SUBJECT + subject;
 
         return this;
     }

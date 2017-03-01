@@ -16,28 +16,19 @@ import java.util.logging.Logger;
 
 public class LiqPay {
     private static Logger log = Logger.getLogger(LiqPay.class.getName());
-//    private Proxy __PROXY = null;
-//    private String __PROXY_AUTH = null;
 
-    private static final String ENV_PARAMETER_GROUP = LiqPay.class.getSimpleName();
-    private static String host = "https://www.liqpay.com/api/";
-    private static String language = "ru";
-    private static String type = "buy";
-    private static String currency = "EUR"; // USD, EUR, RUB, UAH
-    private static String description = "Оплата квитків на сайті www.ukraina-centr.com";
+    static final String ENV_PARAMETER_GROUP = LiqPay.class.getSimpleName();
+    private static String LANGUAGE = "ru";
+    private static String TYPE = "buy";
+    private static String CURRENCY = "EUR"; // USD, EUR, RUB, UAH
+    private static String DESCRIPTION = "Оплата квитків на сайті www.ukraina-centr.com";
     public static String UC_KEY = "@;";
-
-    public LiqPay() {}
-
-    public LiqPay(String public_key, String private_key, String url) {
-        host = url;
-    }
 
     public static JSONObject getLiqPayReservationJSON(double price, String orderId, String orderDesc) throws JSONException {
         JSONObject responseObj = new JSONObject();
 
 
-        HashMap<String, String> liqpayParams = getLiqPayParams(price, currency, description, orderId, orderDesc);
+        HashMap<String, String> liqpayParams = getLiqPayParams(price, CURRENCY, DESCRIPTION, orderId, orderDesc);
         for(String param: liqpayParams.keySet()) {
             responseObj.put(param, liqpayParams.get(param));
         }
@@ -54,7 +45,7 @@ public class LiqPay {
                 backTicket = ticket1;
             }
         }
-        StringBuilder result = new StringBuilder(""+order.getExternalId()).append(LiqPay.UC_KEY).append(" ").append(user.getUsername());
+        StringBuilder result = new StringBuilder(Long.toString(order.getExternalId())).append(LiqPay.UC_KEY).append(" ").append(user.getUsername());
 
         if (ticket == null && backTicket != null) {
             ticket = backTicket;
@@ -84,171 +75,61 @@ public class LiqPay {
         return result.toString();
     }
 
-    @SuppressWarnings("unchecked")
-    public JSONObject api(String path, HashMap<String, String> list) throws Exception{
-
-        JSONObject json = new JSONObject();
-
-        String publicKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "publicKey");
-        json.put("public_key", publicKey);
-
-        for (Map.Entry<String, String> entry: list.entrySet())
-            json.put(entry.getKey(), entry.getValue());
-
-        String dataJson = json.toString();
-        String privateKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "privateKey");
-        String signature = LiqPayUtil.base64_encode( LiqPayUtil.sha1( privateKey + dataJson + privateKey) );
-
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put("data", dataJson);
-        data.put("signature", signature);
-        String resp = LiqPayRequest.post(host + path, data, this);
-
-        JSONObject jsonObj = new JSONObject(resp);
-
-//        HashMap<String, Object> res_json = LiqPayUtil.parseJson(jsonObj);
-
-        return jsonObj;
-
-    }
-
-    public String cnb_form(HashMap<String, String> list){
-
-        String language = "ru";
-        if(list.get("language") != null)
-            language = list.get("language");
-
-        String signature = cnb_signature(list);
-        String publicKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "publicKey");
-        list.put("public_key", publicKey);
-        list.put("signature", signature);
-
-        String form = "";
-        form += "<form method=\"post\" action=\"https://www.liqpay.com/api/pay\" accept-charset=\"utf-8\">\n";
-
-        for (Map.Entry<String, String> entry: list.entrySet())
-            form += "<input type=\"hidden\" name=\""+entry.getKey()+"\" value=\""+entry.getValue()+"\" />\n";
-
-        form += "<input type=\"image\" src=\"//static.liqpay.com/buttons/p1"+language+".radius.png\" name=\"btn_text\" />\n";
-        form += "</form>\n";
-
-        return form;
-
-    }
-
     public static HashMap<String, String> getLiqPayParams(double amount, String currency, String description, String orderId, String orderDesc) {
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("amount", ""+amount);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("amount", Double.toString(amount));
         params.put("currency", currency);
         params.put("description", description);
         params.put("order_id", orderDesc);
-        params.put("type", type);
+        params.put("type", TYPE);
         String serverUrl = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "serverUrl");
         params.put("result_url", serverUrl + "?orderId=" + orderId);
         params.put("server_url", serverUrl + "lpCallback");
         String publicKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "publicKey");
         params.put("public_key", publicKey);
-        params.put("language", language);
+        params.put("language", LANGUAGE);
         String sandbox = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "sandbox");
         params.put("sandbox", sandbox);
-        params.put("signature", cnb_signature(params));
+        params.put("signature", createSignature(params));
         return params;
     }
 
-    public static String getSignature(double amount, String currency, String description, String orderId, String type) {
-        HashMap params = new HashMap();
-        params.put("amount", ""+amount);
-        params.put("currency", currency);
-        params.put("description", description);
-        params.put("order_id", orderId);
-        params.put("type", type);
+    public static String createSignature(Map<String, String> paramsMap) {
+        String result = new LiqPaySignatureBuilder(paramsMap.get("amount"), paramsMap.get("currency"), paramsMap.get("description"))
+                .orderId(paramsMap.get("order_id"))
+                .type(paramsMap.get("type"))
+                .resultUrl(paramsMap.get("result_url"))
+                .serverUrl(paramsMap.get("server_url"))
+                .firstName(paramsMap.get("sender_first_name"))
+                .lastName(paramsMap.get("sender_last_name"))
+                .middleName(paramsMap.get("sender_middle_name"))
+                .countryCode(paramsMap.get("sender_country"))
+                .cityName(paramsMap.get("sender_city"))
+                .address(paramsMap.get("sender_address"))
+                .postalCode(paramsMap.get("sender_postal_code"))
+                .status(paramsMap.get("status"))
+                .transactionId(paramsMap.get("transaction_id"))
+                .senderPhone(paramsMap.get("sender_phone"))
+                .build();
 
-        return cnb_signature(params);
-    }
-
-    public static String cnb_signature(Map<String, String> list) {
-        String amount = list.get("amount");
-        String currency = list.get("currency");
-        String order_id = list.get("order_id");
-        String type = list.get("type");
-        String description = list.get("description");
-        String result_url = list.get("result_url");
-        String server_url = list.get("server_url");
-        String first_name = list.get("sender_first_name");
-        String last_name = list.get("sender_last_name");
-        String middle_name = list.get("sender_middle_name");
-        String country_code = list.get("sender_country");
-        String city_name = list.get("sender_city");
-        String address = list.get("sender_address");
-        String postal_code = list.get("sender_postal_code");
-        String status = list.get("status");
-        String transaction_id = list.get("transaction_id");
-        String sender_phone = list.get("sender_phone");
-
-        if(amount == null)
-            throw new NullPointerException("amount can't be null");
-        if(currency == null)
-            throw new NullPointerException("currency can't be null");
-        if(description == null)
-            throw new NullPointerException("description can't be null");
-
-        String publicKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "publicKey");
-        String privateKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "privateKey");
-        String sign_str = privateKey + amount + currency + publicKey;
-
-        if(order_id != null)sign_str += order_id;
-        if(type != null)sign_str += type;
-        if(description != null) sign_str += description;
-        if(result_url != null)sign_str += result_url;
-        if(server_url != null)sign_str += server_url;
-        if(first_name != null)sign_str += first_name;
-        if(last_name != null)sign_str += last_name;
-        if(middle_name != null)sign_str += middle_name;
-        if(country_code != null)sign_str += country_code;
-        if(city_name != null)sign_str += city_name;
-        if(address != null)sign_str += address;
-        if(postal_code != null)sign_str += postal_code;
-        if(status != null)sign_str += status;
-        if(transaction_id != null)sign_str += transaction_id;
-        if(sender_phone != null)sign_str += sender_phone;
-
-        return str_to_sign(sign_str);
+        return sha1base64Encoding(result);
     }
 
     public static boolean isValid(Map<String, String> params) {
         String signature = params.get("signature");
-        if (signature == null) return false;
+        if (signature == null) {
+            return false;
+        }
 
         if (LiqPay_v3.isVersion3(params)) {
             return LiqPay_v3.isValid(params);
         } else {
-            String calcSignature = cnb_signature(params);
+            String calcSignature = createSignature(params);
             return signature.equals(calcSignature);
         }
     }
 
-//    public void setProxy(String host, Integer port){
-//        __PROXY = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
-//    }
-//
-//    public void setProxy(String host, Integer port, Proxy.Type type){
-//        __PROXY = new Proxy(type, new InetSocketAddress(host, port));
-//    }
-//
-//
-//    public void setProxyUser(String login, String password){
-//        __PROXY_AUTH = new String(LiqPayUtil.base64_encode(new String(login + ":" + password).getBytes()));
-//    }
-//
-//    public Proxy getProxy(){
-//        return __PROXY;
-//    }
-//
-//    public String getProxyUser(){
-//        return __PROXY_AUTH;
-//    }
-
-    public static String str_to_sign(String str) {
-        return LiqPayUtil.base64_encode( LiqPayUtil.sha1( str ) );
+    public static String sha1base64Encoding(String str) {
+        return LiqPayUtil.base64Encode(LiqPayUtil.sha1(str));
     }
 }

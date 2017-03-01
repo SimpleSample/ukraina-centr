@@ -53,10 +53,10 @@ public class LiqPayCallbackProcessor extends HttpServlet {
             User user = order.getUser();
             order.setTransactionId(transactionId);
 
-            if ("failure".equals(status) || "reversed".equals(status)) {
+            if (LiqPayStatus.isOneOfFailed(status)) {
                 order.failed();
                 MailFacade.sendFailedTicketsPurchaseFromLiqPay(user, transactionId);
-            } else if ("cash_wait".equals(status) || "processing".equals(status) || "wait_secure".equals(status)) {
+            } else if (LiqPayStatus.isOneOfProgress(status)) {
                 order.processing();
             } else {
                 order.succeeded();

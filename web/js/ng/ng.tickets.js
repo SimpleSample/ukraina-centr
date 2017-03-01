@@ -58,7 +58,8 @@ MiscUtils = {
 };
 
 (function() {
-    var UKRAINE = "ahFzfm91ci1saXR0bGUtYmFieXIQCxIHQ291bnRyeSIDdWtyDA";
+    var UKRAINE_TEST = "ahFzfm91ci1saXR0bGUtYmFieXIQCxIHQ291bnRyeSIDdWtyDA";
+    var UKRAINE_PROD = "ag9zfnVrcmFpbmEtY2VudHJyEAsSB0NvdW50cnkiA3Vrcgw";
     var clientBundle = window.clientBundle;
     function getCleanState() {
         return {
@@ -256,7 +257,7 @@ MiscUtils = {
                 that.$startCitySelect.on('change', function() {
                     var id = that.$startCitySelect.val()? MiscUtils.getSelectedId(that.$startCitySelect, 1) : null;
                     var newStartCity = id? dataStore.get(id) : null;
-                    var temp = UKRAINE == newStartCity.country;
+                    var temp = newStartCity.country == UKRAINE_PROD || newStartCity.country == UKRAINE_TEST;
                     if (that.isCurrentForth != temp){
                         var forthDayOfWeek = temp? 4 : 0;
                         var backDayOfWeek = temp? 0 : 4;
