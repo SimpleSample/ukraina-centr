@@ -1,8 +1,9 @@
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.ResourceBundle" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="com.nagornyi.uc.i18n.I18n" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
-    ResourceBundle bundle = ResourceBundle.getBundle("i18n.about", Locale.forLanguageTag("uk")); //TODO localization issue
+    ResourceBundle bundle = I18n.getBundle("i18n.about", Locale.forLanguageTag("uk")); //TODO localization issue
 %>
 <!DOCTYPE html>
 <html>

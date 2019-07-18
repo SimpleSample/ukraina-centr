@@ -1,24 +1,43 @@
 package com.nagornyi.uc.dao.app;
 
-import com.google.appengine.api.datastore.*;
+import com.google.appengine.api.datastore.Cursor;
+import com.google.appengine.api.datastore.DeleteContext;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PostDelete;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.QueryResultList;
 import com.nagornyi.uc.cache.TicketCache;
-import com.nagornyi.uc.common.date.DateFormatter;
 import com.nagornyi.uc.common.DiscountCalculator;
+import com.nagornyi.uc.common.date.DateFormatter;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.IPriceDAO;
 import com.nagornyi.uc.dao.ITicketDAO;
 import com.nagornyi.uc.dao.PaginationBatch;
-import com.nagornyi.uc.entity.*;
+import com.nagornyi.uc.entity.City;
+import com.nagornyi.uc.entity.Discount;
+import com.nagornyi.uc.entity.DiscountCategory;
+import com.nagornyi.uc.entity.Order;
+import com.nagornyi.uc.entity.Price;
+import com.nagornyi.uc.entity.Seat;
+import com.nagornyi.uc.entity.Ticket;
+import com.nagornyi.uc.entity.Trip;
+import com.nagornyi.uc.entity.User;
 
-import java.util.*;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Nagorny
  * Date: 22.05.14
  */
 public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
-    private static Logger log = Logger.getLogger(TicketDAO.class.getName());
+    private static final String START_DATE_FIELD = "startDate";
+    private static final String USER_FIELD = "user";
 
     private DaoQuery ticketQuery = new DaoQuery();
 
@@ -40,11 +59,11 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
         }
 
         Query query = new Query(getKind())
-                .setFilter(new Query.FilterPredicate("user", Query.FilterOperator.EQUAL, userEmail))
-                .addSort("startDate", Query.SortDirection.DESCENDING);
+                .setFilter(new Query.FilterPredicate(USER_FIELD, Query.FilterOperator.EQUAL, userEmail))
+                .addSort(START_DATE_FIELD, Query.SortDirection.DESCENDING);
 
         QueryResultList<Entity> results = datastore.prepare(query).asQueryResultList(fetchOptions);
-        PaginationBatch<Ticket> result = new PaginationBatch<Ticket>(results.getCursor().toWebSafeString());
+        PaginationBatch<Ticket> result = new PaginationBatch<>(results.getCursor().toWebSafeString());
         for (Entity entity: results) {
             result.addEntity(createDAOEntity(entity));
         }
@@ -55,8 +74,8 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
     @Override
     public int countAllTicketsForUser(String userEmail) {
         Query query = new Query(getKind())
-                .setFilter(new Query.FilterPredicate("user", Query.FilterOperator.EQUAL, userEmail))
-                .addSort("startDate", Query.SortDirection.DESCENDING);
+                .setFilter(new Query.FilterPredicate(USER_FIELD, Query.FilterOperator.EQUAL, userEmail))
+                .addSort(START_DATE_FIELD, Query.SortDirection.DESCENDING);
         return countForQuery(query);
     }
 
@@ -83,7 +102,7 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
     @Override
     public List<Seat> getUnavailableSeatsForTrip(Trip trip) {
         List<Ticket> tickets = getValidTicketsForTrip(trip.getKey());
-        List<Seat> seats = new ArrayList<Seat>();
+        List<Seat> seats = new ArrayList<>();
         for(Ticket t: tickets) {
             seats.add(t.getSeat());
         }
@@ -134,12 +153,10 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
     @Override
     public Ticket createReservedTicket(String ticketId, Trip trip, Seat seat, String passenger, String phone1, String phone2, User user,
                                String startCityId, String endCityId, Date startDate, boolean isPartial, DiscountCategory category, Order order, String note) {
+        DiscountCategory discountCategory = category == null? DiscountCategory.NONE : category;
 
-        if (category == null) {
-            category = DiscountCategory.NONE;
-        }
         log.info("\tCreating ticket, trip: " + trip.getTripName()+ "("+ DateFormatter.defaultFormat(startDate)+"), seat: " +
-                seat.getSeatNum() + ", passenger: " + passenger + ", discount: " + category.getDiscount().getName());
+                seat.getSeatNum() + ", passenger: " + passenger + ", discount: " + discountCategory.getDiscount().getName());
         Ticket ticket;
         if (ticketId == null) {
             ticket = new Ticket(trip);
@@ -155,8 +172,12 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
         }
 
         ticket.setPassenger(passenger);
-        if (phone1 != null) ticket.setPhone1(phone1);
-        if (phone2 != null) ticket.setPhone2(phone2);
+        if (phone1 != null) {
+            ticket.setPhone1(phone1);
+        }
+        if (phone2 != null) {
+            ticket.setPhone2(phone2);
+        }
         if (user.isPartner()) {
             ticket.setStatus(Ticket.Status.RESERVED);
         } else {
@@ -167,12 +188,16 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
         ticket.setStartDate(startDate);
         ticket.setPartial(isPartial);
 
-        double resultPrice = getPrice(startCityId, endCityId, user, category, isPartial);
+        double resultPrice = getPrice(startCityId, endCityId, user, discountCategory, isPartial);
         log.info("Calculated price for ticket " + resultPrice);
         ticket.setCalculatedPrice(resultPrice);
 
-        if (order != null) ticket.setOrder(order);
-        if (note != null) ticket.setNote(note);
+        if (order != null) {
+            ticket.setOrder(order);
+        }
+        if (note != null) {
+            ticket.setNote(note);
+        }
 
         return ticket;
     }
@@ -180,9 +205,13 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
     public double getPrice(String startCityId, String endCityId, User user, DiscountCategory category, boolean isPartial) {
         IPriceDAO priceDAO = DAOFacade.getDAO(Price.class);
         Price p = priceDAO.getPriceByCities(startCityId, endCityId);
-        List<Discount> discounts = new ArrayList<Discount>();
-        if (user.getDiscount() != null) discounts.add(user.getDiscount());
-        if (category != null) discounts.add(category.getDiscount());
+        List<Discount> discounts = new ArrayList<>();
+        if (user.getDiscount() != null) {
+            discounts.add(user.getDiscount());
+        }
+        if (category != null) {
+            discounts.add(category.getDiscount());
+        }
         return new DiscountCalculator().calculate(isPartial? p.getPriceBoth()/2 : p.getPrice(), discounts);
     }
 
@@ -210,19 +239,36 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
         Ticket lockedTicket = TicketCache.getLockedTicket(KeyFactory.keyToString(id.getParent()),
                 KeyFactory.keyToString(id));
 
-        return lockedTicket == null? super.getById(id) : lockedTicket;
+        return lockedTicket == null ? super.getById(id) : lockedTicket;
     }
 
     @Override
     public void delete(Ticket entity) {
-        Ticket revealingTicket = TicketCache.revealLockedTicket(entity.getStringParentKey(),
-                KeyFactory.keyToString(entity.getKey()));
+        Ticket revealingTicket = TicketCache.revealLockedTicket(entity.getStringParentKey(), entity.getStringKey());
         //if not from cache
         if (revealingTicket == null) {
+            log.info(String.format("Deleting ticket %s, passenger: %s", entity.getStringKey(), entity.getPassenger()));
+
             super.delete(entity);
         }
     }
 
+    @Override
+    public void delete(List<Ticket> tickets) {
+        for (Ticket ticket: tickets) {
+            log.info(String.format("Deleting ticket %s, passenger: %s", ticket.getStringKey(), ticket.getPassenger()));
+        }
+        super.delete(tickets);
+    }
+
+    @Override
+    protected void logDeletionByKeys(Set<Key> keys) {
+        for (Key ticketKey: keys) {
+            log.info(String.format("Deleting ticket %s", KeyFactory.keyToString(ticketKey)));
+        }
+    }
+
+    @SuppressWarnings("unused")
     @PostDelete(kinds = "Trip")
     public void postDeleteTrip(DeleteContext context) {
         deleteTicketsForTrip(KeyFactory.keyToString(context.getCurrentElement()));
@@ -230,18 +276,17 @@ public class TicketDAO extends EntityDAO<Ticket> implements ITicketDAO {
 
     // queries
 
-    public class DaoQuery {
+    private final class DaoQuery {
 
-        public Query getTicketsForUserByPeriodQuery(User user, Date endDate) {
-            if (endDate == null) endDate = new Date();
+        Query getTicketsForUserByPeriodQuery(User user, Date endDate) {
 
-            Query.FilterPredicate userFilter = new Query.FilterPredicate("user",
+            Query.FilterPredicate userFilter = new Query.FilterPredicate(USER_FIELD,
                     Query.FilterOperator.EQUAL,
                     user.getEmail());
 
-            Query.FilterPredicate endDateLessThan = new Query.FilterPredicate("startDate",
+            Query.FilterPredicate endDateLessThan = new Query.FilterPredicate(START_DATE_FIELD,
                     Query.FilterOperator.LESS_THAN_OR_EQUAL,
-                    endDate);
+                    endDate == null? new Date() : endDate);
 
             Query.Filter resultFilter =
                     Query.CompositeFilterOperator.and(userFilter, endDateLessThan);

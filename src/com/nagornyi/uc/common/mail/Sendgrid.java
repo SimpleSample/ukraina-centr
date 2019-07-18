@@ -1,9 +1,9 @@
 package com.nagornyi.uc.common.mail;
 
 
-import com.google.appengine.labs.repackaged.org.json.JSONArray;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONArray;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import com.nagornyi.env.EnvVariablesStorage;
 import org.apache.commons.collections4.CollectionUtils;
 

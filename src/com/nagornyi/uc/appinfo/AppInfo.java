@@ -1,7 +1,5 @@
 package com.nagornyi.uc.appinfo;
 
-import com.nagornyi.uc.util.CurrencyUtil;
-
 /**
  * @author Nagornyi
  * Date: 08.06.14

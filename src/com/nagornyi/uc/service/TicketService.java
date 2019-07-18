@@ -7,6 +7,7 @@ import com.nagornyi.uc.dao.ITicketDAO;
 import com.nagornyi.uc.entity.Order;
 import com.nagornyi.uc.entity.Ticket;
 import com.nagornyi.uc.entity.User;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,7 +35,9 @@ public class TicketService {
         filterTickets(groupedByUser);
 
         for (Map.Entry<String, List<Ticket>> ticketEntry: groupedByUser.tickets.entrySet()) {
-            MailFacade.sendTimedOutTicketsToBeRemoved(groupedByUser.users.get(ticketEntry.getKey()), ticketEntry.getValue());
+            if(CollectionUtils.isNotEmpty(ticketEntry.getValue())) {
+                MailFacade.sendTimedOutTicketsToBeRemoved(groupedByUser.users.get(ticketEntry.getKey()), ticketEntry.getValue());
+            }
         }
 
         IOrderDAO orderDAO = DAOFacade.getDAO(Order.class);

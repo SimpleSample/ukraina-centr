@@ -1,6 +1,7 @@
 package com.nagornyi.uc.common.liqpay;
 
 import javax.xml.bind.DatatypeConverter;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 public class LiqPayUtil {
@@ -10,7 +11,7 @@ public class LiqPayUtil {
         try {
             SHA = MessageDigest.getInstance("SHA-1");
             SHA.reset();
-            SHA.update(param.getBytes("UTF-8"));
+            SHA.update(param.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             throw new RuntimeException("Could not create SHA1");
         }

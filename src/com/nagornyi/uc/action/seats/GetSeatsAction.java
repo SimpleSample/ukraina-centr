@@ -1,6 +1,6 @@
 package com.nagornyi.uc.action.seats;
 
-import com.google.appengine.labs.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONException;
 import com.nagornyi.uc.action.Action;
 import com.nagornyi.uc.action.Authorized;
 import com.nagornyi.uc.action.response.GetAllSeatsResponse;

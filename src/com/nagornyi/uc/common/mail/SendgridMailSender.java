@@ -1,6 +1,6 @@
 package com.nagornyi.uc.common.mail;
 
-import com.google.appengine.labs.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONException;
 import com.nagornyi.uc.entity.User;
 import com.nagornyi.uc.service.ServiceLocator;
 

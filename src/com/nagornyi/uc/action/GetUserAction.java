@@ -1,7 +1,7 @@
 package com.nagornyi.uc.action;
 
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import com.nagornyi.uc.entity.User;
 import com.nagornyi.uc.transport.ActionRequest;
 import com.nagornyi.uc.transport.ActionResponse;

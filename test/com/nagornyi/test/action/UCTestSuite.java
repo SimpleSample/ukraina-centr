@@ -1,6 +1,6 @@
 package com.nagornyi.test.action;
 
-import com.google.appengine.labs.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONException;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.nagornyi.uc.action.dev.RunScriptsAction;

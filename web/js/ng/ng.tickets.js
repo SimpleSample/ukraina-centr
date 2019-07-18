@@ -766,7 +766,7 @@ MiscUtils = {
 
             new Request('order', {order: JSON.stringify(order)}).send(function(data) {
                 var $liqForm = $('#liq-form');
-                if (data && data['order_id']) {
+                if (data && data['data']) {
                     for (var param in data) if (data.hasOwnProperty(param)) {
                         $liqForm.find('[name='+param+']').val(data[param]);
                     }

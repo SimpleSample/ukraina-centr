@@ -1,6 +1,6 @@
 package com.nagornyi.uc.action;
 
-import com.google.appengine.labs.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONException;
 import com.nagornyi.uc.Role;
 import com.nagornyi.uc.common.UserFriendlyException;
 import com.nagornyi.uc.dao.app.UserDAO;

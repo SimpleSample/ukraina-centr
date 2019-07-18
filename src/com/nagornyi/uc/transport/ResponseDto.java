@@ -1,8 +1,8 @@
 package com.nagornyi.uc.transport;
 
-import com.google.appengine.repackaged.org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResponseDto {
 
     private Object data;

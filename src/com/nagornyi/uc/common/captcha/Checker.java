@@ -1,8 +1,8 @@
 package com.nagornyi.uc.common.captcha;
 
-import com.google.appengine.labs.repackaged.com.google.common.base.Strings;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.com.google.common.base.Strings;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import com.nagornyi.env.EnvVariablesStorage;
 import com.nagornyi.uc.transport.ActionRequest;
 

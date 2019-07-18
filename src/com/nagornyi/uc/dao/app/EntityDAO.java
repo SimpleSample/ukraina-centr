@@ -15,12 +15,20 @@ import java.util.logging.Logger;
  * Date: 25.04.14
  */
 public class EntityDAO<E extends EntityWrapper> implements DAO<E> {
-    Logger log = Logger.getLogger(EntityDAO.class.getName());
+    protected Logger log = Logger.getLogger(EntityDAO.class.getName());
     protected DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-    protected E createDAOEntity(Entity entity) {return null;}
+    protected E createDAOEntity(Entity entity) {
+        return null;
+    }
 
-    protected String getKind() {return null;}
+    protected String getKind() {
+        return null;
+    }
+
+    protected void logDeletionByKeys(Set<Key> keys) {
+
+    }
 
     @Override
     public Key create(EntityWrapper wrapper) {
@@ -161,6 +169,8 @@ public class EntityDAO<E extends EntityWrapper> implements DAO<E> {
             keys.add(e.getKey());
         }
         if (!keys.isEmpty()) {
+            logDeletionByKeys(keys);
+
             datastore.delete(keys);
         }
         return keys;

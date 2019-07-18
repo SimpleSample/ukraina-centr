@@ -1,7 +1,7 @@
 package com.nagornyi.uc.action;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONException;
 import com.nagornyi.uc.Constants;
 import com.nagornyi.uc.Role;
 import com.nagornyi.uc.common.UserFriendlyException;

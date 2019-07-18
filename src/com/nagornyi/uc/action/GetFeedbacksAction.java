@@ -1,8 +1,8 @@
 package com.nagornyi.uc.action;
 
-import com.google.appengine.labs.repackaged.org.json.JSONArray;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONArray;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.dao.IFeedbackDAO;
 import com.nagornyi.uc.dao.PaginationBatch;

@@ -1,12 +1,13 @@
 package com.nagornyi.uc.action;
 
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.labs.repackaged.org.json.JSONArray;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONArray;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import com.nagornyi.uc.common.PurchaseResult;
 import com.nagornyi.uc.common.UserFriendlyException;
 import com.nagornyi.uc.common.liqpay.LiqPay;
+import com.nagornyi.uc.common.liqpay.LiqPayRequest;
 import com.nagornyi.uc.common.mail.MailFacade;
 import com.nagornyi.uc.context.RequestContext;
 import com.nagornyi.uc.dao.DAOFacade;
@@ -61,10 +62,10 @@ public class OrderAction implements Action {
                 }
                 log.info("Calculated price for order " + resultPrice);
 
-                String order_desc = LiqPay.getPaymentDescription(order, user, result.getAllTickets());
-                JSONObject liqPayParams = LiqPay.getLiqPayReservationJSON(resultPrice, order.getStringKey(), order_desc);
-                log.info("Liq pay params: " + liqPayParams.toString());
-                resp.setDataObject(liqPayParams);
+                String paymentDescription = LiqPay.getPaymentDescription(order, user, result.getAllTickets());
+                LiqPayRequest liqPayRequest = LiqPay.createLiqPayRequest(resultPrice, order.getStringKey(), paymentDescription);
+                log.info("Liq pay request: " + liqPayRequest.toString());
+                resp.setData(liqPayRequest);
             }
             DAOFacade.save(order);
         }

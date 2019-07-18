@@ -1,7 +1,7 @@
 package com.nagornyi.uc.action;
 
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import com.google.gdata.util.ServiceException;
 import com.nagornyi.uc.oauth2.contacts.ContactsAPI;
 import com.nagornyi.uc.service.ServiceLocator;

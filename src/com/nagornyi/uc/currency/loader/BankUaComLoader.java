@@ -48,7 +48,7 @@ public class BankUaComLoader implements AppInfoLoader {
 
             if (rate != 0.0) {
                 rate = rate/size;
-                map.put("currencyRate", rate);
+                map.put("currencyRate", roundUpToTwoDecimalPlaces(rate));
             } else {
                 throw new AppInfoLoadException();
             }
@@ -64,5 +64,9 @@ public class BankUaComLoader implements AppInfoLoader {
         } catch (XPathExpressionException e) {
             throw new AppInfoLoadException(e);
         }
+    }
+
+    private double roundUpToTwoDecimalPlaces(double rate) {
+        return (double) Math.round(rate * 100) / 100;
     }
 }

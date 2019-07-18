@@ -7,11 +7,9 @@ import com.nagornyi.uc.entity.Order;
 import com.nagornyi.uc.entity.Ticket;
 import com.nagornyi.uc.entity.User;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +24,7 @@ public class LiqPayCallbackProcessor extends HttpServlet {
     private static Logger log = Logger.getLogger(LiqPayCallbackProcessor.class.getName());
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         log.info("received info from liqpay");
         Enumeration names = req.getParameterNames();
         Map<String, String> liqPayParams = new HashMap<String, String>();
@@ -39,9 +37,7 @@ public class LiqPayCallbackProcessor extends HttpServlet {
         if (!LiqPay.isValid(liqPayParams)) {
             log.warning("Signature validation failed");
         } else {
-            if (LiqPay_v3.isVersion3(liqPayParams)) {
-                liqPayParams = LiqPay_v3.parseParams(liqPayParams);
-            }
+            liqPayParams = LiqPay.parseParams(liqPayParams);
             String status = liqPayParams.get("status");
             String order_id_desc = liqPayParams.get("order_id");
             String transactionId = liqPayParams.get("transaction_id");

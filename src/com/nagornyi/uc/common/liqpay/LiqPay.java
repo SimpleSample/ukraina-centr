@@ -1,38 +1,36 @@
 package com.nagornyi.uc.common.liqpay;
 
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
+import com.google.gdata.util.common.util.Base64;
+import com.google.gdata.util.common.util.Base64DecoderException;
 import com.nagornyi.env.EnvVariablesStorage;
 import com.nagornyi.uc.common.date.DateFormatter;
 import com.nagornyi.uc.entity.Order;
 import com.nagornyi.uc.entity.Ticket;
 import com.nagornyi.uc.entity.User;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class LiqPay {
     private static Logger log = Logger.getLogger(LiqPay.class.getName());
 
     static final String ENV_PARAMETER_GROUP = LiqPay.class.getSimpleName();
-    private static String LANGUAGE = "ru";
-    private static String TYPE = "buy";
-    private static String CURRENCY = "EUR"; // USD, EUR, RUB, UAH
-    private static String DESCRIPTION = "Оплата квитків на сайті www.ukraina-centr.com";
-    public static String UC_KEY = "@;";
+    private static final int LIQPAY_VERSION = 3;
+    private static final String LANGUAGE = "uk";
+    private static final String PAY_ACTION = "pay";
+    private static final String CURRENCY = "EUR"; // USD, EUR, RUB, UAH
+    private static final String DESCRIPTION = "Оплата квитків на сайті www.ukraina-centr.com";
+    public static final String UC_KEY = "@;";
 
-    public static JSONObject getLiqPayReservationJSON(double price, String orderId, String orderDesc) throws JSONException {
-        JSONObject responseObj = new JSONObject();
+    public static LiqPayRequest createLiqPayRequest(double price, String orderId, String orderDesc) throws JSONException {
+        String liqpayData = createLiqPayDataField(price, orderId, orderDesc);
+        String signature = generateSignature(liqpayData);
 
-
-        HashMap<String, String> liqpayParams = getLiqPayParams(price, CURRENCY, DESCRIPTION, orderId, orderDesc);
-        for(String param: liqpayParams.keySet()) {
-            responseObj.put(param, liqpayParams.get(param));
-        }
-        return responseObj;
+        return new LiqPayRequest(liqpayData, signature);
     }
 
     public static String getPaymentDescription(Order order, User user, List<Ticket> tickets) {
@@ -45,7 +43,7 @@ public class LiqPay {
                 backTicket = ticket1;
             }
         }
-        StringBuilder result = new StringBuilder(Long.toString(order.getExternalId())).append(LiqPay.UC_KEY).append(" ").append(user.getUsername());
+        StringBuilder builder = new StringBuilder(Long.toString(order.getExternalId())).append(LiqPay.UC_KEY).append(" ").append(user.getUsername());
 
         if (ticket == null && backTicket != null) {
             ticket = backTicket;
@@ -61,75 +59,79 @@ public class LiqPay {
         }
         if (ticket != null) {
             String userTrip = ticket.getStartCity().getLocalizedName(Locale.ENGLISH) + " - " + ticket.getEndCity().getLocalizedName(Locale.ENGLISH);
-            result.append(", ").append(userTrip);
+            builder.append(", ").append(userTrip);
             String startDate = DateFormatter.defaultShortFormat(ticket.getStartDate());
-            result.append(", ").append(startDate);
+            builder.append(", ").append(startDate);
         }
 
         if (backTicket != null) {
             String startBackDate = DateFormatter.defaultShortFormat(backTicket.getStartDate());
-            result.append(", повернення: ").append(startBackDate);
+            builder.append(", повернення: ").append(startBackDate);
 
         }
-        log.info("order_id length: " + result.toString().length());
-        return result.toString();
+        String result = builder.toString();
+        log.info("payment description: " + result);
+        return result;
     }
 
-    public static HashMap<String, String> getLiqPayParams(double amount, String currency, String description, String orderId, String orderDesc) {
-        HashMap<String, String> params = new HashMap<>();
-        params.put("amount", Double.toString(amount));
-        params.put("currency", currency);
-        params.put("description", description);
-        params.put("order_id", orderDesc);
-        params.put("type", TYPE);
+    public static String generateSignature(String liqpayData) {
+        String privateKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "privateKey");
+        return sha1base64Encoding(privateKey + liqpayData + privateKey);
+    }
+
+    private static String createLiqPayDataField(double amount, String orderId, String orderDesc) throws JSONException {
+        String publicKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "publicKey");
         String serverUrl = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "serverUrl");
+
+        JSONObject params = new JSONObject();
+        params.put("version", LIQPAY_VERSION);
+        params.put("public_key", publicKey);
+        params.put("action", PAY_ACTION);
+        params.put("amount", amount);
+        params.put("currency", CURRENCY);
+        params.put("description", DESCRIPTION);
+        params.put("order_id", orderDesc);
+        params.put("language", LANGUAGE);
         params.put("result_url", serverUrl + "?orderId=" + orderId);
         params.put("server_url", serverUrl + "lpCallback");
-        String publicKey = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "publicKey");
-        params.put("public_key", publicKey);
-        params.put("language", LANGUAGE);
-        String sandbox = EnvVariablesStorage.getValue(ENV_PARAMETER_GROUP, "sandbox");
-        params.put("sandbox", sandbox);
-        params.put("signature", createSignature(params));
-        return params;
-    }
 
-    public static String createSignature(Map<String, String> paramsMap) {
-        String result = new LiqPaySignatureBuilder(paramsMap.get("amount"), paramsMap.get("currency"), paramsMap.get("description"))
-                .orderId(paramsMap.get("order_id"))
-                .type(paramsMap.get("type"))
-                .resultUrl(paramsMap.get("result_url"))
-                .serverUrl(paramsMap.get("server_url"))
-                .firstName(paramsMap.get("sender_first_name"))
-                .lastName(paramsMap.get("sender_last_name"))
-                .middleName(paramsMap.get("sender_middle_name"))
-                .countryCode(paramsMap.get("sender_country"))
-                .cityName(paramsMap.get("sender_city"))
-                .address(paramsMap.get("sender_address"))
-                .postalCode(paramsMap.get("sender_postal_code"))
-                .status(paramsMap.get("status"))
-                .transactionId(paramsMap.get("transaction_id"))
-                .senderPhone(paramsMap.get("sender_phone"))
-                .build();
-
-        return sha1base64Encoding(result);
-    }
-
-    public static boolean isValid(Map<String, String> params) {
-        String signature = params.get("signature");
-        if (signature == null) {
-            return false;
-        }
-
-        if (LiqPay_v3.isVersion3(params)) {
-            return LiqPay_v3.isValid(params);
-        } else {
-            String calcSignature = createSignature(params);
-            return signature.equals(calcSignature);
-        }
+        return Base64.encode(params.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     public static String sha1base64Encoding(String str) {
         return LiqPayUtil.base64Encode(LiqPayUtil.sha1(str));
+    }
+
+    public static boolean isValid(Map<String, String> params) {
+        String signature = params.get("signature");
+        String data = params.get("data");
+
+        if (StringUtils.isEmpty(signature) || StringUtils.isEmpty(data)) {
+            return false;
+        }
+
+        String privateKey = EnvVariablesStorage.getValue(LiqPay.ENV_PARAMETER_GROUP, "privateKey");
+        return signature.equals(LiqPay.sha1base64Encoding(privateKey + data + privateKey));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<String, String> parseParams(Map<String, String> requestData) {
+        Map<String, String> result = new HashMap<>();
+        String dataJson = requestData.get("data");
+        try {
+            String parsed = new String(Base64.decode(dataJson));
+            JSONObject data = new JSONObject(parsed);
+            Iterator<String> keys = data.keys();
+            while (keys.hasNext()) {
+                String nextKey = keys.next();
+                result.put(nextKey, data.get(nextKey).toString());
+            }
+        } catch (JSONException e) {
+            throw new IllegalArgumentException("Couldn't parse liqpay request data " + dataJson);
+        } catch (Base64DecoderException e) {
+            throw new IllegalArgumentException("Couldn't Base64.decode " + dataJson);
+        }
+
+        return result;
     }
 }

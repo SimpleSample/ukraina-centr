@@ -4,6 +4,7 @@
  * @param tickets user ordered tickets
  * @param price price for all tickets in euro
  * @param orderId order id
+ * @param actualPrice actual price in UAH
  */
 {template .reserve}
 <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:1000px;">
@@ -30,7 +31,7 @@
             Ціна квитків:
         </td>
         <td align="left" style="padding-right: 20px; line-height:38px;font-size:34px;font-family:'Segoe UI','Segoe WP','Segoe UI Regular','Helvetica Neue',Helvetica,Tahoma,'Arial Unicode MS',Sans-serif;color:#454546" valign="top">
-        <b>{$price}€</b></td>
+        <b>{$price}€ <span style="font-weight:100">або</span> {$actualPrice}₴</b></td>
         </tr>
         </tbody>
     </table>

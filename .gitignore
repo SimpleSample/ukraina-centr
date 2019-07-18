@@ -43,3 +43,5 @@ Temporary Items
 .apdisk
 /src/com/nagornyi/env/secrets/sour-little-baby/env_parameters.json
 /src/com/nagornyi/env/secrets/sukraina-centr/env_parameters.json
+/.idea
+*.iml

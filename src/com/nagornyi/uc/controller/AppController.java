@@ -1,7 +1,7 @@
 package com.nagornyi.uc.controller;
 
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import com.google.apphosting.api.ApiProxy;
 import com.nagornyi.uc.action.Action;
 import com.nagornyi.uc.action.ActionStorage;
@@ -13,7 +13,6 @@ import com.nagornyi.uc.transport.ActionResponse;
 import com.nagornyi.uc.transport.ResponseDto;
 import com.nagornyi.uc.util.ActionUtil;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,7 +30,7 @@ public class AppController extends HttpServlet {
     private static final Logger log = Logger.getLogger(AppController.class.getName());
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String actionAlias = req.getParameter("a");
         if (actionAlias == null) {
             return;

@@ -1,6 +1,6 @@
 package com.nagornyi.uc.util;
 
-import com.google.appengine.repackaged.org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nagornyi.uc.transport.ActionRequest;
 
 import java.io.IOException;

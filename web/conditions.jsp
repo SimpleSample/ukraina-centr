@@ -1,8 +1,9 @@
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.ResourceBundle" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="com.nagornyi.uc.i18n.I18n" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
-  ResourceBundle bundle = ResourceBundle.getBundle("i18n.conditions", Locale.forLanguageTag("uk")); //TODO localization issue
+  ResourceBundle bundle = I18n.getBundle("i18n.conditions", Locale.forLanguageTag("uk")); //TODO localization issue
 %>
 <!DOCTYPE html>
 <html>
@@ -213,9 +214,6 @@
           </p>
           <p>
             Підставою для повернення грошей є бланк (квиток) зі всіма відривними купонами та обкладинкою.
-          </p>
-          <p>
-            Гроші за невикористану зворотну подорож не повертаються.
           </p>
           <p>
             Пасажир, який не з'явився або запізнився, не має право на повернення вартості квитка.

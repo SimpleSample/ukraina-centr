@@ -1,7 +1,7 @@
 package com.nagornyi.uc.currency.loader;
 
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import com.nagornyi.uc.appinfo.AppInfoLoadException;
 import com.nagornyi.uc.appinfo.AppInfoLoader;
 import com.nagornyi.uc.common.captcha.http.HttpLoader;
@@ -10,6 +10,8 @@ import com.nagornyi.uc.common.captcha.http.SimpleHttpLoader;
 import java.util.Map;
 
 /**
+ * //TODO dead
+ *
  * @author Nagornyi
  * Date: 29.06.14
  */

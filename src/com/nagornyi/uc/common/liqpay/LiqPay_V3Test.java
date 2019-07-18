@@ -12,8 +12,8 @@ public class LiqPay_V3Test {
         Map<String, String> params = new HashMap<>();
         params.put("data", data);
         params.put("signature", signature);
-        System.out.println("valid? " + LiqPay_v3.isValid(params));
-        System.out.println("data json " + LiqPay_v3.parseParams(params));
-        System.out.println("Contains order_id? " + LiqPay_v3.parseParams(params).containsKey("order_id"));
+        System.out.println("valid? " + LiqPay.isValid(params));
+        System.out.println("data json " + LiqPay.parseParams(params));
+        System.out.println("Contains order_id? " + LiqPay.parseParams(params).containsKey("order_id"));
     }
 }

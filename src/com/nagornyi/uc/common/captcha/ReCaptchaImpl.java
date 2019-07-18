@@ -15,8 +15,8 @@
  */
 package com.nagornyi.uc.common.captcha;
 
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import com.nagornyi.uc.common.captcha.http.HttpLoader;
 import com.nagornyi.uc.common.captcha.http.SimpleHttpLoader;
 

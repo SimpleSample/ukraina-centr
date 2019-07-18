@@ -2,8 +2,8 @@ package com.nagornyi.uc.converter;
 
 
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.entity.City;
 import com.nagornyi.uc.entity.DiscountCategory;

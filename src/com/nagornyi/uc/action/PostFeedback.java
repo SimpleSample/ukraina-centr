@@ -1,6 +1,6 @@
 package com.nagornyi.uc.action;
 
-import com.google.appengine.labs.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONException;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.entity.Feedback;
 import com.nagornyi.uc.transport.ActionRequest;

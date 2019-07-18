@@ -1,6 +1,7 @@
 package com.nagornyi.env;
 
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.appengine.api.utils.SystemProperty;
 import com.google.apphosting.api.ApiProxy;
 
 import java.io.*;
@@ -16,6 +17,9 @@ public class EnvVariablesStorage {
 
     public static void loadEnvVariables() {
         String appId = ApiProxy.getCurrentEnvironment().getAppId().replaceAll("~", "");
+        if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
+            appId = "sour-little-baby";
+        }
         log.info("App id: " + appId);
         InputStream stream = EnvVariablesStorage.class.getResourceAsStream("secrets/"+appId+"/env_parameters.json");
         try {

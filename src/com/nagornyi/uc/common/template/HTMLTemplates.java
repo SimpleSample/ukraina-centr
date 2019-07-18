@@ -17,7 +17,6 @@ import java.util.Locale;
  */
 public class HTMLTemplates {
 
-    //todo restore <span style="font-weight:100">або</span> {$realPrice}₴ in template when uah prices will be appropriate
     public static String getUserReservationTemplate(double eurSummaryPrice, double summaryPrice, List<Ticket> tickets, User user) {
         Order order = tickets.iterator().next().getOrder();
         String orderExternalId = order == null? "[no order ID]" : order.getExternalId().toString();
@@ -25,7 +24,7 @@ public class HTMLTemplates {
 
         SoyMapData data = getDataForTickets(tickets, user);
         data.put("price", eurSummaryPrice);
-        data.put("realPrice", summaryPrice);
+        data.put("actualPrice", summaryPrice);
         data.put("orderId", orderExternalId);
         return TemplatesManager.INSTANCE.renderTemplate("templates.reserve", data);
     }

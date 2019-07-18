@@ -1,8 +1,9 @@
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.ResourceBundle" %>
+<%@ page import="com.nagornyi.uc.i18n.I18n" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
-    ResourceBundle bundle = ResourceBundle.getBundle("i18n.tickets", Locale.forLanguageTag("uk")); //TODO localization issue
+    ResourceBundle bundle = I18n.getBundle("i18n.tickets", Locale.forLanguageTag("uk")); //TODO localization issue
 %>
 <!DOCTYPE html>
 <html>
@@ -239,18 +240,9 @@
                             <span id="sum-full-price" class="price-self" style="display: none;">0</span>
                         </div>
                     </div>
-                    <form method="POST" id="liq-form" action="https://www.liqpay.com/api/pay" accept-charset="utf-8">
-                        <input type="hidden" name="public_key"/>
-                        <input type="hidden" name="amount"/>
-                        <input type="hidden" name="currency"/>
-                        <input type="hidden" name="description"/>
-                        <input type="hidden" name="order_id"/>
-                        <input type="hidden" name="result_url"/>
-                        <input type="hidden" name="server_url"/>
-                        <input type="hidden" name="type" />
+                    <form method="POST" id="liq-form" action="https://www.liqpay.ua/api/3/checkout" accept-charset="utf-8">
+                        <input type="hidden" name="data"/>
                         <input type="hidden" name="signature"/>
-                        <input type="hidden" name="language"/>
-                        <input type="hidden" name="sandbox"/>
                     </form>
                 </div>
             </div>
@@ -284,6 +276,7 @@
                 <div class="col-sm-6 col-md-12">
                     <h3>Діючі знижки:</h3>
                     <ul class="list-1 italic">
+                        <li><b class="discount">50%</b> - при поверненні квитків за 6 поїздок</li>
                         <li><b class="discount">50%</b> - діти до 4-х років</li>
                         <li><b class="discount">30%</b> - діти до 12-ти років</li>
                         <li><b class="discount">10%</b> - люди пенсійного віку та молодь до 25-ти років</li>
@@ -302,13 +295,13 @@
                             <em style="padding-left: 80px; padding-top: 6px;">з друзями!</em></strong>
                     </div>
                     <div class="social-block">
-                        <script type="text/javascript" src="//yastatic.net/share/share.js" charset="utf-8"></script>
-                        <div class="yashare-auto-init"
-                             data-yashareL10n="uk"
-                             data-yashareType="large"
-                             data-yashareQuickServices="vkontakte,facebook,twitter,odnoklassniki,moimir,gplus,pinterest"
-                             data-yashareTheme="counter"
-                             data-yashareImage="http://www.ukraina-centr.com/img/logo.png"></div>
+                            <div class="a2a_kit a2a_kit_size_24 a2a_default_style">
+                                <a class="a2a_button_facebook a2a_counter"></a>
+                                <a class="a2a_button_google_plusone" data-size="standard" style="width:85px"></a>
+                                <a class="a2a_dd a2a_counter" href="https://www.addtoany.com/share"></a>
+                            </div>
+
+                            <script async src="https://static.addtoany.com/menu/page.js"></script>
                     </div>
                 </div>
             </div>
@@ -344,23 +337,6 @@
                         container.append($(feedHtml));
                     }
                 });
-//                google.load("feeds", "1", {callback: function(){
-//                    new google.feeds.Feed("http://dt.ua/rss/")
-//                            .load(function (result) {
-//                                if (result.error) {
-//                                    console.log('Couldn\'t load rss feed');
-//                                    return;
-//                                }
-//                                var container = $('.rss-news');
-//                                container.html('');
-//                                for (var i = 0; i < result.feed.entries.length; i++) {
-//                                    var entry = result.feed.entries[i];
-//                                    var feedDate = ya_format_date(new Date(entry.publishedDate));
-//                                    var feedHtml = feedTemplate(feedDate, entry.link, entry.title, entry.contentSnippet);
-//                                    container.append($(feedHtml));
-//                                }
-//                            });
-//                }});
             }, 0);
         });
     </script>

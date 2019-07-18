@@ -2,9 +2,9 @@ package com.nagornyi.uc.action;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.labs.repackaged.org.json.JSONArray;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONArray;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import com.nagornyi.uc.Role;
 import com.nagornyi.uc.dao.DAOFacade;
 import com.nagornyi.uc.entity.Bus;
@@ -79,8 +79,12 @@ public class AddRouteAction implements Action {
 
         for (int i = 0, size = linkList.size(); i < size; i++) {
             RouteLink l = linkList.get(i);
-            if (i < size-1) l.setNext(linkList.get(i + 1));
-            if (i > 0) l.setPrevious(linkList.get(i - 1));
+            if (i < size-1) {
+                l.setNext(linkList.get(i + 1));
+            }
+            if (i > 0) {
+                l.setPrevious(linkList.get(i - 1));
+            }
 
         }
         //making circle

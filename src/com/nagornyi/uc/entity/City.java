@@ -1,8 +1,8 @@
 package com.nagornyi.uc.entity;
 
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Locale;

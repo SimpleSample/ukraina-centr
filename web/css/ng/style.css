@@ -265,6 +265,7 @@ h1 {
 .footer-logo {
     width: 125px;
     margin: 0 auto;
+    padding-bottom: 20px;
 }
 
 .footer-logo > a > img {
@@ -846,6 +847,10 @@ button, select {
 .g-signin2 {
     padding: 10px 0;
     border-bottom: 1px solid #ccc;
+}
+
+.a2a_button_facebook, .a2a_dd {
+    padding-top: 12px !important;
 }
 
 @media (min-width: 768px) {
